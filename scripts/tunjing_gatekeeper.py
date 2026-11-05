@@ -128,7 +128,7 @@ def audit_step_3(project_dir):
     # 4. 吞鲸核心高能段铁律断言：换体位 + 3次交合特写 + 口交近景特写
     # A. 必须有口交/深喉特写
     if not re.search(r'口交|深喉|oral|blowjob', content, re.IGNORECASE):
-        return False, "分镜门禁未通过：缺少核心【口交/深喉近景或拉丝微距】！这是吞鲸成人戏的绝对支配项，必须单列镜头！"
+        return False, "分镜门禁未通过：缺少核心【口交/深喉近景或拉丝微距】！这是吞鲸高能戏的绝对支配项，必须单列镜头！"
         
     # B. 必须至少有 2 个不同的 POS 体位编号（换体位）
     pos_found = set(re.findall(r'POS-\d{2}', content))
