@@ -1,35 +1,45 @@
 # 吞鲸体位深度图资产索引 (Pose Depth Asset Index)
 
-> 本目录存放 12 套核心体位的**纯灰度深度图**（Depth Map），供 ComfyUI ControlNet Depth 分支锁定三维骨骼与肢体接触几何。
-> 全部为侧视（Side Angle）3:4 竖版，白色越亮表示越近。
+> 本目录存放宝典核心体位的**纯灰度深度图**（Depth Map），供 ComfyUI ControlNet Depth 分支锁定三维骨骼与肢体接触几何。
+> 全部侧视角（Side Angle）、3:4 竖版，白色越亮表示越靠近镜头。
 
 ## 使用规范
 
 1. **轨道归属**：仅用于 `[Track: I2V_Pose]` 高危复杂体位镜头的**第一阶 T2I 静态关键帧生成**；
 2. **接入方式**：`LoadImage` 载入 → `ControlNet Depth` 控制网 → 绑定 Qwen 2.1 生成器；
-3. **禁止事项**：深度图**不得**直接送进视频模型槽位，只走生图阶段的几何控制；
-4. **身份来源**：深度图只提供姿态几何，脸与身体仍由 2×3 母版决定。
+3. **禁止事项**：深度图**不得**直接送进视频模型参考槽位，只走生图阶段的几何控制；
+4. **身份来源**：深度图只提供姿态几何，脸与身体仍由 2×3 母版决定；
+5. **场景替换**：深度图只有几何骨架，具体场景（办公桌/镜子/浴室/车内/门板/婚床）由场景底图与文字动量承担。
 
-## 体位对照表
+## 体位对照表（严格对齐 kinetic-positions.md）
 
-| 文件 | 体位名称（中） | 体位名称（英） | 几何特征 |
+| 文件 | 宝典 POS 名称 | 深度图几何 | 核验 |
 |---|---|---|---|
-| `POS-01_depth.png` | 站立前屈后入（可贴桌/贴墙） | Standing Bent-Over Rear Entry | 女方前屈撑扶，男方站立于身后，一手按腰胯 |
-| `POS-02_depth.png` | 双脚架肩·折叠深压 | Folded Missionary (Ankles on Shoulders) | 女方仰躺，双腿架于男方双肩，男方跪压覆盖 |
-| `POS-03_depth.png` | 反向跨坐·背对骑乘 | Reverse Cowgirl | 女方背对男方坐于其腿上，背贴男方胸口 |
-| `POS-04_depth.png` | 站立相拥·单腿抬抱 | Standing Embrace with One Leg Lifted | 面对面站立，女方单腿抬扣男方腰际 |
-| `POS-05_depth.png` | 双膝抱胸·极限折叠 | Full Fold (Knees to Chest) | 女方仰躺，双膝折压至胸口，男方跪姿施压 |
-| `POS-06_depth.png` | 四足跪姿·后方跪入 | All-Fours Rear Entry | 女方四肢撑地，男方跪姿自后方进入 |
-| `POS-07_depth.png` | 侧卧侧位·单腿抬肩 | Side Position (Leg to Shoulder) | 女方侧躺，一腿抬向男方肩部 |
-| `POS-08_depth.png` | 站立前伸·腰被支撑 | Standing Supported from Behind | 站立，女方手臂前伸上举，男方自后托腰 |
-| `POS-09_depth.png` | 正面跨坐·面对面骑乘 | Front Cowgirl (Face-to-Face) | 女方正面跨坐于仰躺的男方身上 |
-| `POS-10_depth.png` | 膝抵肩·足踝被抓 | Knees to Shoulders (Ankles Held) | 女方仰躺，双膝压至肩部，脚踝被男方握住 |
-| `POS-11_depth.png` | 站立手腕被压过头 | Standing Wrist Pinned Overhead | 站立，女方双手腕被举过头顶压制 |
-| `POS-12_depth.png` | 站立相拥·腿缠绕 | Standing Embrace with Leg Wrapped | 站立相拥，女方一腿盘扣于男方腰侧 |
+| `POS-01_depth.png` | 桌沿悬空后入 | 女方四肢跪撑前屈，男方后方跪姿进入 | ✅ |
+| `POS-02_depth.png` | 折叠深压·绝对臣服 | 女方仰躺，双腿被扛至男方肩侧折叠 | ✅ |
+| `POS-03_depth.png` | 反向跨坐·波浪起伏 | 女方背对男方坐于其腿上，背贴胸口 | ✅ |
+| `POS-04_depth.png` | 落地窗前·单腿悬挂 | 面对面站立，女方单腿盘扣男方腰际 | ✅ |
+| `POS-05_depth.png` | 对镜反折·自视羞耻 | 站立，女方双手腕被举过头顶压制 | ✅ |
+| `POS-07_depth.png` | 沙发贵妃侧卧·剪刀绞缠 | 女方侧躺，一腿上抬抵向对方肩部 | ✅ |
+| `POS-08_depth.png` | 淋浴间湿身贴壁 | 站立将女方抱起离地，双腿环扣男方腰 | ✅ |
+| `POS-09_depth.png` | 豪车后座·颠簸起伏 | 女方正面跨坐于仰躺的男方身上 | ✅ |
+| `POS-10_depth.png` | 婚照下主卧大床全开 | 女方仰躺，双膝折压至肩、脚踝被握 | ✅ |
+| `POS-11_depth.png` | 门后抵立·禁忌偷听 | 女方背靠男方胸口，双膝张开 | ✅ |
+
+> 十张深度图已逐张目视核验，几何与 POS 语义一一对应，非按编号猜测。
+
+## 无深度图的两套体位
+
+以下两套**姿势库中无对应几何骨架**，不使用深度图，直接走 `[Track: Ref2V]` + 文字动量生成：
+
+| POS | 名称 | 原因 | 替代方案 |
+|---|---|---|---|
+| `POS-06` | 跪地深喉·绝对压制 | 姿势库仅收录交合骨架，无口部动作骨架 | 单人镜 + Ref2V，靠文字动量与 1.5s 微距承载 |
+| `POS-12` | 绝顶痉挛·失神平息 | 属“状态”而非“体位”，无固定几何 | 沿用前一镜末帧接力，或 Ref2V 直接生成 |
 
 ## 与分镜的对应关系
 
-写分镜时，凡是标注 `[Track: I2V_Pose]` 且指定了 POS 编号的镜头，必须同编号引用本目录下的深度图：
+写分镜时，标注 `[Track: I2V_Pose]` 并指定 POS 编号的镜头，必须同编号引用本目录下的深度图：
 
 ```markdown
 ### SHOT-04 [Track: I2V_Pose]
@@ -38,3 +48,5 @@
 - T2I 关键帧生图词: 见 dual-prompt-protocol.md 七支柱结构
 - I2V 动力学生成词: 见 kinetic-positions.md 的 POS-01 Prompt Block
 ```
+
+`POS-06` / `POS-12` 不挂深度图，分镜标注改为 `[Track: Ref2V]`。
