@@ -1,19 +1,19 @@
 ---
-name: tunjing-adult-drama-engine
-description: 吞鲸工作室专属·成人漫剧极速生产引擎。专治文戏乏味、动作像流水账配种、体位融化及分镜平铺。会话中说「吞鲸开始」即刻唤醒并启动门禁流水线。
+name: tunjing-baodian
+description: 吞鲸宝典·吞鲸工作室精品漫剧全流程极速生产引擎。专治文戏乏味、动作平铺、镜头僵死及分镜脱节。会话中说「吞鲸开始」即刻唤醒并启动六大刚性门禁流水线。
 version: 1.1.0
 author: 吞鲸工作室 (Swallowing Whale Studio)
 license: MIT
 metadata:
   hermes:
-    tags: [adult-drama, anime, kinetic-kama-sutra, bounce-cut, tunjing]
+    tags: [tunjing, baodian, drama, kinetic-positions, bounce-cut, gatekeeper]
     related_skills: [drama-production-standard]
 ---
 
-# 吞鲸工作室 · 成人漫剧极速生产引擎 (Tunjing Adult Drama Engine v1.1)
+# 吞鲸宝典 · 精品漫剧极速生产引擎 (Tunjing Baodian v1.1)
 
-> **吞鲸宗旨**：**文戏带刀有张力，做爱带电有花样，步步门禁不跳步，工业流程一次过。**
-> 会话中输入启动口令「吞鲸开始」，系统立即挂载本引擎并进入五大刚性门禁流水线作业。
+> **吞鲸宗旨**：**文戏带刀有张力，动作带电有花样，步步门禁不跳步，工业流程一次过。**
+> 吞鲸工作室至高生产手册与自动化技能包。会话中输入启动口令「吞鲸开始」，系统立即挂载本宝典并进入六大刚性门禁流水线作业。
 
 ---
 
