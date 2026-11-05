@@ -55,12 +55,14 @@ metadata:
 
 ## 三、核心资产与驱动链接 (The Core Engine Assets)
 
-1. **【六大步进门禁中枢】**：`scripts/tunjing_gatekeeper.py`
+1. **【在制接盘与断点修复规范】**：`references/takeover-and-patching.md`
+   - 专治半截烂摊子工程：基线盘点、保护已有合格素材、逆向推导状态继承、局部细胞级置换、差量增量渲染。
+2. **【六大步进门禁中枢】**：`scripts/tunjing_gatekeeper.py`
    - 命令行调用：`python scripts/tunjing_gatekeeper.py <项目目录> [步骤1-6]`
    - 步进拦截：前置步骤不合格时直接抛出 `[X] 阻断拦截`，严禁跳步。
-2. **【生成前自我终极审查标准】**：`references/pre-render-audit-standard.md`
+3. **【生成前自我终极审查标准】**：`references/pre-render-audit-standard.md`
    - 六大必杀维度（资产实名、音画咬合、四项肉戏契约、运镜防崩、提示词纯净、双轨准备度），不留死角。
-3. **【12套生物力学体位字典】**：`references/kinetic-positions.md`
+4. **【12套生物力学体位字典】**：`references/kinetic-positions.md`
    - POS-01 到 POS-12，全套由支点、受力凹陷、脊柱反弓与神经痉挛写成；
    - 随调随用，支持一键注入分镜与提示词。
 2. **【视听弹跳分镜规范】**：`references/shot-design-and-bounce.md`
