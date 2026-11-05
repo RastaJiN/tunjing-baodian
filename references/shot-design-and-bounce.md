@@ -55,9 +55,9 @@
 
 ---
 
-## 四、成人戏四套“防穿模防换脸”电影级运镜法则 (Bulletproof Camera Grammar)
+## 四、高能戏四套“防穿模防换脸”电影级运镜法则 (Bulletproof Camera Grammar)
 
-在成人高能戏份中，严禁大范围环绕 (Orbit)、剧烈手持晃动或大推拉，这会导致模型换脸、算力分散和肢体融化。必须严格执行以下四种受控运镜：
+在高能戏份中，严禁大范围环绕 (Orbit)、剧烈手持晃动或大推拉，这会导致模型换脸、算力分散和肢体融化。必须严格执行以下四种受控运镜：
 
 ### 1. 核心交合冲撞：【低机位死锁 (Static Side Lock)】
 - **场景**：大开大合的深顶、后入、律动。
@@ -69,10 +69,17 @@
 - **法则**：极其平滑匀速推进，耗时 4~6 秒，严禁中途变速。
 - **控机词**：`A slow, steady Push In moving continuously across 5.0 seconds from the waistline toward her flushed cheek, without acceleration or tilt.`
 
-### 3. 1.5s 生理阻断特写：【纯微距极近死锁 (Macro Static)】
-- **场景**：指节抓白床单、脚趾神经性反弓、喉结吞吐拉丝。
-- **法则**：纯定焦点微距，绝对静止，毫秒级交接。
-- **控机词**：`Stationary extreme close-up macro, razor-sharp focus on white-knuckled fingers twisting into the silk sheet, zero panning.`
+### 3. 12~15s 硬件物理上限与【视听呼吸感】心电图公式 (Hardware Cap & Rhythm Breathing)
+
+在 12GB 显卡 (RTX 4070 Ti) + MiniMax H3 架构下，**单段生成物理上限严格锁定在 12s~15s (288~362帧)**。为防止碎剪眼花或单镜死撑僵死，分镜必须严格遵循【短 ➔ 中 ➔ 长 ➔ 极短】心电图弹跳呼吸：
+
+| 呼吸节拍 | 时长窗口 | 镜头职责 | 视听心流 |
+|---|---|---|---|
+| **吸气·爆发标点 (Inhale)** | **1.5s ~ 2.5s** | 证据甩脸、撕裂衣物、1.5s 生理阻断微距 (指节抓白/足弓反弓/咬唇)、交合破壁微距 | 神经性暴击，心跳骤停 |
+| **呼气·因果位移 (Exhale)** | **3.5s ~ 5.5s** | 走位逼近、诛心逼问、翻转换体位 (POS-A ➔ POS-B 过继)、深喉口交连贯近景 | 交代物理因果，给足视听气口 |
+| **屏息·交合发力 (Immersion)** | **6.5s ~ 10.0s** (上限≤12s) | 骨盆高频冲撞、大腿软肉凹陷回弹、脊柱波浪反弓、绝顶痉挛锁死 | 连续受力沉浸，动量饱满不漂移 |
+
+**严禁连续出现三个相同秒数的镜头**！分镜必须像心跳一样交替弹跳。
 
 ### 4. 禁忌窥视与支配感：【紧凑过肩/门框遮挡 (Tight OTS / Framing)】
 - **场景**：下位者被压制、办公桌沿、门后偷听。

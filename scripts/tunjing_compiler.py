@@ -58,7 +58,7 @@ def main():
     errors, warnings = lint_tunjing_prompt(content)
     
     print("=" * 50)
-    print("吞鲸成人漫剧引擎 · 提示词体检报告")
+    print("🐳 吞鲸宝典 · 提示词体检报告")
     print("=" * 50)
     
     if warnings:

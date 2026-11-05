@@ -20,7 +20,7 @@
 ### 维度二：台词音画物理咬合 (Audio-Visual Sync)
 - [ ] **每句台词均过公式计算**：单句发音时长 = $\frac{\text{汉字数}}{3.0} + (\text{省略号数} \times 0.8) + 1.0\text{s} \le \text{本镜请求秒数}$；
 - [ ] **无对白镜强制闭口声明**：零台词镜头，正向必须写死 `strictly NO speech and NO voice-over; characters remain silent`；
-- [ ] **画外音必带双重死锁**：OS 镜头必须包含 `says in an off-screen voiceover` **并且** 紧跟 `while her lips remain completely closed`。
+- [ ] **画外音必带三重死锁**：OS 镜头必须包含官方语法 `says in an off-screen voiceover: <d>...</d> while her lips remain completely closed`，**并且** 动作描述中必须加入【嘴部物理占位死锁】（如 `bite down on lower lip` 下牙咬住下唇、或 `teeth clenched on sheet` 咬紧床单）或直接采用【机位逃逸】（后脑勺/过肩背向/胸口锁骨微距），彻底消灭模型在情绪动荡时的嘴部蠕动！
 
 ### 维度三：高能肉戏四项刚性契约 (The 4 Intimate Iron Laws)
 - [ ] **双体位强制位移**：全片肉戏必须完成一次明晰的【中途换体位】（POS-A ➔ POS-B），拒绝单一体位机械活塞；

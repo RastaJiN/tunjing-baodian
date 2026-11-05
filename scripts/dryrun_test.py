@@ -18,7 +18,7 @@ def h3_frames(sec):
 
 def run_dryrun(target_dir):
     print("=" * 60)
-    print("吞鲸工作室 · 成人漫剧生产引擎 · 目标机兼容性实跑验证")
+    print("🐳 吞鲸宝典 · 精品漫剧生产引擎 · 目标机兼容性实跑验证")
     print("=" * 60)
     
     os.makedirs(target_dir, exist_ok=True)

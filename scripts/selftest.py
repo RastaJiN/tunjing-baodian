@@ -1,8 +1,8 @@
 import sys
 import os
 
-print("=== 吞鲸成人漫剧引擎自检开始 ===")
-skill_dir = r"C:\Users\Rasta\AppData\Local\hermes\skills\tunjing-adult-drama-engine"
+print("=== 🐳 吞鲸宝典引擎自检开始 ===")
+skill_dir = r"C:\Users\Rasta\AppData\Local\hermes\skills\tunjing-baodian"
 
 files = [
     os.path.join(skill_dir, "SKILL.md"),

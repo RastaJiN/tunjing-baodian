@@ -6,7 +6,7 @@
 ## 一、双轨硬件与环境基准 (Hardware & Env Baseline)
 - **最低显卡配置**：NVIDIA RTX 3060 12GB / RTX 4070 Ti 12GB 或更高（支持单卡渲染）；
 - **宿主环境**：ComfyUI (原生或 Docker 版均可，监听端口默认 8188)；
-- **底层生图底模**：全线采用**越狱解禁版底模 (Uncensored Checkpoints / GGUF)**，彻底释放成人解剖与真实交合生成能力；
+- **底层生图底模**：全线采用**越狱解禁版底模 (Uncensored Checkpoints / GGUF)**，彻底释放真实解剖与身体受力生成能力；
 - **底层视频模型**：MiniMax H3 (33B / INT8 近似) 或 同级开源影视级视频模型 (如 Wan2.1 / Seedance)。
 
 ---
@@ -44,14 +44,37 @@
 ### 1. 为什么不能纯靠文生视频？
 文生视频的 Cross-Attention 在计算两人多肢体复杂缠绕时会发生拓扑崩溃（出现三条腿、融化成橡皮泥）。因此必须在第一步把身体接触用高精度生图底模锁定！
 
-### 2. 两阶段作业拓扑
+### 2. 两阶段作业拓扑（吸纳 qwen21-nsfw-pose 作者级工程配方）
 ```
-【阶段 1：姿态关键帧锁定 (T2I / Inpainting)】
-[男女素身母版] + [POS 姿态 ControlNet/OpenPose] ➔ Qwen-Image-2.1 / FLUX ➔ [100% 完美的交合关键帧 PNG]
-                                                                        ↓
+【阶段 1：姿态关键帧锁定 (T2I / Edit / ControlNet Depth)】
+[男女素身母版] + [POSE-DB-02 纯灰度深度图 / 姿态骨架] 
+       ↓
+[Qwen-Image-2.1 (int8_convrot)] 
+挂载专用 LoRA:
+- 默认解剖强化: qwen2_1-femaledVaginus-nsfw-v1_3-fine_L22-31.safetensors @ 1.0
+- 换姿势脱衣保脸: qwen21-nsfw-image-edit.safetensors @ 1.0 (CFG 3.0 / 20步)
+       ↓ (作者级核心参数死锁)
+- 采样器: er_sde + beta (严禁用 euler/simple！)
+- CFG: 2.5 ~ 4.0 (严禁给 1.0，CFG 1.0 会饿死 LoRA 导致质感全无)
+- 步数: 50 步 (按摩拉伸类可 30 步)
+- 分辨率: 1152×1728 (2:3 竖版大画幅)
+       ↓
+[100% 完美的交合关键帧 PNG (解剖清晰、四肢无多余、皮肤汗水通透)]
+       ↓
 【阶段 2：动力学脉冲启动 (I2V)】
 [该交合关键帧 PNG] ➔ LoadImage (作为 Initial Frame) ➔ [H3 / 视频 I2V Sampler] ➔ 输出 2.5 ~ 4.0s 猛烈受力冲撞
 ```
-### 3. 关键运行参数
+
+### 3. 提示词七支柱结构规范 (Prompt 7-Pillars for Keyframe)
+为确保关键帧具备电影质感与高张力，写生图词必须写满以下 7 要素（300~1500字符），严禁空洞形容词：
+1. **Camera**：机位与角度（`hyper-realistic photograph, low-angle shot, tight framing`，低机位直接 +1 级大胆度）；
+2. **Subject**：年龄、体脂轮廓、发丝湿润散乱状态；
+3. **Pose (Limb-by-limb)**：逐肢姿态（四肢具体着力点、哪个膝盖弯曲、双手抓在何处、脊柱反弓度）；
+4. **Setting & Lighting**：环境光态（水汽微雾、暗部冷青、局部高光溢出）；
+5. **Skin Texture**：皮肤真实微结构（`glistening, visible fine pores, natural skin texture, slick sheen`）；
+6. **Explicit Anatomy**：生理结合部位真实解剖词（结合部对齐、受力凹陷）；
+7. **Finish**：`8k resolution, cinematic lighting, candid caught-in-the-moment atmosphere, photorealistic anatomy`。
+
+### 4. 视频 I2V 关键运行参数
 - **Motion Scale / Denoise**：0.65 ~ 0.80（既保持身体结合部不散架，又赋予肌肉与臀肉足够的撞击回弹）；
-- **英文提示词**：直接调用 `kinetic-positions.md` 中的对应 `Prompt Block`。
+- **英文动量提示词**：直接调用 `kinetic-positions.md` 中的对应 `Prompt Block`。
