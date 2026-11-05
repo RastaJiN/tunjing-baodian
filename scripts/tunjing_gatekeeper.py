@@ -123,8 +123,23 @@ def audit_step_3(project_dir):
             
             if required_time > duration + 0.2: # 允许 0.2s 容差
                 return False, f"分镜门禁未通过：台词与镜头时长严重脱节！检测到该镜头时长仅 {duration}s，但台词 '{speech_clean}' 包含 {char_count} 字，物理朗读需要至少 {required_time:.1f}s！请增加镜头时长或精简台词！"
+
+    # 4. 吞鲸核心高能段铁律断言：换体位 + 3次交合特写 + 口交近景特写
+    # A. 必须有口交/深喉特写
+    if not re.search(r'口交|深喉|oral|blowjob', content, re.IGNORECASE):
+        return False, "分镜门禁未通过：缺少核心【口交/深喉近景或拉丝微距】！这是吞鲸成人戏的绝对支配项，必须单列镜头！"
         
-    return True, "分镜镜头组、弹跳微距、双轨路由与【音画台词秒数咬合】全量验收 PASS！允许进入提示词编译。"
+    # B. 必须至少有 2 个不同的 POS 体位编号（换体位）
+    pos_found = set(re.findall(r'POS-\d{2}', content))
+    if len(pos_found) < 2:
+        return False, f"分镜门禁未通过：单集肉戏必须中途【换体位】！实测仅检测到 {len(pos_found)} 个体位 ({list(pos_found)})，必须包含至少 2 个不同体位 (如 POS-01 ➔ POS-02)！"
+        
+    # C. 必须包含至少 3 次独立的交合部位微距特写
+    macro_matches = re.findall(r'交合特写|结合部微距|结合特写|macro pelvic|macro penetration|macro interlocking', content, re.IGNORECASE)
+    if len(macro_matches) < 3:
+        return False, f"分镜门禁未通过：单集肉戏必须包含至少 3 次【独立的交合/结合部微距特写】（入口破壁/深层抽送咬合/绝顶死锁）！实测仅检测到 {len(macro_matches)} 次，严禁用手脸充数！"
+        
+    return True, "分镜镜头组、弹跳微距、双轨路由、【音画咬合】及【换体位+3次交合微距+口交】全量验收 PASS！允许进入提示词编译。"
 
 def audit_step_4(project_dir):
     """门禁 4：提示词编译与零中文正文检查"""
