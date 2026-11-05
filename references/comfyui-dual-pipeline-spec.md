@@ -6,7 +6,7 @@
 ## 一、双轨硬件与环境基准 (Hardware & Env Baseline)
 - **最低显卡配置**：NVIDIA RTX 3060 12GB / RTX 4070 Ti 12GB 或更高（支持单卡渲染）；
 - **宿主环境**：ComfyUI (原生或 Docker 版均可，监听端口默认 8188)；
-- **底层生图底模**：全线采用**越狱解禁版底模 (Uncensored Checkpoints / GGUF)**，彻底释放成人解剖与真实交合生成能力；
+- **底层生图底模**：全线采用**越狱解禁版底模 (Uncensored Checkpoints / GGUF)**，彻底释放真实解剖与身体受力生成能力；
 - **底层视频模型**：MiniMax H3 (33B / INT8 近似) 或 同级开源影视级视频模型 (如 Wan2.1 / Seedance)。
 
 ---
