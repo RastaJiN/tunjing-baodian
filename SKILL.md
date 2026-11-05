@@ -55,9 +55,11 @@ metadata:
 
 ## 三、核心资产与驱动链接 (The Core Engine Assets)
 
-1. **【高能戏双阶梯提示词编写规范】**：`references/dual-prompt-protocol.md`
+1. **【高刺激剧作发条指南】**：`references/high-tension-mechanisms.md`
+   - 彻底粉碎平淡无聊：极限倒计时（实时连线电话/电梯逼近）、羞耻道具置换（婚戒口含/撕裂衣装反差）、诛心审讯式台词（伴侣习惯复刻与高潮确认），以及 OS 防对口型三大物理原则。
+2. **【高能戏双阶梯提示词编写规范】**：`references/dual-prompt-protocol.md`
    - 彻底解耦【T2I 静态姿态生图词】与【I2V 动力学动量视频词】，先锁姿态后给动力，提供实战对标模板。
-2. **【在制接盘与断点修复规范】**：`references/takeover-and-patching.md`
+3. **【在制接盘与断点修复规范】**：`references/takeover-and-patching.md`
    - 专治半截烂摊子工程：基线盘点、保护已有合格素材、逆向推导状态继承、局部细胞级置换、差量增量渲染。
 3. **【六大步进门禁中枢】**：`scripts/tunjing_gatekeeper.py`
    - 命令行调用：`python scripts/tunjing_gatekeeper.py <项目目录> [步骤1-6]`
