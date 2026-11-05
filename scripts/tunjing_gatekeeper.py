@@ -161,7 +161,25 @@ def audit_step_4(project_dir):
     if not re.search(r'pressed flat|hyperextends|pelvic crest|kinetic|straddle', content, re.IGNORECASE):
         return False, "提示词门禁未通过：肉戏提示词缺少生物力学物理动词（必须从 kinetic-positions.md 继承动量描述）！"
         
-    return True, "提示词全英文动量描述与语法门禁验收 PASS！允许进入最终渲染提交。"
+    # 5. 画外音与内心独白 (OS/Voiceover) 绝对防对口型死锁检查
+    if re.search(r'voiceover|monologue|\bOS\b', content, re.IGNORECASE):
+        # 必须显式包含物理闭口或嘴部占位描述
+        mouth_lock_patterns = [
+            r'lips remain completely closed',
+            r'bite[s]? down on',
+            r'jaw completely clamped',
+            r'lips are pressed into',
+            r'sealed around',
+            r'oral cavity is physically locked',
+            r'lips remain parted in breathless gasps', # 允许纯喘息微张，但严禁动嘴说话
+            r'back of her head', # 机位逃逸：背面
+            r'viewpoint is from behind'
+        ]
+        has_mouth_lock = any(re.search(p, content, re.IGNORECASE) for p in mouth_lock_patterns)
+        if not has_mouth_lock:
+            return False, "提示词门禁未通过：检测到包含画外音/内心独白(Voiceover/OS)，但未添加【嘴部物理占位死锁】！必须显式声明 'lips remain completely closed'、咬下唇 'bite down on lower lip' 或机位背向，防止模型在画面中对口型穿帮！"
+            
+    return True, "提示词全英文动量描述、语法门禁与【OS防对口型物理死锁】验收 PASS！允许进入最终渲染提交。"
 
 def audit_step_5(project_dir):
     """门禁 5：生成前自我终极审核 (Pre-Render Self-Audit)"""
