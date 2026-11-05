@@ -55,7 +55,9 @@ metadata:
 
 ## 三、核心资产与驱动链接 (The Core Engine Assets)
 
-1. **【高阶反杀与蛇蝎美人心理模型】**：`references/femme-fatale-reversal.md`
+1. **【体位深度图资产库】**：`assets/pose_depth/`（12 张纯灰度深度图 + README 索引）
+   - POS-01 ~ POS-12 全套侧视深度图，供 ControlNet Depth 在生图阶段锁死三维骨骼与肢体接触几何，根治多肢融化；文件名与 `kinetic-positions.md` 严格一一对应。
+2. **【高阶反杀与蛇蝎美人心理模型】**：`references/femme-fatale-reversal.md`
    - 超越市面平庸套路的关键核武：拒绝扁平工具人，肉体交合是蛇蝎反向下套的掩护，事毕脱力瞬间的致命窃取与冷冽眼神，母版切换点物理契约。
 2. **【吞鲸节奏 · 3~5分钟工业级双波浪规范】**：`templates/tunjing_rhythm_300s.md`
    - 专治长时长疲软：单集 180s~300s（20~26镜），独创“第一波初破壁 ➔ 中段大阻断危机 ➔ 第二波换体位失控绝顶 ➔ 终局断崖卡点”双波浪模型。
