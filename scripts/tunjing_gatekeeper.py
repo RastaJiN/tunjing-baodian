@@ -14,7 +14,8 @@ STAGE_NAMES = {
     2: "第 2 步：刀锋剧本创作 (Sharp Script)",
     3: "第 3 步：弹跳分镜与双轨路由 (Bounce Storyboard)",
     4: "第 4 步：提示词编译与硬规则门禁 (Prompt Audit)",
-    5: "第 5 步：渲染提交与工程出片 (Render Dispatch)"
+    5: "第 5 步：生成前自我终极审核 (Pre-Render Self-Audit)",
+    6: "第 6 步：渲染提交与工程出片 (Render Dispatch)"
 }
 
 def get_status_file(project_dir):
@@ -162,6 +163,30 @@ def audit_step_4(project_dir):
         
     return True, "提示词全英文动量描述与语法门禁验收 PASS！允许进入最终渲染提交。"
 
+def audit_step_5(project_dir):
+    """门禁 5：生成前自我终极审核 (Pre-Render Self-Audit)"""
+    report_file = os.path.join(project_dir, "审查", "生成前终审报告.md")
+    if not os.path.exists(report_file):
+        # 兼容根目录下的报告
+        alt_report = os.path.join(project_dir, "生成前终审报告.md")
+        if os.path.exists(alt_report):
+            report_file = alt_report
+        else:
+            return False, "缺少 '生成前终审报告.md'！鲸鲸必须对照 pre-render-audit-standard.md 完成六大维度终审并出具报告，方可放行出片！"
+            
+    with open(report_file, "r", encoding="utf-8") as f:
+        content = f.read()
+        
+    if "PASS" not in content or "REJECT" in content:
+        return False, "终审门禁未通过：终审报告中存在未解决的 REJECT 项或未明确标注 PASS！必须全部达标！"
+        
+    required_checks = ["资产实名与槽位", "音画台词咬合", "换体位与特写契约", "受控运镜规范", "提示词纯净度", "双轨准备度"]
+    missing = [c for c in required_checks if c not in content]
+    if missing:
+        return False, f"终审门禁未通过：终审报告缺少以下维度的审核记录: {missing}！必须六项全检！"
+        
+    return True, "生成前六大维度终审报告 100% PASS！彻底扫除所有翻车隐患，正式签发放行出片！"
+
 def check_gate(project_dir, target_step=None):
     status = load_status(project_dir)
     curr = status.get("current_step", 1)
@@ -186,7 +211,8 @@ def check_gate(project_dir, target_step=None):
         1: audit_step_1,
         2: audit_step_2,
         3: audit_step_3,
-        4: audit_step_4
+        4: audit_step_4,
+        5: audit_step_5
     }
     
     if target_step in auditors:
@@ -204,8 +230,8 @@ def check_gate(project_dir, target_step=None):
             print(f"\n[X] 门禁拦截 (FAIL): {msg}")
             print(f"    当前步骤被阻断，修复上述问题后重新运行门禁检查。")
             return False
-    elif target_step == 5:
-        print("\n[✓] 前序 4 大门禁已全部通关！允许执行终端渲染命令 (python export_comfy_payload.py)！")
+    elif target_step == 6:
+        print("\n[✓] 前序 5 大门禁（含生成前终极自审）已全部通关！允许执行终端渲染命令 (python export_comfy_payload.py)！")
         return True
         
     return False

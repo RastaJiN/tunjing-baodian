@@ -30,7 +30,7 @@ metadata:
 
 ---
 
-## 二、五大刚性步进门禁 (The 5 Mandatory Gates)
+## 二、六大刚性步进门禁 (The 6 Mandatory Gates)
 
 **核心铁律**：严禁未经前置门禁批准私自进入下一步！每一步完成后必须由 `scripts/tunjing_gatekeeper.py` 判定 PASS 后，才允许推进！
 
@@ -39,21 +39,25 @@ metadata:
          ↓ PASS
 [Gate 2：刀锋剧本门禁] ➔ 必须具备实体道具流转 + 三幕式推进 + 显式引用 POS 体位编号 + <d> 台词
          ↓ PASS
-[Gate 3：弹跳分镜门禁] ➔ 必须具备 1.2s~2.0s 生理阻断微距 + [Track: Ref2V / I2V_Pose] 双轨标注
+[Gate 3：弹跳分镜门禁] ➔ 必须具备 1.2s~2.0s 生理阻断微距 + [Track: Ref2V / I2V_Pose] 双轨标注 + 换体位 + 3次交合微距 + 深喉口交
          ↓ PASS
 [Gate 4：提示词编译门禁] ➔ 必须纯英文物理动量正文 + 零毒性油光词 + 继承 kinetic-positions 动量
          ↓ PASS
-[Gate 5：出片渲染门禁] ➔ 运行 export_comfy_payload.py 提交 ComfyUI 队列完成最终出片！
+[Gate 5：生成前终极自审] ➔ 对照 pre-render-audit-standard.md 执行冷血六维度自检，出具合格终审报告！
+         ↓ PASS
+[Gate 6：出片渲染门禁] ➔ 运行 export_comfy_payload.py 提交 ComfyUI 队列完成最终出片！
 ```
 
 ---
 
 ## 三、核心资产与驱动链接 (The Core Engine Assets)
 
-1. **【五大步进门禁中枢】**：`scripts/tunjing_gatekeeper.py`
-   - 命令行调用：`python scripts/tunjing_gatekeeper.py <项目目录> [步骤1-5]`
+1. **【六大步进门禁中枢】**：`scripts/tunjing_gatekeeper.py`
+   - 命令行调用：`python scripts/tunjing_gatekeeper.py <项目目录> [步骤1-6]`
    - 步进拦截：前置步骤不合格时直接抛出 `[X] 阻断拦截`，严禁跳步。
-2. **【12套生物力学体位字典】**：`references/kinetic-positions.md`
+2. **【生成前自我终极审查标准】**：`references/pre-render-audit-standard.md`
+   - 六大必杀维度（资产实名、音画咬合、四项肉戏契约、运镜防崩、提示词纯净、双轨准备度），不留死角。
+3. **【12套生物力学体位字典】**：`references/kinetic-positions.md`
    - POS-01 到 POS-12，全套由支点、受力凹陷、脊柱反弓与神经痉挛写成；
    - 随调随用，支持一键注入分镜与提示词。
 2. **【视听弹跳分镜规范】**：`references/shot-design-and-bounce.md`
