@@ -1,7 +1,7 @@
 import sys
 import os
 
-print("=== 吞鲸成人漫剧引擎自检开始 ===")
+print("=== 🐳 吞鲸宝典引擎自检开始 ===")
 skill_dir = r"C:\Users\Rasta\AppData\Local\hermes\skills\tunjing-adult-drama-engine"
 
 files = [
