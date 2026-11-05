@@ -6,7 +6,17 @@
 ## 一、双轨硬件与环境基准 (Hardware & Env Baseline)
 - **最低显卡配置**：NVIDIA RTX 3060 12GB / RTX 4070 Ti 12GB 或更高（支持单卡渲染）；
 - **宿主环境**：ComfyUI (原生或 Docker 版均可，监听端口默认 8188)；
+- **底层生图底模**：全线采用**越狱解禁版底模 (Uncensored Checkpoints / GGUF)**，彻底释放成人解剖与真实交合生成能力；
 - **底层视频模型**：MiniMax H3 (33B / INT8 近似) 或 同级开源影视级视频模型 (如 Wan2.1 / Seedance)。
+
+---
+
+## 一之一、越狱版底模实战防翻车铁律 (Uncensored Pitfalls)
+1. **越狱底模出场景的“防发春脑补”断言**：
+   越狱模型对 `bed, hotel, sofa, bathroom` 等词极度敏感，容易自动脑补裸体假人或情趣内衣残留。
+   - **出纯场景时负向必须强拍死**：`human, person, woman, man, body, limbs, skin, nude, naked, clothes, underwear, lingerie, condom, sex toys, face`，确保场景 100% 纯净无人，防止进 I2V 裂殖出第三人！
+2. **越狱底模出姿态关键帧的“全解剖释放”**：
+   跑 POS-01 到 POS-12 姿态首帧时，直接调用 `kinetic-positions.md` 中的全套受力与解剖英文动量，越狱底模能直接出精准咬合与身体受力，彻底告别打码和融化。
 
 ---
 
