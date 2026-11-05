@@ -52,3 +52,29 @@
 分镜表中每一镜必须显式标注执行轨道，提示下游生成管线：
 - `[Track: Ref2V]`：常规文戏对话、单人走位、纯面部特写（走纯血 Ref2V 提示词直接生成，省时高效）；
 - `[Track: I2V_Pose]`：高难度多人肢体缠绕、复杂交合体位（POS-01 ~ POS-11）、特殊角度（必须先出姿态首帧关键帧，再送 I2V 启动动态，防肢体融化）。
+
+---
+
+## 四、成人戏四套“防穿模防换脸”电影级运镜法则 (Bulletproof Camera Grammar)
+
+在成人高能戏份中，严禁大范围环绕 (Orbit)、剧烈手持晃动或大推拉，这会导致模型换脸、算力分散和肢体融化。必须严格执行以下四种受控运镜：
+
+### 1. 核心交合冲撞：【低机位死锁 (Static Side Lock)】
+- **场景**：大开大合的深顶、后入、律动。
+- **法则**：**机位完全静止，让肉体动，不让相机动！** 所有 Cross-Attention 算力独占分配给受力形变与肌肉震颤。
+- **控机词**：`The camera is locked at a stationary side-angle at hip height, strictly NO camera movement, capturing continuous physical kinetic impacts.`
+
+### 2. 心理拉扯与逼近：【五秒超慢匀速推轨 (Slow Linear Push In)】
+- **场景**：由交合部向女方面部、泪痕、咬唇表情交棒。
+- **法则**：极其平滑匀速推进，耗时 4~6 秒，严禁中途变速。
+- **控机词**：`A slow, steady Push In moving continuously across 5.0 seconds from the waistline toward her flushed cheek, without acceleration or tilt.`
+
+### 3. 1.5s 生理阻断特写：【纯微距极近死锁 (Macro Static)】
+- **场景**：指节抓白床单、脚趾神经性反弓、喉结吞吐拉丝。
+- **法则**：纯定焦点微距，绝对静止，毫秒级交接。
+- **控机词**：`Stationary extreme close-up macro, razor-sharp focus on white-knuckled fingers twisting into the silk sheet, zero panning.`
+
+### 4. 禁忌窥视与支配感：【紧凑过肩/门框遮挡 (Tight OTS / Framing)】
+- **场景**：下位者被压制、办公桌沿、门后偷听。
+- **法则**：借男主宽厚肩膀或门框前景压迫，形成逼仄景深，杜绝大平光穿帮。
+- **控机词**：`Tight Over-The-Shoulder framing from behind his shoulder, foreground shoulder soft and dark, holding static on her pinned expression.`
