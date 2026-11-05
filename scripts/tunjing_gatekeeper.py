@@ -83,7 +83,7 @@ def audit_step_2(project_dir):
     return True, "刀锋剧本三幕式、实体道具与体位编号验收 PASS！允许进入分镜设计。"
 
 def audit_step_3(project_dir):
-    """门禁 3：弹跳分镜与双轨路由检查"""
+    """门禁 3：弹跳分镜与双轨路由检查（含台词时长毫秒级咬合）"""
     sb_file = os.path.join(project_dir, "分镜.md")
     if not os.path.exists(sb_file):
         return False, "缺少 '分镜.md'！请先拆解分镜。"
@@ -91,17 +91,40 @@ def audit_step_3(project_dir):
     with open(sb_file, "r", encoding="utf-8") as f:
         content = f.read()
         
-    # 必须有生理阻断微距
+    # 1. 必须有生理阻断微距
     if not re.search(r'1\.[0-9]s|微距|生理阻断|特写', content):
         return False, "分镜门禁未通过：核心交合动作前后必须插入至少一个 1.2s~2.0s 的生理阻断微距特写（指节抓白/足弓反弓/咬唇）！"
         
-    # 必须显式标注双轨路由
+    # 2. 必须显式标注双轨路由
     has_ref2v = "Ref2V" in content
     has_i2v = "I2V" in content
     if not (has_ref2v or has_i2v):
         return False, "分镜门禁未通过：每个镜头必须明确标注执行轨道 [Track: Ref2V] 或 [Track: I2V_Pose]！"
         
-    return True, "分镜镜头组、弹跳微距与双轨道路由验收 PASS！允许进入提示词编译。"
+    # 3. 严格核算：台词与分镜秒数物理咬合 (中文 3.0 字/s + 1.0s 气口)
+    # 匹配格式示例: [SHOT-xx] ... 时长: 3.5s ... 台词: <d>...</d>
+    shot_blocks = re.split(r'###?\s*SHOT-|\n\[SHOT-', content)
+    for block in shot_blocks[1:]:
+        sec_match = re.search(r'(\d+\.?\d*)\s*(?:秒|s)', block, re.IGNORECASE)
+        speech_match = re.search(r'<d>(.*?)</d>', block, re.DOTALL)
+        
+        if sec_match and speech_match:
+            duration = float(sec_match.group(1))
+            speech = speech_match.group(1).strip()
+            # 过滤掉 [Chinese] 或 [Language] 标记
+            speech_clean = re.sub(r'\[.*?\]', '', speech)
+            # 计算纯中文字数
+            char_count = len(re.findall(r'[\u4e00-\u9fa5]', speech_clean))
+            # 包含省略号增加气口停顿
+            ellipsis_count = speech_clean.count('…') + speech_clean.count('...')
+            
+            # 物理时间需求
+            required_time = (char_count / 3.0) + (ellipsis_count * 0.8) + 1.0
+            
+            if required_time > duration + 0.2: # 允许 0.2s 容差
+                return False, f"分镜门禁未通过：台词与镜头时长严重脱节！检测到该镜头时长仅 {duration}s，但台词 '{speech_clean}' 包含 {char_count} 字，物理朗读需要至少 {required_time:.1f}s！请增加镜头时长或精简台词！"
+        
+    return True, "分镜镜头组、弹跳微距、双轨路由与【音画台词秒数咬合】全量验收 PASS！允许进入提示词编译。"
 
 def audit_step_4(project_dir):
     """门禁 4：提示词编译与零中文正文检查"""
