@@ -3,9 +3,9 @@
 作用：
 在任何机器上无需人工干预，一键实测验证整个吞鲸宝典从 Gate 1 到 Gate 6 的 100% 闭环能力：
 1. 自动创建测试项目目录与定版资产占位 (Gate 1)
-2. 自动生成包含工作台原生 pose id 的三幕式刀锋剧本 (Gate 2)
+2. 自动生成包含吞鲸内置 pose id 的三幕式刀锋剧本 (Gate 2)
 3. 自动调用 tunjing_scene.py 将 120s 床戏拆解为 29 个 2~6s 独立短镜，落盘 分镜.md + 视频提示词.md + 批量任务.json (Gate 3 & Gate 4)
-4. 自动调用 tunjing_compiler.py 校验工作台六段式结构与正向压油词
+4. 自动调用 tunjing_compiler.py 校验吞鲸标准六段式结构与正向压油词
 5. 自动生成合格的生成前六维度终审报告 (Gate 5)
 6. 逐步运行 tunjing_gatekeeper.py 跑通 Step 1 ➔ Step 6 全绿通关，并由 export_comfy_payload.py 核验批量任务包！
 """
@@ -44,7 +44,7 @@ def run_dryrun(target_dir):
 
     assert gate_mod.check_gate(target_dir, 1), "Gate 1 资产门禁未通过！"
 
-    # ── 2. 准备 Gate 2 刀锋剧本（显式使用工作台原生 pose id）──
+    # ── 2. 准备 Gate 2 刀锋剧本（显式使用吞鲸内置 pose id）──
     script_content = """# 深渊交锋 · EP01 刀锋剧本
 
 ## 第一幕：秘密撕扯与极限阻断
@@ -54,7 +54,7 @@ def run_dryrun(target_dir):
 男主单手将她按在墙边（kiss_pin），门外突发脚步声停驻，两人瞬间屏息凝固。
 
 ## 第二幕：防线失守与羞耻前戏
-危机暂退，男主展开凌厉前戏：调用工作台 kiss_fondle（揉胸舌吻）➔ bj（跪姿口交）➔ fingering（手指扣插女穴）➔ cunnilingus（舔阴）。
+危机暂退，男主展开凌厉前戏：调用吞鲸引擎 kiss_fondle（揉胸舌吻）➔ bj（跪姿口交）➔ fingering（手指扣插女穴）➔ cunnilingus（舔阴）。
 男主：<d>[Chinese] 叫啊，让他进来看看李太太现在的样子。</d>
 
 ## 第三幕：多体位清战与绝顶收网
@@ -99,7 +99,7 @@ def run_dryrun(target_dir):
 2. 音画台词咬合：[PASS] (台词均满足 3.0字/s+1.0s 余量)
 3. 换体位与特写契约：[PASS] (missionary ➔ cowgirl ➔ doggy，交合特写3次，口交特写齐全)
 4. 受控运镜规范：[PASS] (逐镜标明景别与机位，无环绕/无快变焦)
-5. 提示词纯净度：[PASS] (工作台六段式结构，内嵌正向肯定句压油词)
+5. 提示词纯净度：[PASS] (吞鲸标准六段式结构，内嵌正向肯定句压油词)
 6. 纯血Ref2V单轨规范：[PASS] (全片 100% 纯血 Ref2V 单轨，零首帧垫图，29 镜每镜 2~5s)
 """
     with open(os.path.join(audit_dir, "生成前终审报告.md"), "w", encoding="utf-8") as f:
