@@ -1,50 +1,97 @@
 # 🐳 吞鲸宝典 (Tunjing Baodian)
 
-> 吞鲸工作室至高资产 · 文戏带刀有张力，动作带电有花样，步步门禁不跳步，工业流程一次过。
+> 吞鲸工作室 · 精品漫剧极速生产引擎
+> 绑定桌面《大人的工作台》真源，1:1 复刻其姿势矩阵与提示词装配逻辑。
 
 ---
 
-## 快速安装与使用 (Installation)
+## 安装
 
-### 方式 1：标准 Skills 安装
 ```bash
-npx skills add <你的GitHub用户名>/tunjing-baodian
-```
-
-### 方式 2：Git Clone 本地挂载
-直接克隆到你的 Agent skills 目录：
-```bash
-git clone https://github.com/<你的GitHub用户名>/tunjing-baodian.git ~/.hermes/skills/tunjing-baodian
+git clone https://github.com/RastaJiN/tunjing-baodian.git ~/.hermes/skills/tunjing-baodian
 ```
 
 ---
 
-## 一键唤醒与启动
+## 一键唤醒
 
-在与任何支持 Skills 的智能体（Hermes / Claude Code / Codex / 千问 / 豆包）会话中发送：
+会话中发送：
 > **`吞鲸开始`**
 
-系统将自动挂载本宝典并初始化 6 大步进门禁状态机。
+系统挂载本宝典并初始化六大门禁状态机。
 
 ---
 
-## 核心资产架构
+## 核心能力
 
-- **`SKILL.md`**：引擎总控中枢与唤醒契约；
-- **`references/kinetic-positions.md`**：12 套实战生物力学体位字典（POS-01 到 POS-12，全套由支点、受力凹陷、脊柱反弓与神经痉挛写成）；
-- **`references/shot-design-and-bounce.md`**：视听弹跳分镜规范（镜头组 + 1.5s 生理阻断微距）；
-- **`references/pre-render-audit-standard.md`**：生成前终审六大冷血维度；
-- **`references/comfyui-dual-pipeline-spec.md`**：ComfyUI 双轨渲染工作流与节点规范；
-- **`scripts/tunjing_gatekeeper.py`**：六大刚性步进门禁状态机；
-- **`scripts/dryrun_test.py`**：一键最小闭环跑通测试脚本；
-- **`scripts/tunjing_compiler.py`**：全英文物理动量提示词编译器与体检工具。
+### 1. 整段床戏自动拆镜（主轴）
+
+```bash
+python scripts/tunjing_scene.py --chain "kiss_fondle,bj,fingering,cunnilingus,missionary,cowgirl,doggy,cum_butt" --total 120 --scene "办公室"
+```
+
+输出 **29 镜分镜表 + 每镜完整送模提示词**：
+- 每镜 2~6 秒（贴合硬件上限，不把多体位压进一镜）
+- 逐镜标明**景别**（wide/mcu/cu/macro/hip/face）与**机位**（static_side/static_rear/low_hip/ots/high_angle 等）
+- 每镜输出完整六段式 H3 提示词，可直接贴进 ComfyUI
+
+加 `--table-only` 只看拆镜表，不出提示词。
+加 `--lines "台词"` / `--idea "剧情"` 注入台词与用户介绍。
+
+### 2. 单镜精修
+
+```bash
+python scripts/tunjing_storyboard.py --shot "bj,cowgirl,doggy,cum_butt" --dur 12 --scene "办公室"
+```
+
+### 3. 六大步进门禁
+
+```bash
+python scripts/tunjing_gatekeeper.py <项目目录> [1-6]
+```
+
+Gate 3 强制检查：逐镜景别、逐镜机位、平均单镜时长 ≤8s、换体位、3 次交合微距、口交特写。
 
 ---
 
-## 目标机 1:1 出片自检
+## 真源数据（全部 1:1 提取自工作台 `h3-app.js`）
 
-在任何新机器上下载后，运行：
+| 文件 | 内容 | 条数 |
+|---|---|---|
+| `references/workbench_poses_matrix.json` | 单体姿势（framing + beats 中英原文） | 50 套 |
+| `references/oneshot_transitions.json` | 一键组合模板（仅作转场桥参考） | 9 套 |
+| `references/transition_recipes.json` | 物理换位配方 | 40 条 |
+| `references/kinetic-positions.md` | 上表的人类可读视图（由 JSON 生成） | — |
+| `references/official-prompt-assembly-spec.md` | 六段式装配规格 | — |
+
+---
+
+## 核心纪律
+
+1. **2 分钟床戏必须拆成 20~30 镜**，严禁把多个体位压进一个镜头；
+2. **逐镜必给景别与机位**，缺一即不合格；
+3. **全片纯血 Ref2V**，严禁 I2V 首帧垫图；
+4. **正向肯定句压油**（工作流负向被清零，负向排油词无效）；
+5. **动作文本禁止脑补**，必须从真源 JSON 取原文。
+
+---
+
+## 目标机自检
+
 ```bash
 python scripts/dryrun_test.py
 ```
-验证帧长换算与 ComfyUI Payload 输出，全绿即可无缝接入生产。
+
+---
+
+## 脚本一览
+
+| 脚本 | 作用 |
+|---|---|
+| `tunjing_scene.py` | 整段拆镜 + 逐镜出完整提示词（主轴） |
+| `tunjing_storyboard.py` | 单镜精修 / 一键组合复现 |
+| `tunjing_core.py` | 提示词装配共享核心（唯一实现） |
+| `tunjing_gatekeeper.py` | 六大步进门禁状态机 |
+| `tunjing_compiler.py` | 提示词体检工具 |
+| `tunjing_resolver.py` | 单个动作快速查询 |
+| `dryrun_test.py` | 目标机最小闭环自检 |
