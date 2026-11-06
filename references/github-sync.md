@@ -19,9 +19,9 @@
    ```bash
    python scripts/dryrun_test.py
    ```
-   当终端输出 `🎉 恭喜！吞鲸宝典 Gate 1 ~ Gate 6 全链路自检 100% 绿灯通关！` 时，说明当前机器环境、工作台真源矩阵、13 类场地适配与门禁系统 100% 就绪。
+   当终端输出 `🎉 恭喜！吞鲸宝典 Gate 1 ~ Gate 6 全链路自检 100% 绿灯通关！` 时，说明当前机器环境、吞鲸内置真源矩阵、13 类场地适配与门禁系统 100% 就绪。
 
 ## 三、开发维护纪律
-- **真源唯一性**：`references/workbench_poses_matrix.json`、`references/transition_recipes.json`、`references/oneshot_transitions.json` 为唯一数据真源；`references/kinetic-positions.md` 由脚本从 JSON 自动生成，严禁手改导致脱节。
+- **真源唯一性**：`references/tunjing_poses_matrix.json`、`references/transition_recipes.json`、`references/oneshot_transitions.json` 为唯一数据真源；`references/kinetic-positions.md` 由脚本从 JSON 自动生成，严禁手改导致脱节。
 - **装配唯一性**：`scripts/tunjing_core.py` 为六段式提示词装配与 `with_scene_surface` 场地适配的唯一内核，`tunjing_scene.py` 与 `tunjing_storyboard.py` 统一调用该内核，严禁各写一份。
 - **仓库卫生**：推送远端时严格排除 `__pycache__/` 与临时测试目录，确保远端仓库永远处于干净整洁的 Master 状态。
