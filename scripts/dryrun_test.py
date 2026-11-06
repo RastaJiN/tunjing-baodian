@@ -1,114 +1,123 @@
 """
-吞鲸标准生产引擎 · 一键最小闭环跑通测试 (Tunjing Dry-Run & Payload Builder)
+吞鲸标准生产引擎 · 一键最小闭环全门禁通关测试 (Tunjing Full-Pipeline Dry-Run)
 作用：
-不需要用户输入任何长篇大论，直接在目标机器上执行本脚本：
-1. 自动生成标准 EP001 示例（刀锋剧本 + 弹跳分镜 + 物理动量提示词）
-2. 自动根据 H3 真实节点公式换算 17 帧步长
-3. 生成可以直接送进 ComfyUI 的标准 API Payload JSON
-4. 验证整个 Skill 在目标机器上是否 100% 具备出片能力！
+在任何机器上无需人工干预，一键实测验证整个吞鲸宝典从 Gate 1 到 Gate 6 的 100% 闭环能力：
+1. 自动创建测试项目目录与定版资产占位 (Gate 1)
+2. 自动生成包含工作台原生 pose id 的三幕式刀锋剧本 (Gate 2)
+3. 自动调用 tunjing_scene.py 将 120s 床戏拆解为 29 个 2~6s 独立短镜，落盘 分镜.md + 视频提示词.md + 批量任务.json (Gate 3 & Gate 4)
+4. 自动调用 tunjing_compiler.py 校验工作台六段式结构与正向压油词
+5. 自动生成合格的生成前六维度终审报告 (Gate 5)
+6. 逐步运行 tunjing_gatekeeper.py 跑通 Step 1 ➔ Step 6 全绿通关，并由 export_comfy_payload.py 核验批量任务包！
 """
 
 import os
 import sys
-import json
+import subprocess
 
-def h3_frames(sec):
-    raw = max(5, round(sec * 24))
-    return raw + (5 - (raw % 17)) % 17
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, SCRIPT_DIR)
+
+import tunjing_scene as scene_mod
+import tunjing_gatekeeper as gate_mod
+import tunjing_compiler as comp_mod
+
 
 def run_dryrun(target_dir):
-    print("=" * 60)
-    print("🐳 吞鲸宝典 · 精品漫剧生产引擎 · 目标机兼容性实跑验证")
-    print("=" * 60)
-    
+    print("=" * 70)
+    print("🐳 吞鲸宝典 · 纯血 Ref2V 全链路门禁 (Gate 1~6) 端到端闭环实测")
+    print("=" * 70)
+
+    # 清理旧状态确保从 Step 1 全新开始
     os.makedirs(target_dir, exist_ok=True)
-    
-    # 1. 产出最小闭环分镜与提示词示范
-    ep_data = {
-        "drama_name": "深渊交锋_EP001",
-        "shots": [
-            {
-                "id": "SHOT-01",
-                "type": "Inquiry",
-                "track": "Ref2V",
-                "seconds": 3.5,
-                "frames": h3_frames(3.5), # 89 帧
-                "desc": "Standing by the mahogany desk under dim spotlight. The male character steps forward into her personal space.",
-                "dialogue": "<d>[Chinese] 他拿来抵押的第一张契约，就是你的名字。</d>",
-                "ref_images": ["male_master.png", "scene_office.png"]
-            },
-            {
-                "id": "SHOT-02",
-                "type": "Denial_Block",
-                "track": "Ref2V",
-                "seconds": 1.8,
-                "frames": h3_frames(1.8), # 48 帧
-                "desc": "Extreme close-up of her knuckles gripping the glass desk edge, turning stark white under tension.",
-                "dialogue": "",
-                "ref_images": ["female_master.png", "scene_office.png"]
-            },
-            {
-                "id": "SHOT-03",
-                "type": "Kinetic_Climax_POS01",
-                "track": "I2V_Pose",
-                "seconds": 6.5,
-                "frames": h3_frames(6.5), # 158 帧
-                "desc": "POS-01 Standing Desk Doggy. Upper body pressed flat against the mahogany desk, spine hyperextended into deep arch, absorbing heavy rhythmic kinetic thrusts from behind.",
-                "dialogue": "<d>[Chinese] 抓紧了……别让门外加班的人听见你的声音。</d>",
-                "ref_images": ["pose_pos01_keyframe.png"]
-            }
-        ]
-    }
-    
-    # 2. 导出分镜工程
-    shot_file = os.path.join(target_dir, "EP001_分镜工程.json")
-    with open(shot_file, "w", encoding="utf-8") as f:
-        json.dump(ep_data, f, ensure_ascii=False, indent=2)
-    print(f"[1/3] 标准分镜工程已生成: {shot_file}")
-    
-    # 3. 编译出可以直接提交给 ComfyUI /prompt 接口的标准 Payload 骨架
-    payload_file = os.path.join(target_dir, "EP001_ComfyUI_Payload.json")
-    mock_payload = {
-        "client_id": "tunjing_studio",
-        "prompt": {
-            "3": {
-                "class_type": "KSampler",
-                "inputs": {
-                    "cfg": 1.0,
-                    "steps": 10,
-                    "sampler_name": "euler",
-                    "scheduler": "simple",
-                    "denoise": 1.0
-                }
-            },
-            "263": {
-                "class_type": "PrimitiveString",
-                "inputs": {
-                    "text": ep_data["shots"][2]["desc"] + " " + ep_data["shots"][2]["dialogue"]
-                }
-            },
-            "250": {
-                "class_type": "MiniMaxH3ReferenceToVideo",
-                "inputs": {
-                    "length": ep_data["shots"][2]["frames"]
-                }
-            }
-        }
-    }
-    with open(payload_file, "w", encoding="utf-8") as f:
-        json.dump(mock_payload, f, ensure_ascii=False, indent=2)
-    print(f"[2/3] 标准 ComfyUI Payload 已生成: {payload_file}")
-    
-    # 4. 帧数自检与闭环计算
-    print("[3/3] 核心物理参数自检:")
-    for s in ep_data["shots"]:
-        print(f"  - 镜头 {s['id']} ({s['track']}): 设定 {s['seconds']}s ➔ H3 严格物理帧长 = {s['frames']} 帧 ((F-5)%17==0 合规)")
-        
-    print("\n" + "=" * 60)
-    print("恭喜！吞鲸生产引擎在当前机器已完全跑通自检！")
-    print("此文件夹下的数据可以直接拷贝至任何工作机进行无损渲染。")
-    print("=" * 60)
+    status_file = os.path.join(target_dir, ".tunjing_status.json")
+    if os.path.exists(status_file):
+        os.remove(status_file)
+
+    # ── 1. 准备 Gate 1 资产目录 ──
+    asset_dir = os.path.join(target_dir, "00_资产")
+    os.makedirs(asset_dir, exist_ok=True)
+    for fname in ("男主_穿衣与素身母版_2x3.png", "女主_穿衣与素身母版_2x3.png", "场景_顶奢办公室_scene.png"):
+        fpath = os.path.join(asset_dir, fname)
+        if not os.path.exists(fpath):
+            with open(fpath, "wb") as f:
+                f.write(b"\x89PNG\r\n\x1a\n" + b"0" * 1024)
+
+    assert gate_mod.check_gate(target_dir, 1), "Gate 1 资产门禁未通过！"
+
+    # ── 2. 准备 Gate 2 刀锋剧本（显式使用工作台原生 pose id）──
+    script_content = """# 深渊交锋 · EP01 刀锋剧本
+
+## 第一幕：秘密撕扯与极限阻断
+男主将偷拍的酒店发票重重拍在红木办公桌上，步步紧逼。
+男主：<d>[Chinese] 你以为你丈夫能保得住你？他拿来抵押的第一张契约，就是你的名字。</d>
+女主：<d>[Chinese] 疯子……把东西还我！</d>
+男主单手将她按在墙边（kiss_pin），门外突发脚步声停驻，两人瞬间屏息凝固。
+
+## 第二幕：防线失守与羞耻前戏
+危机暂退，男主展开凌厉前戏：调用工作台 kiss_fondle（揉胸舌吻）➔ bj（跪姿口交）➔ fingering（手指扣插女穴）➔ cunnilingus（舔阴）。
+男主：<d>[Chinese] 叫啊，让他进来看看李太太现在的样子。</d>
+
+## 第三幕：多体位清战与绝顶收网
+进入主力冲撞：先以 missionary（传教士）破壁贯入，中途强制换体位至 cowgirl（女上位骑乘）与 doggy（后入趴跪），最后以 cum_butt（射在臀部）完成绝顶清算。
+女主：<d>[Chinese] 别……求你……关灯……</d>
+"""
+    with open(os.path.join(target_dir, "剧本.md"), "w", encoding="utf-8") as f:
+        f.write(script_content)
+
+    assert gate_mod.check_gate(target_dir, 2), "Gate 2 剧本门禁未通过！"
+
+    # ── 3. 调用 tunjing_scene.py 自动拆镜并落盘（驱动 Gate 3 & Gate 4）──
+    poses = scene_mod.load_poses()
+    chain = ["kiss_fondle", "bj", "fingering", "cunnilingus", "missionary", "cowgirl", "doggy", "cum_butt"]
+    shots, actual = scene_mod.build_scene(chain, 120.0, poses)
+    pose_names = "→".join(poses.get(p, {}).get("nameZh", p) for p in chain)
+    _, pr_path, bj_path = scene_mod.save_project_artifacts(
+        target_dir, shots, actual, 120.0,
+        lines="嗯…啊…不要…", idea="女秘书被按在办公桌上清算",
+        scene="顶奢办公室", pose_names=pose_names
+    )
+
+    assert gate_mod.check_gate(target_dir, 3), "Gate 3 拆镜门禁未通过！"
+    assert gate_mod.check_gate(target_dir, 4), "Gate 4 提示词门禁未通过！"
+
+    # 额外用 tunjing_compiler.py 体检提示词文件
+    with open(pr_path, "r", encoding="utf-8") as f:
+        errs, warns = comp_mod.lint_tunjing_prompt(f.read())
+    assert not errs, f"tunjing_compiler 体检报错: {errs}"
+    print("[✓] tunjing_compiler.py 六段式体检 0 错误 PASS！")
+
+    # ── 4. 准备 Gate 5 生成前自我终审报告 ──
+    audit_dir = os.path.join(target_dir, "审查")
+    os.makedirs(audit_dir, exist_ok=True)
+    report_content = """# 吞鲸工作室 · 渲染放行终审报告 (Clearance Report)
+- 剧集：深渊交锋 · EP01
+- 自审执行人：鲸鲸 (执行导演)
+- 审查结论：[PASS 放行]
+
+### 核查清单对账：
+1. 资产实名与槽位：[PASS] (男女母版与场景底图齐全，无第三人裂殖隐患)
+2. 音画台词咬合：[PASS] (台词均满足 3.0字/s+1.0s 余量)
+3. 换体位与特写契约：[PASS] (missionary ➔ cowgirl ➔ doggy，交合特写3次，口交特写齐全)
+4. 受控运镜规范：[PASS] (逐镜标明景别与机位，无环绕/无快变焦)
+5. 提示词纯净度：[PASS] (工作台六段式结构，内嵌正向肯定句压油词)
+6. 纯血Ref2V单轨规范：[PASS] (全片 100% 纯血 Ref2V 单轨，零首帧垫图，29 镜每镜 2~5s)
+"""
+    with open(os.path.join(audit_dir, "生成前终审报告.md"), "w", encoding="utf-8") as f:
+        f.write(report_content)
+
+    assert gate_mod.check_gate(target_dir, 5), "Gate 5 终审门禁未通过！"
+    assert gate_mod.check_gate(target_dir, 6), "Gate 6 渲染放行门禁未通过！"
+
+    # ── 5. 调用 export_comfy_payload.py 核验最终批量任务包 ──
+    rc = subprocess.call([sys.executable, os.path.join(SCRIPT_DIR, "export_comfy_payload.py"), target_dir])
+    assert rc == 0, "export_comfy_payload.py 校验失败！"
+
+    print("\n" + "=" * 70)
+    print("🎉 恭喜！吞鲸宝典 Gate 1 ~ Gate 6 全链路自检 100% 绿灯通关！")
+    print(f"产出目录: {target_dir}")
+    print("=" * 70)
+
 
 if __name__ == "__main__":
-    out_dir = r"C:\Users\Rasta\AppData\Local\hermes\cache\scratch\tunjing_test_run"
-    run_dryrun(out_dir)
+    out = os.path.join(os.path.expanduser("~"), "AppData", "Local", "hermes", "cache", "scratch", "tunjing_test_run")
+    run_dryrun(out)
