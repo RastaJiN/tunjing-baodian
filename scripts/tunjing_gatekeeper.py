@@ -95,7 +95,7 @@ def audit_step_2(project_dir):
     return True, f"刀锋剧本三幕式、实体道具与工作台体位 ID ({sorted(ids_in_script | pos_in_script)}) 验收 PASS！允许进入分镜设计。"
 
 def audit_step_3(project_dir):
-    """门禁 3：弹跳分镜与双轨路由检查（含台词时长毫秒级咬合）"""
+    """门禁 3：拆镜密度、景别机位与纯血单轨路由检查（含台词时长毫秒级咬合）"""
     sb_file = os.path.join(project_dir, "分镜.md")
     if not os.path.exists(sb_file):
         return False, "缺少 '分镜.md'！请先拆解分镜。"
@@ -155,8 +155,8 @@ def audit_step_3(project_dir):
     all_poses = pos_found | ids_found
     if len(all_poses) < 2:
         return False, (f"分镜门禁未通过：单集肉戏必须中途【换体位】！"
-                       f"实测仅检测到 {len(all_poses)} 个姿势，必须包含至少 2 个不同姿势"
-                       f"（如 missionary ➔ doggy，或 POS-01 ➔ POS-02）！")
+                       f"实测仅检测到 {len(all_poses)} 个姿势，必须包含至少 2 个不同工作台姿势"
+                       f"（如 missionary ➔ cowgirl ➔ doggy）！")
         
     # C. 必须包含至少 3 次独立的交合部位微距特写
     macro_matches = re.findall(r'交合特写|结合部微距|结合特写|macro pelvic|macro penetration|macro interlocking', content, re.IGNORECASE)
@@ -193,7 +193,7 @@ def audit_step_3(project_dir):
                            f"平均单镜 {avg:.1f}s，超过 8s 上限。"
                            f"2 分钟床戏应拆成 20~30 个 2~6s 短镜，严禁把多个体位压进一镜！")
         
-    return True, "分镜镜头组、弹跳微距、双轨路由、【音画咬合】及【换体位+3次交合微距+口交】全量验收 PASS！允许进入提示词编译。"
+    return True, "分镜【拆镜密度 + 逐镜景别机位 + 纯血Ref2V单轨 + 音画咬合 + 换体位与3次交合微距】全量验收 PASS！允许进入提示词编译。"
 
 def audit_step_4(project_dir):
     """门禁 4：工作台六段式提示词结构与正向压油核验"""
