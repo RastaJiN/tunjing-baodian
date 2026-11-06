@@ -55,10 +55,22 @@ metadata:
 
 ## 三、核心资产与驱动链接 (The Core Engine Assets)
 
-1. **【工作台体位真源与姿态词典】**：`references/kinetic-positions.md`
-   - 继承自桌面《大人的工作台/姿势词典/双人缠绵_55组.md》，严格收纳正常位、后入位、骑乘位、面对面坐位、立位贴身、侧卧位等最强中文身体接触点，全量转化为纯英文物理动量。
-2. **【高阶反杀与蛇蝎美人心理模型】**：`references/femme-fatale-reversal.md`
-   - 超越市面平庸套路的关键核武：拒绝扁平工具人，肉体交合是蛇蝎反向下套的掩护，事毕脱力瞬间的致命窃取与冷冽眼神，母版切换点物理契约。
+> **有据可查的证据链（任何模型创作床戏的唯三数据来源，严禁脑补）**：
+> 1. `references/workbench_poses_matrix.json` — 49 套单体体位（framing + beats 中英原文，1:1 提取自工作台 `h3-app.js` 的 `POSES`/`POSE_EN`）
+> 2. `references/oneshot_transitions.json` — 9 套换体位/射出转换模板（1:1 提取自 `ONE_SHOT_FILMS`）
+> 3. `references/official-prompt-assembly-spec.md` — 工作台 `buildOfficialH3Prompt()` 真实六段式装配规格
+
+1. **【工作台提示词装配真源规格】**：`references/official-prompt-assembly-spec.md`
+   - 1:1 转写工作台 `buildOfficialH3Prompt()` 的六段式结构（Goal/Reference map/Consistency/Intensity/逐镜时间线/音效 + 独立负面列表）；
+   - 所有送模提示词严禁止脑补，必须按此规格逐段装配，动作内容只能引自 matrix 与 transitions 两个 JSON 原文。
+2. **【49 套单体体位矩阵】**：`references/workbench_poses_matrix.json`
+   - 从工作台 `h3-app.js` 无损提取，含 `framing`（机位景别死锁）、`beats`（三节拍物理动量）、`sfx`（拟声）、`line`（台词）的中英双语原文；
+   - 覆盖口爱/后入/骑乘/传教士/立位/亲吻/指插/绝顶清算全品类。
+3. **【9 套换体位转换模板】**：`references/oneshot_transitions.json`
+   - 从工作台 `ONE_SHOT_FILMS` 无损提取，如 `doggy_to_cum_butt`（后入→射屁股）、`cg_to_doggy`（女上位→后入）；
+   - 剧本出现「换体位/抽出射某处」时，衔接动作必须 1:1 引用对应模板 beats，绝不自由发挥。
+4. **【工作台纯血 Ref2V 生产管线规范】**：`references/comfyui-dual-pipeline-spec.md`
+   - 继承自桌面《大人的准则_SOP.md》：彻底封杀 I2V 垫图，全片纯血 Ref2V；交合核心镜头强制收缩景别（腰胯中近景/局部微距）；死锁正向肯定句压油词（Node 328 零化负向物理真相）。
 3. **【吞鲸节奏 · 3~5分钟工业级双波浪规范】**：`templates/tunjing_rhythm_300s.md`
    - 专治长时长疲软：单集 180s~300s（20~26镜），独创“第一波初破壁 ➔ 中段大阻断危机 ➔ 第二波换体位失控绝顶 ➔ 终局断崖卡点”双波浪模型。
 4. **【吞鲸节奏 · 120秒极速规范】**：`templates/tunjing_rhythm_120s.md`
