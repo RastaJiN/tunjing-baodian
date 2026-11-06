@@ -4,8 +4,8 @@
 吞鲸宝典 · 提示词装配共享核心 (Tunjing Assembly Core)
 
 唯一装配实现，供 tunjing_scene.py 与 tunjing_storyboard.py 共同调用，杜绝双份定义。
-1. 装配结构 1:1 对齐《大人的工作台》buildOfficialH3Prompt() 六段式
-2. 完整移植工作台 withSceneSurface() 与 h3SceneSfxZh()，根据传入的 scene 自动把动作与声场里的“床/床单/床板”动态改写为目标场地（办公桌/沙发/浴室/车内/墙边/地面等），彻底根绝跨场景穿帮！
+1. 装配结构 1:1 对齐吞鲸宝典内置引擎吞鲸六段式标准装配器 六段式
+2. 完整移植吞鲸引擎 with_scene_surface() 与 build_soundscape_zh()，根据传入的 scene 自动把动作与声场里的“床/床单/床板”动态改写为目标场地（办公桌/沙发/浴室/车内/墙边/地面等），彻底根绝跨场景穿帮！
 """
 
 import json, os, re
@@ -37,7 +37,7 @@ No cartoon drift, messy background, or focus collapse
 No stiff, robotic, or frozen motion; bodies move with inertia, follow-through, and visible breathing
 No pose popping or teleporting limbs between beats; motion continues seamlessly through cuts"""
 
-# ── 1:1 移植自工作台 h3-app.js 的 13 类场景承托面与声学映射 ──
+# ── 1:1 移植自吞鲸引擎 tunjing_poses_matrix.json 的 13 类场景承托面与声学映射 ──
 SURFACE_PROFILES = {
     "bed":     {"noun": "床", "on": "在床上", "brace": "撑床", "grab": "抓床单", "edge": "床沿", "sitEdge": "坐在床沿", "pad": "床单", "lie": "仰卧在床上", "kneel": "跪在床上", "sfx": "床板轻响"},
     "hotel":   {"noun": "酒店床", "on": "在酒店床上", "brace": "撑酒店床", "grab": "抓酒店床单", "edge": "酒店床沿", "sitEdge": "坐在酒店床沿", "pad": "酒店床品", "lie": "仰卧在酒店床上", "kneel": "跪在酒店床上", "sfx": "床板轻响"},
@@ -56,7 +56,7 @@ SURFACE_PROFILES = {
 
 
 def detect_scene_id(scene_name):
-    """根据用户传入的场景名自动识别工作台场地类型，彻底告别硬编码卧室/床"""
+    """根据用户传入的场景名自动识别吞鲸引擎场地类型，彻底告别硬编码卧室/床"""
     s = (scene_name or "").lower()
     if any(k in s for k in ("车", "座舱", "后座", "car")):
         return "car"
@@ -86,7 +86,7 @@ def detect_scene_id(scene_name):
 
 
 def with_scene_surface(act_text, scene_name):
-    """复刻工作台 withSceneSurface(act)：当场景不是床时，把动作里的床/床单/床沿全部替换为当前场景承托面"""
+    """复刻吞鲸引擎 with_scene_surface(act)：当场景不是床时，把动作里的床/床单/床沿全部替换为当前场景承托面"""
     if not act_text:
         return act_text
     sc_id = detect_scene_id(scene_name)
@@ -135,7 +135,7 @@ def with_scene_surface(act_text, scene_name):
 
 
 def build_soundscape_zh(scene_name):
-    """复刻工作台 h3SceneSfxZh：根据当前场景动态生成底层环境声，杜绝在办公室/浴室里出现床板声"""
+    """复刻吞鲸引擎 build_soundscape_zh：根据当前场景动态生成底层环境声，杜绝在办公室/浴室里出现床板声"""
     sc_id = detect_scene_id(scene_name)
     loc = SURFACE_PROFILES.get(sc_id, SURFACE_PROFILES["bed"])
     surf_sfx = loc.get("sfx", "")
@@ -147,7 +147,7 @@ def build_soundscape_zh(scene_name):
 
 
 def load_poses():
-    with open(os.path.join(REF, "workbench_poses_matrix.json"), encoding="utf-8") as f:
+    with open(os.path.join(REF, "tunjing_poses_matrix.json"), encoding="utf-8") as f:
         return json.load(f)
 
 
