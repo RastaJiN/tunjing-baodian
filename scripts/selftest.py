@@ -40,6 +40,7 @@ REQUIRED_FILES = [
     "scripts/tunjing_gatekeeper.py",
     "scripts/tunjing_compiler.py",
     "scripts/export_comfy_payload.py",
+    "scripts/export_jianying_draft.py",
     "scripts/dryrun_test.py",
     "scripts/selftest.py",
     "templates/episode_template.md",
