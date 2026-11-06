@@ -52,3 +52,19 @@ Skin & Lighting: authentic matte velvet skin finish, powdered dry texture, natur
 - **Scheduler**：`beta` / `simple`
 - **画幅规格**：`9:16` (`864x1536` 或 `928x1664`)
 - **严格物理帧长公式**：`length = 5 + 17 * N`（由 `tunjing_scene.py` 按单镜秒数自动换算写入 `批量任务.json`）
+
+---
+
+## 五、渲染出片入库与防踩坑物理铁律（2026一线实测定稿）
+
+1. **`VHS_VideoCombine` 取件真理（优先取 `-audio.mp4`）**：
+   - `VHS_VideoCombine` 在挂了音频渲染时，虽然本地磁盘会产出主视频（无声版）与 `-audio.mp4`（带音轨版）两个文件，但 ComfyUI `/history/<prompt_id>` 接口的 `outputs` **只返回 `-audio.mp4` 一个文件名**！
+   - 下游入库脚本必须**优先提取 `-audio.mp4`** 作为带声音的正式成片，严禁使用“跳过 audio”的筛选逻辑，否则会导致筛空丢片、白跑整轮任务！
+2. **严禁开场大全景脱衣（防遛鸟）**：
+   - 若第一镜为 `undress`（脱衣诱惑），景别强制收紧为 `mcu`（中近景）或 `cu`（特写），把画面锁定在肩颈与衣领扣子滑落，男方衣着完整，物理上严禁第 1 帧生殖器露出！
+3. **前戏严禁插入要点**：
+   - `undress`、`kiss_fondle`、`breast_rub`、`nipple_lick` 等前戏体位及转场桥镜，严禁带入任何“阴茎与阴道紧密贴合插入”语句，防止模型动作精神分裂与动作打架。
+4. **核心动作全英文物理力学驱动**：
+   - 严格遵循 MiniMax H3 官方模型特性，动作描述 100% 采用吞鲸矩阵内置的 `POSE_EN` 纯英文物理力学（`beatsEn` 与 `framingEn`），台词保留 `<d>[Chinese]...</d>`，彻底杜绝中文散文导致的动作漂移与纯灰影棚跑偏！
+5. **接吻防蛇信子形态锁**：
+   - 接吻类镜头统一注入物理边界：`lips gently parted, subtle tongue contact, natural human lips anatomy, no exaggerated tongue protrusion`，防止舌头拉伸变形。
