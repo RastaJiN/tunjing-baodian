@@ -18,14 +18,11 @@
 """
 
 import json, os, argparse, re
+from tunjing_core import (load_poses, DE_OIL, NEG, FINISH_IDS, ORAL_ONLY,
+                          single_shot_prompt)
 
 BASE = os.path.dirname(os.path.abspath(__file__))
 REF = os.path.join(BASE, "..", "references")
-
-FINISH_IDS = {"creampie", "cum_face", "cum_chest", "cum_belly", "cum_butt"}
-ORAL_ONLY = {"bj", "squat_bj", "prone_bj", "deepthroat", "head_thrust", "facefuck",
-             "sixty_nine", "cunnilingus", "sofa_cunni", "fingering", "clit_tease",
-             "tip_lick", "ball_lick", "penis_slap", "handjob", "titjob"}
 
 # ── 景别库（逐镜必给，按动作类型自动分配）──────────────────────────
 SHOT_SIZES = {
@@ -106,9 +103,8 @@ POSE_SHOT_PLAN = {
 }
 
 
-def load_poses():
-    with open(os.path.join(REF, "workbench_poses_matrix.json"), encoding="utf-8") as f:
-        return json.load(f)
+def load_poses_local():
+    return load_poses()
 
 
 def plan_shot(pid, poses):
@@ -178,7 +174,8 @@ def build_scene(chain, total_sec, poses):
     return shots, round(t, 1)
 
 
-def print_table(shots, actual_total, want_total):
+def print_table(shots, actual_total, want_total, lines="", idea="", scene="卧室",
+                pose_names="", emit_prompts=True):
     print("=" * 96)
     print(f"🐳 吞鲸宝典 · 整段床戏拆镜表    目标 {want_total}s / 实际 {actual_total}s / 共 {len(shots)} 镜")
     print("=" * 96)
@@ -196,21 +193,35 @@ def print_table(shots, actual_total, want_total):
     print("景别分布:", ", ".join(f"{k}×{v}" for k, v in sorted(sizes.items())))
     print("机位分布:", ", ".join(f"{k}×{v}" for k, v in sorted(cams.items())))
     print()
-    print("=== 逐镜提示词（可直接送模）===")
+
+    if not emit_prompts:
+        return
+
+    print("=" * 96)
+    print("=== 逐镜完整送模提示词（每镜独立一文件，可直接贴进 H3）===")
+    print("=" * 96)
     for i, s in enumerate(shots, 1):
         size_desc = SHOT_SIZES[s["size"]]
         cam_desc = CAMS[s["cam"]]
-        print(f"\n[SHOT {i:02d}] {s['dur']}s  ({s['t0']}-{s['t1']}s)")
-        print(f"  景别: {size_desc}")
-        print(f"  机位: {cam_desc}")
-        print(f"  姿势: {s['pose_zh']}  [{s['pose']}]")
-        print(f"  动作: {s['text']}")
+        prompt = single_shot_prompt(
+            s, i - 1, len(shots), s["dur"], size_desc, cam_desc,
+            lines=lines, idea=idea, scene=scene, pose_names=pose_names,
+        )
+        print(f"\n{'─' * 96}")
+        print(f"### SHOT {i:02d}  {s['dur']}s  ({s['t0']}-{s['t1']}s)  "
+              f"{SHOT_SIZES[s['size']]} / {CAMS[s['cam']]} / {s['pose_zh']}")
+        print(f"{'─' * 96}")
+        print(prompt)
 
 
 def main():
-    ap = argparse.ArgumentParser(description="吞鲸整段床戏拆镜引擎")
+    ap = argparse.ArgumentParser(description="吞鲸整段床戏拆镜引擎（拆镜 + 逐镜出完整提示词）")
     ap.add_argument("--chain", help="姿势链，逗号分隔")
     ap.add_argument("--total", type=float, default=120.0, help="整段总时长秒（默认120）")
+    ap.add_argument("--lines", default="", help="本段台词")
+    ap.add_argument("--idea", default="", help="用户介绍/剧情描述")
+    ap.add_argument("--scene", default="卧室", help="场景名")
+    ap.add_argument("--table-only", action="store_true", help="只出拆镜表，不出提示词")
     ap.add_argument("--list-poses", action="store_true")
     args = ap.parse_args()
 
@@ -227,7 +238,10 @@ def main():
 
     chain = [x.strip() for x in args.chain.split(",") if x.strip()]
     shots, actual = build_scene(chain, args.total, poses)
-    print_table(shots, actual, args.total)
+    pose_names = "→".join(poses.get(p, {}).get("nameZh", p) for p in chain)
+    print_table(shots, actual, args.total, lines=args.lines, idea=args.idea,
+                scene=args.scene, pose_names=pose_names,
+                emit_prompts=not args.table_only)
 
 
 if __name__ == "__main__":
