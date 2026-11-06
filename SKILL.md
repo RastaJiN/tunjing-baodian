@@ -99,7 +99,45 @@ metadata:
 
 ---
 
-## 吞鲸极速作业四步走 (The 4-Step Pipeline)
+## 四、分镜 → 提示词 自动装配链路（工作台同款，取代人工点选）
+
+> 工作台原本是「人手动勾姿势 → 吐提示词」。宝典把这条链路自动化：**分镜写完后，把每镜的姿势链丢给引擎，自动吐出工作台同款提示词**。
+> 完全复刻工作台四个函数的真实逻辑，所有文本来自 `references/` 三个真源 JSON，**零脑补**。
+
+```
+order_physically()            # 复刻 orderPosesPhysically：finish 类（射精）永远排最后
+        ↓
+expand_poses()                # 复刻 expandPosesWithTransitions：
+        ↓                     #   每姿势展开「建立 / 推进 / 衔接转场 / 收束」，多姿势自动插转场
+find_transition()             # 复刻 buildPoseTransition：40 条物理换位配方查表（含 famKey 兜底）
+        ↓
+shot_time_bounds()            # 复刻 buildShotTimeBounds：射精段压到片尾约4秒，其余均分
+        ↓
+build_prompt()                # 复刻 buildOfficialH3Prompt：六段式装配 + 独立负面列表
+```
+
+### 用法（分镜完成后逐镜调用）
+
+```bash
+# 单镜：姿势链逗号分隔，自动展开转场、切镜、装配
+python scripts/tunjing_storyboard.py --shot "bj,cowgirl,doggy,cum_butt" --dur 12 \
+    --lines "嗯…啊…不要…" --idea "女秘书被按在办公桌上" --scene "办公室"
+
+# 查可用姿势 / 查可用转场配方
+python scripts/tunjing_storyboard.py --list-poses
+python scripts/tunjing_storyboard.py --list-trans
+```
+
+### 关键纪律（实测踩过的坑，必须遵守）
+
+1. **绝不丢姿势**：镜头数压缩时，只能合并同姿势的「建立+推进」，或把转场并入前镜，**严禁直接砍掉某个体位**——否则会出现「女上位直接接射精、后入凭空消失」的断链；
+2. **口交镜不加阴道要点**：`bj`/`deepthroat`/`cunnilingus`/`fingering` 等 ORAL_ONLY 姿势**不得**附加「阴茎与阴道贴合插入」要点，那是插入类姿势（missionary/doggy/cowgirl）专用；
+3. **台词一句只念一次**：同一句台词全镜链只出现一次，避免模型重复念白；
+4. **射精段独占片尾**：`buildShotTimeBounds` 会把 finish 类动作压到片尾约 4 秒（≥12s 片长时），这是工作台实测最优的出精节奏，不得均分。
+
+---
+
+## 五、吞鲸极速作业四步走 (The 4-Step Pipeline)
 
 ```
 [步骤一：刀锋剧本] ➔ 实体证据流转 + 心理逼问 + 强行阻断 + 肉体作为最后清算
