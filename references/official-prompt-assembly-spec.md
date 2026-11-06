@@ -1,17 +1,17 @@
-# 吞鲸·大人的工作台提示词装配真源规格 (Official H3 Prompt Assembly Spec)
+# 吞鲸宝典 · 六段式提示词装配权威规格 (Official H3 Prompt Assembly Spec)
 
-> 本文档 1:1 忠实转写桌面《大人的工作台》`assets/h3-app.js` 中 `buildOfficialH3Prompt()` 的真实装配结构。
-> **用途**：任何大模型在为吞鲸漫剧编写送模提示词时，必须严格按本规格逐段装配，**严禁脑补任何不在工作台源码中的词汇与结构**。
-> 所有动作内容（Framing / Beats / 转换 / 台词）的来源只能有三个：
-> 1. `references/workbench_poses_matrix.json`（49 套单体体位的 framing 与 beats 原文）
-> 2. `references/oneshot_transitions.json`（9 套换体位/射出转换模板的 beats 原文）
-> 3. 本规格文档（装配结构、负面列表、音效、一致性死锁的原文）
+> 本文档定义吞鲸宝典内置的 **六段式标准提示词装配结构**（代码实现位于 `scripts/tunjing_core.py`）。
+> **用途**：任何大模型或 Agent 在为吞鲸漫剧编写送模提示词时，必须严格按本规格逐段装配，**严禁脑补任何不在内置真源矩阵中的词汇与结构**。
+> 所有动作内容（Framing / Beats / 转换 / 台词）的来源只能有三个内置文件：
+> 1. `references/tunjing_poses_matrix.json`（50 套单体体位的 framing 与 beats 原文）
+> 2. `references/transition_recipes.json`（40 条物理换位配方的原文）
+> 3. `references/oneshot_transitions.json`（9 套转换模板的 beats 原文）
 
 ---
 
-## 一、工作台真实提示词 = 六段式中英混合结构
+## 一、吞鲸引擎真实提示词 = 六段式中英混合结构
 
-`buildOfficialH3Prompt` 最终输出的不是一段英文动量，而是一个多段式 prompt，依次为：
+`吞鲸六段式标准装配器` 最终输出的不是一段英文动量，而是一个多段式 prompt，依次为：
 
 ```
 [1] Goal + Audio rule + 表情/口型指令 + 用户介绍 + 动作优先
@@ -95,7 +95,7 @@ Intensity focus: {强度链，如 男人·暴力}。抽插强度按时间线递�
 [Shot N] At {时间戳}, the camera cuts to a new beat while staying on the same scene. {actZh}。…
 ```
 
-- **`framingZh` 与 `actZh` 的来源**：即 `workbench_poses_matrix.json` 中每个 pose 的 `framingZh` / `beatsZh`（中文原版），或 `oneshot_transitions.json` 的 `beatsZh`（换体位时）。
+- **`framingZh` 与 `actZh` 的来源**：即 `tunjing_poses_matrix.json` 中每个 pose 的 `framingZh` / `beatsZh`（中文原版），或 `oneshot_transitions.json` 的 `beatsZh`（换体位时）。
 - **首镜交合必加画面要点**（非口交、有插入时）：
   ```text
   画面要点：阴茎与阴道紧密贴合插入，短行程进出清晰可读，交合处比例接近真人参考、阴唇自然包裹，不要占满画面
