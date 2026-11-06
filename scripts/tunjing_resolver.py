@@ -3,7 +3,7 @@
 """
 吞鲸宝典 · 床戏动作实时响应引擎 (Tunjing Pose Real-time Resolver)
 
-用法：在创作到床戏环节时，直接喊动作需求，本引擎 1:1 从《大人的工作台》矩阵
+用法：在创作到床戏环节时，直接喊动作需求，本引擎 1:1 从吞鲸宝典内置引擎矩阵
 返回该动作的完整送模提示词（Framing + 压油 + Beats + Line）。
 
 命令行：
@@ -20,16 +20,16 @@ import os
 import re
 
 MATRIX_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                           "..", "references", "workbench_poses_matrix.json")
+                           "..", "references", "tunjing_poses_matrix.json")
 
-# 恒定正向压油模板（工作台 Node 328 零化负向的物理真相：靠正向肯定句压油）
+# 恒定正向压油模板（吞鲸引擎 Node 328 零化负向的物理真相：靠正向肯定句压油）
 DE_OIL = ("authentic matte velvet skin finish, powdered dry texture, natural human skin "
           "with visible fine pores and subtle imperfections, soft subsurface scattering "
           "without surface reflection, non-greasy complexion, heavily diffused soft ambient light, "
           "zero hard directional light, 35mm film grain, photorealistic anatomy, "
           "strictly zero extra limbs and zero fused body parts")
 
-# 中文/口语动作别名 -> 矩阵 pose id（关键：把用户口语映射到工作台原版 ID）
+# 中文/口语动作别名 -> 矩阵 pose id（关键：把用户口语映射到吞鲸引擎原版 ID）
 ALIAS = {
     # 口爱
     "女口交": "bj", "口交": "bj", "含": "bj", "吹": "bj", "跪口": "bj", "跪姿口交": "bj",
@@ -162,7 +162,7 @@ def main():
         return
     print("=" * 60)
     print("🐳 吞鲸宝典 · 实时响应")
-    print(f"需求「{query}」→ 命中工作台动作 [{pid}]")
+    print(f"需求「{query}」→ 命中吞鲸标准动作 [{pid}]")
     print("=" * 60)
     print(render_prompt(pid, entry))
 
