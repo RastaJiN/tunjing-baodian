@@ -79,9 +79,7 @@ metadata:
    - 专治半途引入宝典的旧烂摊子：出具《热接盘诊断报告与微创修改方案》供监制审批、保护已合格镜头、逆向推导状态继承、局部细胞级置换、差量增量渲染。
 6. **【高刺激剧作发条指南】**：`references/high-tension-mechanisms.md`
    - 彻底粉碎平淡无聊：极限倒计时（实时连线电话/电梯逼近）、羞耻道具置换（婚戒口含/撕裂衣装反差）、诛心审讯式台词（伴侣习惯复刻与高潮确认），以及 OS 防对口型三大物理原则。
-7. **【工作台纯血 Ref2V 生产管线规范】**：`references/comfyui-dual-pipeline-spec.md`
-   - 继承自桌面《大人的准则_SOP.md》：彻底封杀 I2V 垫图，全片纯血 Ref2V；交合核心镜头强制收缩景别（腰胯中近景/局部微距）；死锁正向肯定句压油词（Node 328 零化负向物理真相）。
-8. **【六大步进门禁中枢】**：`scripts/tunjing_gatekeeper.py`
+7. **【六大步进门禁中枢】**：`scripts/tunjing_gatekeeper.py`
    - 命令行调用：`python scripts/tunjing_gatekeeper.py <项目目录> [步骤1-6]`
    - 步进拦截：前置步骤不合格时直接抛出 `[X] 阻断拦截`，严禁跳步。
 9. **【生成前自我终极审查标准】**：`references/pre-render-audit-standard.md`
