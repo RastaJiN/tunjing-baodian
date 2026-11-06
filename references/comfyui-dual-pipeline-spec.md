@@ -1,63 +1,54 @@
-# 吞鲸纯血 Ref2V 生产管线规范 (Tunjing Pure Ref2V Standard)
+# 吞鲸纯血 Ref2V 生产管线规范 (Tunjing Pure Ref2V Pipeline Specification)
 > 继承自桌面《大人的工作台》与《大人的准则_SOP.md》
-> 唯一铁律：坚决彻底摒弃首帧依赖（I2V 禁令）！全片 100% 采用全局母版 Ref2V 一采直出！
+> 唯一铁律：彻底摒弃单镜首帧依赖（I2V 禁令），全片 100% 采用全局母版 Ref2V 一采直出！
 
 ---
 
-## 一、为什么彻底封杀 I2V 首帧垫图？(大人的准则第一条)
-1. **注意力竞争导致人脸与骨骼融化**：
-   在扩散模型（MiniMax H3 / DiT）的 Cross-Attention 机制中，每镜单独截取的首帧关键帧，会与全局角色母版产生剧烈的特征冲突与注意力拉扯，导致角色骨骼剧烈漂移、换脸、甚至产生多肢连体畸变；
-2. **流程割裂彻底摧毁自动化**：
-   单镜抽首帧迫使流水线不断中断，需要人工切软件选图、切图、改参数，成功率串联暴跌；
-3. **纯血真理**：
-   **全片 100% 采用【1套角色2x3母版 + 1张纯净环境底图】双锚定直通 H3 视频生成**，步骤最少、断点最少、全自动跑批量的稳定性最高！
+## 一、为什么彻底封杀单镜首帧垫图 (I2V)？
+1. **Cross-Attention 注意力竞争导致骨骼漂移与换脸**：
+   在视频扩散模型（MiniMax H3）中，若每镜单独抽一张首帧图喂入，首帧图的局部光影/姿态会与全局角色 2x3 母版发生剧烈的特征争夺，导致人物五官变形、身材比例坍塌甚至多肢畸变；
+2. **流程割裂摧毁批量自动化**：
+   单镜抽首帧迫使生产管线中断，需要人工切图、选图，无法跑通全自动队列；
+3. **纯血双锚定真理**：
+   全片每一镜均由 **【1 张纯净场景底图 (`<Picture 1>`) + 男女角色 2x3 定版母版 (`<Picture 2>`, `<Picture 3>`)】** 共同驱动，配合工作台六段式提示词直接生成视频，一致性最高、批量稳定性最强。
 
 ---
 
-## 二、纯血 Ref2V 解决复杂体位不融化的核心法则：【景别收缩与局部聚焦】
+## 二、纯血 Ref2V 攻克高难度体位不融化的三大物理法则
 
-在不依赖外部垫图的前提下，跑高难度双人体位（后入、折叠深压、跨坐），必须在分镜与提示词中严格执行**三大视听法则**：
-
-1. **核心交合冲撞强制收紧景别**：
-   - 严禁在大全景或全身中景里画两人交合（全裸全身会让模型同时计算两张正脸+四只手+四条腿+骨盆结合，算力必过载融化）；
-   - **取景范围强制死锁在腰胯中近景或局部微距**（`framing strictly from mid-thigh to lower ribcage, hip-height crop`）；
-   - 将全部潜空间注意力 100% 独占分配给骨盆前后冲撞、臀肉受力凹陷回弹、脊柱波浪反弓！
+1. **核心交合强制收缩景别（算力独占）**：
+   - 严禁在大全景 (`wide`) 中让模型同时计算全身四肢 + 两张正脸 + 复杂交合（算力必然过载融化）；
+   - 核心冲撞镜头强制收紧为 **中近景 (`mcu`)、腰胯特写 (`hip`) 或结合部微距 (`macro`)**，将扩散算力 100% 集中于腰臀冲撞、软组织受力回弹与局部接触点。
 2. **面部微表情注意力交棒**：
-   - 女主角的失神翻白眼、咬唇泪痕，**不在交合大动作中强行同框计算**；
-   - 顺势切给相邻的 **1.5s 生理阻断微距特写**，音画毫秒级对位，既保住了暴烈受力，又保住了神级微表情！
-3. **单镜一主动作，下镜必须物理换部位与机位**：
-   - 遵循工作台状态机推进（脱衣剥落 ➔ 指尖试探 ➔ 足部受力 ➔ 抓桌沿发力 ➔ 侧平视低机位主律动 ➔ 面部微距喘息 ➔ 顶点痉挛 ➔ 相拥平息），严禁单一动作机械复读。
+   - 激烈动作中的失神、咬唇、泪痕，交棒给相邻的 **1.5s~3.0s 独立面部/微距特写 (`face` / `macro`)**，通过弹跳剪辑组合出完整的视听高潮。
+3. **0.00s 空间接触死锁与防僵硬二次动作**：
+   - 每个动作镜头从 `0.00s` 起即处于接触/结合就位状态（1:1 调用工作台 `workbench_poses_matrix.json` 的 `beats` 原文），杜绝前戏漫游穿模；
+   - 全局挂载工作台 `Motion quality（防僵硬）` 锁：包含预备—发力—跟随三阶段惯性、二次动作波浪晃动与呼吸起伏。
 
 ---
 
-## 三、工作流负向清零与【正向肯定句绝对压油法则】(吸取工作台核心教训)
+## 三、工作流负向清零真相与【正向肯定句绝对压油】
 
-在《大人的工作台》实战中已彻底查明：
-> **工作流负向通道是零化的（Node 328 = ConditioningZeroOut），负向提示词完全不生效！在负向里写一万句 strictly NO oily skin 全是废话，必须靠正向肯定句压油！**
+《大人的工作台》底层工作流（`H3.V2.json`）中，**Node 328 = `ConditioningZeroOut` 将负向条件通道直接清零**。
+因此，任何写在负向里的排油词在物理上均不参与采样计算，**压除 LoRA 高光油腻感必须且只能靠正向肯定句**（已固化于 `tunjing_core.py` 的 `DE_OIL` 常量中）：
 
-### 必须内嵌进每个镜头提示词的正向压油肯定句段落：
 ```text
-[skin & texture]
-authentic matte velvet skin finish, powdered dry texture, natural human skin with visible fine pores and subtle imperfections, soft subsurface scattering without surface reflection, non-greasy complexion.
-
-[lighting]
-heavily diffused soft ambient light through large soft diffusion source, zero hard directional light, no harsh specular rim light on cheek, perfectly soft gradient shadow falloff.
-
-[cinematography]
-35mm film still, shallow depth of field, fine authentic 35mm film grain, neutral color science, candid caught-in-the-moment intensity, photorealistic anatomy, strictly zero extra limbs.
+Skin & Lighting: authentic matte velvet skin finish, powdered dry texture, natural human skin with visible fine pores and subtle imperfections, soft subsurface scattering without surface reflection, non-greasy complexion, heavily diffused soft ambient light, zero hard directional light, 35mm film grain, photorealistic anatomy
 ```
 
 ---
 
-## 四、标准 Ref2V 节点拓扑与参数死锁 (RTX 4070 Ti 12GB 基准)
+## 四、标准 Ref2V 节点拓扑与硬件参数基准
 
+```text
+[<Picture 1> 纯净场景底图 PNG] ➔ \
+[<Picture 2> 女主 2x3 母版 PNG] ➔ ---> [MiniMax H3 ReferenceToVideo] ➔ VAE Decode ➔ 成片 MP4
+[<Picture 3> 男主 2x3 母版 PNG] ➔ /
+[工作台六段式送模提示词文本]    ➔ /
 ```
-[角色 2x3 母版 PNG] (槽位 ref_image_1) ➔ \
-[纯净场景底图 PNG] (槽位 ref_image_0) ➔ ---> [MiniMax H3 ReferenceToVideo] ➔ VAE Decode ➔ 完美成片 MP4
-[全英文物理动量四段式文本] ➔ /
-```
-- **CFG**：1.0（杜绝 Turbo 蒸馏底模与 H3 潜空间过饱和彩噪）；
-- **Sampling Steps**：10 ~ 12 步；
-- **Scheduler**：beta / simple；
-- **画幅规格**：9:16 (864x1536 或 928x1664)；
-- **物理帧长**：`length = 5 + 17 * N` (由脚本自动按秒数换算整数帧)。
+
+- **CFG**：`1.0`
+- **Sampling Steps**：`10 ~ 12`
+- **Scheduler**：`beta` / `simple`
+- **画幅规格**：`9:16` (`864x1536` 或 `928x1664`)
+- **严格物理帧长公式**：`length = 5 + 17 * N`（由 `tunjing_scene.py` 按单镜秒数自动换算写入 `批量任务.json`）
