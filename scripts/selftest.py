@@ -4,7 +4,7 @@
 吞鲸宝典 v2.0 · 跨机权威完整性自检器 (Tunjing Master Self-Test)
 全部采用相对路径（可移植到任何机器、任何目录），一次性核验：
 1. 全部 25 个核心文件存在且非空
-2. 3 个工作台真源 JSON 结构合法（50 套姿势 / 40 条换位配方 / 9 套转换模板）
+2. 3 个吞鲸内置真源 JSON 结构合法（50 套姿势 / 40 条换位配方 / 9 套转换模板）
 3. 全部 8 个 Python 脚本 AST 语法 100% 通过
 4. 13 类场地承托面动态适配 (with_scene_surface) 功能正常
 """
@@ -21,7 +21,7 @@ sys.path.insert(0, SCRIPT_DIR)
 REQUIRED_FILES = [
     "SKILL.md",
     "README.md",
-    "references/workbench_poses_matrix.json",
+    "references/tunjing_poses_matrix.json",
     "references/transition_recipes.json",
     "references/oneshot_transitions.json",
     "references/official-prompt-assembly-spec.md",
@@ -63,7 +63,7 @@ def main():
     print(f"[✓] 1/4 文件清单核验 PASS (共 {len(REQUIRED_FILES)} 个核心文件全部就绪)")
 
     # 2. 真源 JSON 数据核验
-    with open(os.path.join(SKILL_DIR, "references/workbench_poses_matrix.json"), encoding="utf-8") as f:
+    with open(os.path.join(SKILL_DIR, "references/tunjing_poses_matrix.json"), encoding="utf-8") as f:
         poses = json.load(f)
     with open(os.path.join(SKILL_DIR, "references/transition_recipes.json"), encoding="utf-8") as f:
         recipes = json.load(f)
@@ -72,7 +72,7 @@ def main():
     assert len(poses) >= 50, f"姿势数不足 50: {len(poses)}"
     assert len(recipes) >= 40, f"换位配方不足 40: {len(recipes)}"
     assert len(oneshots) >= 9, f"转换模板不足 9: {len(oneshots)}"
-    print(f"[✓] 2/4 工作台真源数据 PASS ({len(poses)} 套姿势 / {len(recipes)} 条换位配方 / {len(oneshots)} 套模板)")
+    print(f"[✓] 2/4 吞鲸内置真源数据 PASS ({len(poses)} 套姿势 / {len(recipes)} 条换位配方 / {len(oneshots)} 套模板)")
 
     # 3. 脚本语法核验
     py_files = [r for r in REQUIRED_FILES if r.endswith(".py")]
