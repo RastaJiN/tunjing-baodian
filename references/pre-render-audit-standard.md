@@ -32,14 +32,15 @@
 - [ ] **四类受控运镜严守**：大冲撞必须【低机位死锁】，推进必须【5秒极慢推轨】，微距必须【纯微距定焦】，支配必须【紧凑过肩】；
 - [ ] **大范围移动零容忍**：全片提示词严禁出现 `orbit, 360, rapid pan, fast zoom, shaky camera` 等诱发换脸与肢体融化的毒性运镜词。
 
-### 维度五：语言与提示词纯净度 (Prompt Hygiene)
+### 维度五：正向压油与动量纯净度 (Positive Anti-Grease & Kinetic Momentum)
 - [ ] **正文全英文纯度**：除 `<d>[Chinese]...</d>` 台词与英文双引号画内文字外，提示词正文严禁残留未翻译中文字符；
-- [ ] **毒性油光蜡感词清零**：负向必须包含排油光蜡感声明，正向严禁出现 `sweat sheen, oily skin, plastic, dewy glisten` 等词；
-- [ ] **纯英文物理动量**：动作描述必须继承自 `kinetic-positions.md`，写明支撑面、脊柱反弓度、软组织凹陷与反作用力。
+- [ ] **负向清零与正向肯定句压油**：牢记工作流负向已清零，必须在正向显式包含工作台压油三段式（`authentic matte velvet skin finish, powdered dry texture, natural human skin with visible fine pores, soft subsurface scattering without surface reflection, non-greasy complexion`）；
+- [ ] **纯英文物理动量**：动作描述必须继承自工作台体位库，写明支撑面、脊柱反弓度、软组织凹陷与反作用力。
 
-### 维度六：双轨路由与 I2V 姿态准备度 (Dual-Pipeline Readiness)
-- [ ] **Ref2V 轨**：文戏对话与单人镜，已确认挂载穿衣母版与纯净 Qwen 场景底图；
-- [ ] **I2V 轨**：复杂交合姿态镜，已确认对应的生图姿态关键帧已就绪（或已规划姿态底图生成），杜绝纯血文生视频硬顶高危体位。
+### 维度六：纯血 Ref2V 单轨规范 (Pure Ref2V Pipeline Compliance)
+- [ ] **坚决封杀 I2V 垫图**：全片所有镜头（包括交合核心）100% 走纯血 Ref2V 轨道，严禁中间抽卡垫图；
+- [ ] **高难度交合景别强制收窄**：交合冲撞镜头取景范围必须收紧在腰胯中近景或微距（`framing strictly from mid-thigh to lower ribcage`），严禁全身全景硬算导致肢体融化；
+- [ ] **母版槽位双锚定**：确认 `ref_image_0` 挂纯净场景底图，`ref_image_1` 挂角色 2x3 母版。
 
 ---
 
@@ -57,5 +58,5 @@
 3. 换体位与特写契约：[PASS / FAIL] (POS-A ➔ POS-B，交合特写3次，深喉口交1次)
 4. 受控运镜规范：[PASS / FAIL] (无环绕/无手持晃动，死锁与微距到位)
 5. 提示词纯净度：[PASS / FAIL] (全英文动量，零油光毒性词)
-6. 双轨准备度：[PASS / FAIL] (Ref2V 与 I2V 轨道路由明确)
+6. 纯血Ref2V单轨规范：[PASS / FAIL] (全片纯血Ref2V无垫图，交合景别收缩腰胯)
 ```
