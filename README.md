@@ -52,6 +52,16 @@ python scripts/tunjing_gatekeeper.py <项目目录> [1-6]
 
 Gate 3 强制检查：逐镜景别、逐镜机位、平均单镜时长 ≤8s、换体位、3 次交合微距、口交特写。
 
+### 4. 渲染后一键转剪映草稿工程 (无缝后期剪辑)
+
+```bash
+python scripts/export_jianying_draft.py <项目目录> --name "我的漫剧_EP01"
+```
+自动读取分镜与渲染视频，直接向本机剪映（JianyingPro）生成本地草稿工程：
+- 自动按分镜时间轴拼装视频轨；
+- 自动提取台词生成卡点字幕轨（黄色描边、底部居中）；
+- 打开剪映客户端即可直接双击预览、加转场特效或导出成片！
+
 ---
 
 ## 真源数据（全部 1:1 提取自吞鲸引擎 `tunjing_poses_matrix.json`）
