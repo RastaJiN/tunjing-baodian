@@ -77,11 +77,22 @@ def audit_step_2(project_dir):
     if "<d>" not in content or "</d>" not in content:
         return False, "剧本门禁未通过：台词必须严格使用 <d>[Chinese]...</d> 标签包裹！"
         
-    # 检查是否提及体位 POS
-    if not re.search(r'POS-\d{2}', content):
-        return False, "剧本门禁未通过：第三幕肉戏必须显式声明调用的生物力学体位编号（如 POS-01、POS-02）！"
+    # 检查是否提及体位（支持工作台 50 个原生 pose id，兼容旧 POS-xx）
+    KNOWN_IDS = {"bj","squat_bj","prone_bj","deepthroat","head_thrust","facefuck","sixty_nine",
+                 "tip_lick","ball_lick","penis_slap","titjob","handjob","fingering","clit_tease",
+                 "cunnilingus","sofa_cunni","kiss_fondle","kiss_pin","kiss_force","kiss_her",
+                 "breast_rub","nipple_lick","undress","pov_insert","missionary","missionary_legup",
+                 "doggy","table_doggy","stand_doggy_wall","stand_bend_doggy","bedside_stand","anal",
+                 "cowgirl","cowgirl_upright","reverse_cowgirl","squat_cowgirl","lap_sit_back","lap_sit",
+                 "facesit","stand_face_hug","carry_insert","face_insert","side_face","side_spoon",
+                 "ass_rub","footjob","creampie","cum_face","cum_chest","cum_belly","cum_butt",
+                 "finger_masturbate"}
+    ids_in_script = set(re.findall(r'\b([a-z][a-z_]{1,24})\b', content)) & KNOWN_IDS
+    pos_in_script = set(re.findall(r'POS-\d{2}', content))
+    if not (ids_in_script or pos_in_script):
+        return False, "剧本门禁未通过：第三幕高能戏必须显式声明调用的工作台体位 ID（如 bj、missionary、cowgirl、doggy、cum_butt）！"
         
-    return True, "刀锋剧本三幕式、实体道具与体位编号验收 PASS！允许进入分镜设计。"
+    return True, f"刀锋剧本三幕式、实体道具与工作台体位 ID ({sorted(ids_in_script | pos_in_script)}) 验收 PASS！允许进入分镜设计。"
 
 def audit_step_3(project_dir):
     """门禁 3：弹跳分镜与双轨路由检查（含台词时长毫秒级咬合）"""
@@ -185,7 +196,7 @@ def audit_step_3(project_dir):
     return True, "分镜镜头组、弹跳微距、双轨路由、【音画咬合】及【换体位+3次交合微距+口交】全量验收 PASS！允许进入提示词编译。"
 
 def audit_step_4(project_dir):
-    """门禁 4：提示词编译与零中文正文检查"""
+    """门禁 4：工作台六段式提示词结构与正向压油核验"""
     prompt_file = os.path.join(project_dir, "视频提示词.md")
     if not os.path.exists(prompt_file):
         return False, "缺少 '视频提示词.md'！请先编译送模提示词。"
@@ -193,19 +204,33 @@ def audit_step_4(project_dir):
     with open(prompt_file, "r", encoding="utf-8") as f:
         content = f.read()
         
-    # 剔除台词内部后，正向不能大段中文
-    clean_text = re.sub(r'<d>.*?</d>', '', content, flags=re.DOTALL)
-    chinese_chars = re.findall(r'[\u4e00-\u9fa5]', clean_text)
-    if len(chinese_chars) > 50:
-        return False, f"提示词门禁未通过：正向描述包含未翻译中文 ({len(chinese_chars)} 字)！送模正文必须为纯英文物理动量描述。"
+    # 1. 检查工作台 buildOfficialH3Prompt() 六段式必填结构锚点
+    required_blocks = [
+        ("Goal: Generate", "缺少 [1] Goal 目标与时长画幅声明"),
+        ("Audio rule:", "缺少 [1] Audio rule 台词与静音纪律声明"),
+        ("Reference map", "缺少 [2] Reference map (<Picture N> 母版与场景槽位映射)"),
+        ("Consistency:", "缺少 [3] Consistency 身份与场景一致性死锁"),
+        ("Motion quality", "缺少 [3] Motion quality 防僵硬二次动作锁"),
+        ("integrated_multimodal_description:", "缺少 [5] integrated_multimodal_description 逐镜时间线主体"),
+        ("overall_soundscape:", "缺少 [6] overall_soundscape 环境底噪与动作声场"),
+        ("No subtitles, captions, watermarks", "缺少独立成段的 NEGATIVE 负面列表")
+    ]
+    for marker, err_msg in required_blocks:
+        if marker not in content:
+            return False, f"提示词门禁未通过：{err_msg}（必须严格遵循工作台六段式结构）！"
+            
+    # 2. 检查正向肯定句压油（工作流 Node 328 零化负向，必须靠正向压油）
+    if not re.search(r'matte velvet skin finish|powdered dry texture|visible fine pores', content, re.IGNORECASE):
+        return False, "提示词门禁未通过：缺少【工作台正向肯定句压油词】（authentic matte velvet skin finish, powdered dry texture）！工作流负向通道已零化，必须正向压油！"
         
-    # 检查是否有 POS 动量
-    if not re.search(r'pressed flat|hyperextends|pelvic crest|kinetic|straddle|hip-height|matte velvet', content, re.IGNORECASE):
-        return False, "提示词门禁未通过：肉戏提示词缺少生物力学物理动词（必须从 kinetic-positions.md 继承动量描述并包含正向压油词）！"
+    # 3. 检查是否误入毒性油光词
+    toxic_words = ['sweat sheen', 'oily face', 'shiny plastic', 'vaseline skin', 'dewy glisten']
+    for tw in toxic_words:
+        if tw in content.lower():
+            return False, f"提示词门禁未通过：检测到诱发油光蜡感的毒性词 '{tw}'！请立即剔除。"
         
-    # 5. 画外音与内心独白 (OS/Voiceover) 绝对防对口型死锁检查
+    # 4. 画外音与内心独白 (OS/Voiceover) 绝对防对口型死锁检查
     if re.search(r'voiceover|monologue|\bOS\b', content, re.IGNORECASE):
-        # 必须显式包含物理闭口或嘴部占位描述
         mouth_lock_patterns = [
             r'lips remain completely closed',
             r'bite[s]? down on',
@@ -213,15 +238,15 @@ def audit_step_4(project_dir):
             r'lips are pressed into',
             r'sealed around',
             r'oral cavity is physically locked',
-            r'lips remain parted in breathless gasps', # 允许纯喘息微张，但严禁动嘴说话
-            r'back of her head', # 机位逃逸：背面
+            r'lips remain parted in breathless gasps',
+            r'back of her head',
             r'viewpoint is from behind'
         ]
         has_mouth_lock = any(re.search(p, content, re.IGNORECASE) for p in mouth_lock_patterns)
         if not has_mouth_lock:
             return False, "提示词门禁未通过：检测到包含画外音/内心独白(Voiceover/OS)，但未添加【嘴部物理占位死锁】！必须显式声明 'lips remain completely closed'、咬下唇 'bite down on lower lip' 或机位背向，防止模型在画面中对口型穿帮！"
             
-    return True, "提示词全英文动量描述、语法门禁与【OS防对口型物理死锁】验收 PASS！允许进入最终渲染提交。"
+    return True, "提示词【工作台六段式结构 + 正向肯定句压油 + OS防对口型死锁】全量验收 PASS！允许进入生成前终审。"
 
 def audit_step_5(project_dir):
     """门禁 5：生成前自我终极审核 (Pre-Render Self-Audit)"""
