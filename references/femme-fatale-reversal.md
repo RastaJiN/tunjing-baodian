@@ -23,7 +23,7 @@
 
 ### 模型 C：【女本位掌控 · 绝对支配】(Female Dominance / Reverse Control)
 - **关系内核**：由女方掌握绝对的心理或权力主动权，男方处于仰视、渴望、被调教或甘愿臣服的位置；
-- **视觉落点**：高频调用工作台 `cowgirl`（女上位骑乘）、`cowgirl_upright`、`reverse_cowgirl`、`lap_sit`、`facesit`、`kiss_her`（女主动接吻）等女方主导姿态；
+- **视觉落点**：高频调用吞鲸引擎 `cowgirl`（女上位骑乘）、`cowgirl_upright`、`reverse_cowgirl`、`lap_sit`、`facesit`、`kiss_her`（女主动接吻）等女方主导姿态；
 - **适用题材**：姐弟恋、女王与忠犬、女尊/女上司。
 
 ### 模型 D：【绝境相依 · 救赎与暴烈温柔】(Desperate Bond / Dark Romance)
