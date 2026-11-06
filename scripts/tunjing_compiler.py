@@ -1,9 +1,10 @@
 """
-吞鲸极速提示词装配与校验引擎 (Tunjing Prompt Compiler & Linter)
-专为 MiniMax H3 / 视频扩散模型打造：
-1. 自动注入吞鲸体位字典 (Kinetic Kama-Sutra)
-2. 剥离人类废话，全英文物理动词
-3. 严格校验台词包裹与槽位对齐
+吞鲸极速提示词校验引擎 (Tunjing Prompt Linter)
+严格对齐《大人的工作台》buildOfficialH3Prompt() 六段式中英混合结构：
+1. 校验六段式必填结构锚点（Goal / Audio rule / Reference map / Consistency / Motion quality / integrated_multimodal_description / overall_soundscape / NEGATIVE）
+2. 校验正向肯定句压油词（针对 Node 328 零化负向的物理真相）
+3. 拦截诱发油光蜡感的毒性词
+4. 严格校验台词 <d> 标签包裹
 """
 
 import sys
@@ -14,37 +15,45 @@ def lint_tunjing_prompt(text):
     errors = []
     warnings = []
     
-    # 1. 检查台词是否规范
+    # 1. 检查台词标签是否为空
     speech_matches = re.findall(r'<d>(.*?)</d>', text, re.DOTALL)
-    if not speech_matches and 'Track: Ref2V' in text:
-        warnings.append("提示：本镜头标注为 Ref2V 但未检测到台词 <d> 标签，若为纯动作镜请忽略。")
-        
     for sp in speech_matches:
         if not sp.strip():
             errors.append("错误：检测到空的台词标签 <d></d>！")
             
-    # 2. 检查是否有未经翻译的中文描述（排除台词内部）
-    # 将台词部分剔除后检查正向文本
-    clean_text = re.sub(r'<d>.*?</d>', '', text, flags=re.DOTALL)
-    # 排除中文标点和常用注释标记
-    chinese_chars = re.findall(r'[\u4e00-\u9fa5]', clean_text)
-    if len(chinese_chars) > 20: # 允许少量注释，但正文必须全英文
-        errors.append(f"错误：正文描述包含过多中文字符 ({len(chinese_chars)} 个)！送模正文必须为纯英文物理描述。")
+    # 2. 检查工作台六段式核心结构锚点
+    required_blocks = [
+        ("Goal: Generate", "缺少 [1] Goal 目标与时长画幅声明"),
+        ("Audio rule:", "缺少 [1] Audio rule 台词与静音纪律声明"),
+        ("Reference map", "缺少 [2] Reference map (<Picture N> 母版与场景槽位映射)"),
+        ("Consistency:", "缺少 [3] Consistency 身份与场景一致性死锁"),
+        ("Motion quality", "缺少 [3] Motion quality 防僵硬二次动作锁"),
+        ("integrated_multimodal_description:", "缺少 [5] integrated_multimodal_description 逐镜时间线主体"),
+        ("overall_soundscape:", "缺少 [6] overall_soundscape 环境底噪与动作声场"),
+        ("No subtitles, captions, watermarks", "缺少独立成段的 NEGATIVE 负面列表")
+    ]
+    for marker, msg in required_blocks:
+        if marker not in text:
+            errors.append(f"结构错误：{msg}")
+            
+    # 3. 检查工作台正向肯定句压油词
+    if not re.search(r'matte velvet skin finish|powdered dry texture|visible fine pores', text, re.IGNORECASE):
+        errors.append("压油错误：缺少工作台正向肯定句压油词（authentic matte velvet skin finish, powdered dry texture）！")
         
-    # 3. 检查受控词与毒性油光词
+    # 4. 检查毒性油光词
     toxic_words = ['sweat sheen', 'oily face', 'shiny plastic', 'vaseline skin', 'dewy glisten']
     for tw in toxic_words:
-        if tw in clean_text.lower():
-            warnings.append(f"警告：检测到容易引发塑料油光的词汇 '{tw}'，建议改用纯哑光柔光描述。")
+        if tw in text.lower():
+            errors.append(f"毒性词错误：检测到容易引发塑料油光的词汇 '{tw}'，必须剔除！")
             
-    # 4. 检查槽位对应关系
-    if '<Subject 1>' in text and 'ref_image_0' not in text and '<Picture 1>' not in text:
-        warnings.append("警告：声明了 <Subject 1> 但未检测到对应的母版绑定 (<Picture 1> 或 ref_image_0)。")
+    # 5. 检查槽位对应关系
+    if '<Picture 1>' not in text:
+        warnings.append("警告：未检测到 <Picture 1> 槽位声明。")
         
     return errors, warnings
 
 def main():
-    parser = argparse.ArgumentParser(description="吞鲸提示词编译器")
+    parser = argparse.ArgumentParser(description="吞鲸提示词六段式体检器")
     parser.add_argument("file", help="待检测的提示词文件路径")
     args = parser.parse_args()
     
@@ -57,9 +66,9 @@ def main():
         
     errors, warnings = lint_tunjing_prompt(content)
     
-    print("=" * 50)
-    print("🐳 吞鲸宝典 · 提示词体检报告")
-    print("=" * 50)
+    print("=" * 55)
+    print("🐳 吞鲸宝典 · 工作台六段式提示词体检报告")
+    print("=" * 55)
     
     if warnings:
         print(f"[!] 发现 {len(warnings)} 条建议/警告:")
@@ -75,7 +84,7 @@ def main():
         print("\n结果: FAIL (禁止提交渲染)")
         sys.exit(1)
     else:
-        print("\n结果: PASS (可直接送入 ComfyUI 队列)")
+        print("\n结果: PASS (100% 符合工作台六段式规范，可直接送入 ComfyUI)")
         sys.exit(0)
 
 if __name__ == "__main__":
