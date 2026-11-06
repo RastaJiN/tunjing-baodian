@@ -128,15 +128,59 @@ def audit_step_3(project_dir):
     if not re.search(r'口交|深喉|oral|blowjob', content, re.IGNORECASE):
         return False, "分镜门禁未通过：缺少核心【口交/深喉近景或拉丝微距】！这是吞鲸高能戏的绝对支配项，必须单列镜头！"
         
-    # B. 必须至少有 2 个不同的 POS 体位编号（换体位）
+    # B. 必须至少有 2 个不同的姿势（换体位）
     pos_found = set(re.findall(r'POS-\d{2}', content))
-    if len(pos_found) < 2:
-        return False, f"分镜门禁未通过：单集肉戏必须中途【换体位】！实测仅检测到 {len(pos_found)} 个体位 ({list(pos_found)})，必须包含至少 2 个不同体位 (如 POS-01 ➔ POS-02)！"
+    # 新链路：支持 workbench pose id 与中文姿势名
+    KNOWN_IDS = {"bj","squat_bj","prone_bj","deepthroat","head_thrust","facefuck","sixty_nine",
+                 "tip_lick","ball_lick","penis_slap","titjob","handjob","fingering","clit_tease",
+                 "cunnilingus","sofa_cunni","kiss_fondle","kiss_pin","kiss_force","kiss_her",
+                 "breast_rub","nipple_lick","undress","pov_insert","missionary","missionary_legup",
+                 "doggy","table_doggy","stand_doggy_wall","stand_bend_doggy","bedside_stand","anal",
+                 "cowgirl","cowgirl_upright","reverse_cowgirl","squat_cowgirl","lap_sit_back","lap_sit",
+                 "facesit","stand_face_hug","carry_insert","face_insert","side_face","side_spoon",
+                 "ass_rub","footjob","creampie","cum_face","cum_chest","cum_belly","cum_butt",
+                 "finger_masturbate"}
+    ids_found = set(re.findall(r'\b([a-z][a-z_]{2,24})\b', content)) & KNOWN_IDS
+    all_poses = pos_found | ids_found
+    if len(all_poses) < 2:
+        return False, (f"分镜门禁未通过：单集肉戏必须中途【换体位】！"
+                       f"实测仅检测到 {len(all_poses)} 个姿势，必须包含至少 2 个不同姿势"
+                       f"（如 missionary ➔ doggy，或 POS-01 ➔ POS-02）！")
         
     # C. 必须包含至少 3 次独立的交合部位微距特写
     macro_matches = re.findall(r'交合特写|结合部微距|结合特写|macro pelvic|macro penetration|macro interlocking', content, re.IGNORECASE)
     if len(macro_matches) < 3:
         return False, f"分镜门禁未通过：单集肉戏必须包含至少 3 次【独立的交合/结合部微距特写】（入口破壁/深层抽送咬合/绝顶死锁）！实测仅检测到 {len(macro_matches)} 次，严禁用手脸充数！"
+
+    # D. 【拆镜密度门禁】逐镜必须有景别 + 机位，且镜头密度符合硬件上限
+    shot_marks = re.findall(r'(?:^|\n)\s*(?:###?\s*)?\[?SHOT[\s\-]?\d+', content, re.IGNORECASE)
+    shot_count = len(shot_marks)
+    if shot_count == 0:
+        return False, ("分镜门禁未通过：未检测到任何 [SHOT-N / ### SHOT N] 镜头标记！"
+                       "必须逐镜拆解，每镜独立成条。")
+
+    # 景别必须逐镜出现（mcu/cu/macro/hip/face/wide 或中文景别词）
+    size_hits = len(re.findall(r'\b(?:wide|mcu|cu|macro|hip|face)\b|中景|中近景|近景|微距|腰胯特写|面部特写', content))
+    if size_hits < shot_count * 0.8:
+        return False, (f"分镜门禁未通过：【景别标注缺失】！检测到 {shot_count} 个镜头，"
+                       f"但仅 {size_hits} 处景别标注。逐镜必须标明景别"
+                       f"（wide/mcu/cu/macro/hip/face 或中景/中近景/近景/微距/腰胯特写/面部特写）！")
+
+    # 机位必须逐镜出现
+    cam_hits = len(re.findall(r'static_side|static_rear|static_front|low_hip|ots|high_angle|slow_push|follow_soft|固定机位|侧机位|后侧机位|低机位|过肩|俯机位|推轨|固定侧|固定后侧', content))
+    if cam_hits < shot_count * 0.8:
+        return False, (f"分镜门禁未通过：【机位标注缺失】！检测到 {shot_count} 个镜头，"
+                       f"但仅 {cam_hits} 处机位标注。逐镜必须标明机位"
+                       f"（static_side/static_rear/low_hip/ots/high_angle 等）！")
+
+    # 镜头密度：从时长反推，平均单镜不得超过 8 秒（硬件上限）
+    durations = [float(x) for x in re.findall(r'(\d+(?:\.\d+)?)\s*(?:秒|s)\b', content)]
+    if durations and shot_count:
+        avg = sum(d for d in durations if d <= 30) / max(1, len([d for d in durations if d <= 30]))
+        if avg > 8.0:
+            return False, (f"分镜门禁未通过：【镜头过长，违反硬件上限】！"
+                           f"平均单镜 {avg:.1f}s，超过 8s 上限。"
+                           f"2 分钟床戏应拆成 20~30 个 2~6s 短镜，严禁把多个体位压进一镜！")
         
     return True, "分镜镜头组、弹跳微距、双轨路由、【音画咬合】及【换体位+3次交合微距+口交】全量验收 PASS！允许进入提示词编译。"
 
