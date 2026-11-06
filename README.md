@@ -1,7 +1,7 @@
 # 🐳 吞鲸宝典 (Tunjing Baodian)
 
 > 吞鲸工作室 · 精品漫剧极速生产引擎
-> 绑定桌面《大人的工作台》真源，1:1 复刻其姿势矩阵与提示词装配逻辑。
+> 绑定吞鲸宝典内置引擎真源，1:1 复刻其姿势矩阵与提示词装配逻辑。
 
 ---
 
@@ -54,11 +54,11 @@ Gate 3 强制检查：逐镜景别、逐镜机位、平均单镜时长 ≤8s、�
 
 ---
 
-## 真源数据（全部 1:1 提取自工作台 `h3-app.js`）
+## 真源数据（全部 1:1 提取自吞鲸引擎 `tunjing_poses_matrix.json`）
 
 | 文件 | 内容 | 条数 |
 |---|---|---|
-| `references/workbench_poses_matrix.json` | 单体姿势（framing + beats 中英原文） | 50 套 |
+| `references/tunjing_poses_matrix.json` | 单体姿势（framing + beats 中英原文） | 50 套 |
 | `references/oneshot_transitions.json` | 一键组合模板（仅作转场桥参考） | 9 套 |
 | `references/transition_recipes.json` | 物理换位配方 | 40 条 |
 | `references/kinetic-positions.md` | 上表的人类可读视图（由 JSON 生成） | — |
