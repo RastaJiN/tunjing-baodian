@@ -2,7 +2,7 @@
 吞鲸 ComfyUI 跨机渲染提交与批量任务打包器 (Tunjing ComfyUI Payload Exporter)
 功能：
 1. 检查项目目录下前序 5 大门禁是否全部 PASS（未全绿严禁导出渲染！）
-2. 自动核验或生成工作台标准 `批量任务.json` (schema: h3-drama-task, 纯血 Ref2V 单轨)
+2. 自动核验或生成吞鲸标准 `批量任务.json` (schema: h3-drama-task, 纯血 Ref2V 单轨)
 3. 自动检测本机 ComfyUI 服务 (http://127.0.0.1:8188) 并输出一键启动指令
 """
 
@@ -83,7 +83,7 @@ def main():
 
     online = check_comfy_health()
     if online:
-        print("\n[OK] 本机 ComfyUI 在线，可直接将项目目录下的 `批量任务.json` 拖入工作台或调用 batch_h3.py --run 启动批量渲染！")
+        print("\n[OK] 本机 ComfyUI 在线，可直接将项目目录下的 `批量任务.json` 拖入吞鲸引擎交由 ComfyUI H3 节点队列直接批量渲染！")
     else:
         print("\n[READY] 离线打包与校验已完成！生成的 `批量任务.json` 可随时拷贝至运行 ComfyUI 的工作机无损出片。")
     sys.exit(0)
