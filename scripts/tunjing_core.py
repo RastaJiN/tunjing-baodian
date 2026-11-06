@@ -17,6 +17,9 @@ FINISH_IDS = {"creampie", "cum_face", "cum_chest", "cum_belly", "cum_butt"}
 ORAL_ONLY = {"bj", "squat_bj", "prone_bj", "deepthroat", "head_thrust", "facefuck",
              "sixty_nine", "cunnilingus", "sofa_cunni", "fingering", "clit_tease",
              "tip_lick", "ball_lick", "penis_slap", "handjob", "titjob"}
+FOREPLAY = {"undress", "kiss_fondle", "breast_rub", "nipple_lick",
+            "kiss_pin", "kiss_force", "kiss_her", "ass_rub", "masturbation",
+            "finger_masturbate", "strip_tease"}
 
 DE_OIL = ("authentic matte velvet skin finish, powdered dry texture, natural human skin with "
           "visible fine pores and subtle imperfections, soft subsurface scattering without "
@@ -206,16 +209,19 @@ def footer_block(scene="当前场景"):
 
 
 def insert_hint(pose_id):
-    """只有插入类姿势才加阴道贴合要点"""
-    first = (pose_id or "").split("->")[0]
-    if first in FINISH_IDS or first in ORAL_ONLY:
+    """只有插入类姿势才加阴道贴合要点；前戏、口交、转场位移与射精姿势一律不加"""
+    p = pose_id or ""
+    if "->" in p:
+        return ""
+    first = p.split("->")[0]
+    if first in FINISH_IDS or first in ORAL_ONLY or first in FOREPLAY:
         return ""
     return ("；画面要点：阴茎与阴道紧密贴合插入，短行程进出清晰可读，"
             "交合处比例接近真人参考、阴唇自然包裹，不要占满画面")
 
 
 def single_shot_prompt(shot, index, total_shots, dur, size_desc, cam_desc,
-                       lines="", idea="", scene="当前场景", pose_names=""):
+                       lines="", speaker="女子A", idea="", scene="当前场景", pose_names=""):
     """
     为「拆镜表」中的单个镜头生成完整可送模提示词（含自动承托面与声场适配）。
     """
@@ -227,11 +233,21 @@ def single_shot_prompt(shot, index, total_shots, dur, size_desc, cam_desc,
         head = "[Shot 1] At 0.00s, this clip begins directly at this beat."
 
     adapted_text = with_scene_surface(shot["text"], scene)
+    pose_raw = shot.get("pose", "")
+
+    # 针对接吻类体位增加防蛇信子约束
+    if any(k in pose_raw for k in ("kiss", "kiss_fondle", "kiss_pin", "kiss_force", "kiss_her")):
+        adapted_text += "（物理约束：唇齿轻启微碰，自然触碰，严禁舌头过度伸出，保持真人自然接吻生理形态）"
+
+    # 针对脱衣类前戏防止开场遛鸟约束
+    if "undress" in pose_raw:
+        adapted_text += "（画面锁定在肩颈与衣领扣子滑落，男方衣着完整，严禁下半身过度裸露与生殖器入画）"
+
     body = f"景别：{size_desc}。机位：{cam_desc}。{adapted_text}"
-    body += insert_hint(shot.get("pose", ""))
+    body += insert_hint(pose_raw)
 
     if lines:
-        body += f" 女子A says: <d>[Chinese]{lines}</d>."
+        body += f" {speaker} says: <d>[Chinese]{lines}</d>."
 
     if index == total_shots - 1:
         body += f" Final state: 人物身份不漂移，交合处仍紧密贴合、比例自然，构图稳定收住到 {dur:.2f}s。"
