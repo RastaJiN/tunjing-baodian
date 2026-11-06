@@ -1,6 +1,6 @@
 """
 吞鲸极速提示词校验引擎 (Tunjing Prompt Linter)
-严格对齐《大人的工作台》buildOfficialH3Prompt() 六段式中英混合结构：
+严格对齐吞鲸宝典内置引擎吞鲸六段式标准装配器 六段式中英混合结构：
 1. 校验六段式必填结构锚点（Goal / Audio rule / Reference map / Consistency / Motion quality / integrated_multimodal_description / overall_soundscape / NEGATIVE）
 2. 校验正向肯定句压油词（针对 Node 328 零化负向的物理真相）
 3. 拦截诱发油光蜡感的毒性词
@@ -21,7 +21,7 @@ def lint_tunjing_prompt(text):
         if not sp.strip():
             errors.append("错误：检测到空的台词标签 <d></d>！")
             
-    # 2. 检查工作台六段式核心结构锚点
+    # 2. 检查吞鲸标准六段式核心结构锚点
     required_blocks = [
         ("Goal: Generate", "缺少 [1] Goal 目标与时长画幅声明"),
         ("Audio rule:", "缺少 [1] Audio rule 台词与静音纪律声明"),
@@ -36,9 +36,9 @@ def lint_tunjing_prompt(text):
         if marker not in text:
             errors.append(f"结构错误：{msg}")
             
-    # 3. 检查工作台正向肯定句压油词
+    # 3. 检查吞鲸正向肯定句压油词
     if not re.search(r'matte velvet skin finish|powdered dry texture|visible fine pores', text, re.IGNORECASE):
-        errors.append("压油错误：缺少工作台正向肯定句压油词（authentic matte velvet skin finish, powdered dry texture）！")
+        errors.append("压油错误：缺少吞鲸正向肯定句压油词（authentic matte velvet skin finish, powdered dry texture）！")
         
     # 4. 检查毒性油光词
     toxic_words = ['sweat sheen', 'oily face', 'shiny plastic', 'vaseline skin', 'dewy glisten']
@@ -67,7 +67,7 @@ def main():
     errors, warnings = lint_tunjing_prompt(content)
     
     print("=" * 55)
-    print("🐳 吞鲸宝典 · 工作台六段式提示词体检报告")
+    print("🐳 吞鲸宝典 · 吞鲸标准六段式提示词体检报告")
     print("=" * 55)
     
     if warnings:
@@ -84,7 +84,7 @@ def main():
         print("\n结果: FAIL (禁止提交渲染)")
         sys.exit(1)
     else:
-        print("\n结果: PASS (100% 符合工作台六段式规范，可直接送入 ComfyUI)")
+        print("\n结果: PASS (100% 符合吞鲸标准六段式规范，可直接送入 ComfyUI)")
         sys.exit(0)
 
 if __name__ == "__main__":
