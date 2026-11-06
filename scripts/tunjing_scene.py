@@ -182,7 +182,7 @@ def h3_frames(sec):
 
 def save_project_artifacts(out_dir, shots, actual_total, want_total, lines="",
                            idea="", scene="卧室", pose_names=""):
-    """一键在项目目录落盘：分镜.md + 视频提示词.md + 批量任务.json（工作台 h3-drama-task 规范）"""
+    """一键在项目目录落盘：分镜.md + 视频提示词.md + 批量任务.json（吞鲸引擎 h3-drama-task 规范）"""
     import datetime
     os.makedirs(out_dir, exist_ok=True)
 
@@ -198,7 +198,7 @@ def save_project_artifacts(out_dir, shots, actual_total, want_total, lines="",
     ]
 
     prompt_lines = [
-        f"# 吞鲸工作室 · 逐镜工作台六段式送模提示词",
+        f"# 吞鲸工作室 · 逐镜吞鲸标准六段式送模提示词",
         f"- 场景：{scene} | 总镜数：{len(shots)} 镜",
         "",
         "---",
@@ -297,7 +297,7 @@ def save_project_artifacts(out_dir, shots, actual_total, want_total, lines="",
 
     print(f"[✓] 已落盘分镜表: {sb_path}")
     print(f"[✓] 已落盘提示词: {pr_path}")
-    print(f"[✓] 已落盘工作台批量任务 JSON ({len(batch_shots)} 镜): {bj_path}")
+    print(f"[✓] 已落盘吞鲸标准批量任务 JSON ({len(batch_shots)} 镜): {bj_path}")
     return sb_path, pr_path, bj_path
 
 
