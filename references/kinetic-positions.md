@@ -1,483 +1,679 @@
-# 吞鲸·大人的工作台 1:1 姿势与物理动量全量矩阵 (Workbench Pose Matrix)
-> 本文档 1:1 提取自桌面《大人的工作台》核心驱动引擎 `assets/h3-app.js` 与 `姿势词典/双人缠绵_55组.md`。
-> **唯一铁律**：任何大模型在为吞鲸漫剧设计床戏、拆解分镜或编译提示词时，**严禁脑补任何自由发挥的英文词汇，必须 1:1 查表调用本矩阵中的 ID、机位 (Framing) 与三阶段物理动量 (Beats)！**
+# 吞鲸 · 工作台姿势与物理动量全量字典
 
----
-## 一、大模型床戏搭配法则 (How Models Assemble Intimate Scenes)
-任何模型接盘，单集肉戏必须严格按【前戏破防 ➔ 主力交合(换体位) ➔ 绝顶清算】三段式结构从本表中挑选组合：
+> **本文件是 `workbench_poses_matrix.json` 的人类可读视图**，由脚本从 JSON 真源生成，不再手工维护。
+> 当前收录 **50 套姿势 / 9 套一键组合 / 40 条换位配方**。
 
-1. **前戏 (2~3 镜)**：从【前戏与口爱类】选取，如 `kiss_pin` ➔ `bj` 或 `deepthroat`；
-2. **主力交合 (4~6 镜)**：必须选取 **2 个不同体位**（如 `table_doggy` ➔ `carry_insert` 或 `missionary` ➔ `reverse_cowgirl`）；
-3. **绝顶清算 (2~3 镜)**：从【绝顶清算类】选取，如 `creampie` 或 `cum_face`。
+## ⚠️ 装配口径声明（与旧版不同，必须遵守）
 
-### 每一镜提示词的标准装配公式 (100% 跑通 Ref2V)：
+送模提示词**不是**「四段式公式」，而是工作台 `buildOfficialH3Prompt()` 的**六段式结构**：
+
 ```text
-[机位景别死锁 (framingEn)] +
-[工作台正向压油 (authentic matte velvet skin finish, powdered dry texture...)] +
-[工作台 1:1 动量节拍 (beatsEn[0] / beatsEn[1] / beatsEn[2])] +
-[拟声与台词 (lineEn / lineZh)]
+[1] Goal + Audio rule + 表情口型 + 用户介绍
+[2] Reference map（<Picture N> 逐槽锁定：场景锁空间、人物锁身份）
+[3] Consistency + Skin&Lighting 正向压油 + Motion quality 防僵硬
+[4] Pose focus chain（本镜姿势链）
+[5] integrated_multimodal_description（逐镜 [Shot N] 时间线）
+[6] overall_soundscape + non_diegetic_music
+独立成段：Negative 列表（禁止塞进正文）
 ```
 
+> 完整装配规格见 `official-prompt-assembly-spec.md`；**禁止再用旧的四段式公式**。
+
 ---
-## 二、全量 49 套体位 1:1 物理动量字典
+
+## 一、怎么用这份字典（大模型必读）
+
+1. **先拆镜再查表**：2 分钟床戏必须拆成 20~30 个独立短镜，每镜 2~6 秒；
+2. **每镜只用一个姿势**：严禁把多个体位压进一镜（一键组合仅用于转场桥）；
+3. **逐镜必给机位与景别**：见 `SKILL.md` 第四章的景别库与机位库；
+4. **动作文本直接从本表取**：下方每个姿势的 `Beats` 是工作台原文，禁止改写或脑补；
+5. **换体位查 transition**：用 `transition_recipes.json` 的 40 条物理换位配方，禁止凭空瞬移。
 
 
-### 【口爱与深喉】
+## 口爱与深喉
 
-#### 编号: `bj` | 跪姿口交 (Kneeling BJ)
-- **Framing (机位与景别死锁)**:
-  `MCU (face + mouth; lips sealed on shaft; already engaged from 0.00s; glans hidden)`
-- **Beats (工作台 1:1 动量推进)**:
-  - **Beat 1**: `From 0.00s: lips already sealed mid-shaft, penis at least halfway in (not tip hovering, not empty open mouth, not tongue-out blocking, not chin-rest); hands on his front thighs or her knees (not gripping shaft); continuous readable shallow-deep bobbing, glans never exits on the shallow end; his arms at his sides, not holding her head or blocking her mouth`
-  - **Beat 2**: `Shallow bobbing still keeps ≥ half inside: glans never exits the lips; saliva strings; hands stay on thighs/knees, not on the shaft`
-  - **Beat 3**: `Deeper: more than half to near-throat, occasional deep hold then back to half still enclosed; glans never exposed; hands brace his thighs`
-- **SFX (环境音效)**: `sucking, soft breathy moans`
-- **Line (参考喘息/台词)**: `嗯，啊，嗯，啊，`
-
-#### 编号: `squat_bj` | 站立蹲姿口交 (Standing squat BJ)
-- **Framing (机位与景别死锁)**:
-  `MCU (he stands upright; she squats on the floor right in front of him; penis half inside her mouth from 0.00s; glans hidden)`
-- **Beats (工作台 1:1 动量推进)**:
-  - **Beat 1**: `From 0.00s space lock already engaged: he stands upright, both feet on the floor; she squats right in front of him, knees apart, feet flat, hips near heels, torso upright; lips sealed mid-shaft, penis at least halfway in (not tip hovering, not empty open mouth, not tongue-out blocking, not chin-rest); her hands at her sides (not gripping the shaft, no titjob); continuous readable shallow-deep bobbing, glans never exits on the shallow end; his arms at his sides, not holding her head or blocking her mouth`
-  - **Beat 2**: `Shallow bobbing while squatting: ≥ half stays inside, glans never exits the lips; saliva strings; eyes looking up at him; hands still at her sides, not on the shaft`
-  - **Beat 3**: `Deeper: more than half to near-throat, occasional deep hold then back to half still enclosed; glans never exposed; squat steady, torso upright`
-- **SFX (环境音效)**: `sucking, soft breathy moans`
-- **Line (参考喘息/台词)**: `嗯，啊，嗯，啊，`
-
-#### 编号: `prone_bj` | 趴姿口交 (Prone BJ)
-- **Framing (机位与景别死锁)**:
-  `side MCU / slight high (him supine; her prone at his crotch; mouth already on shaft from 0.00s; glans hidden)`
-- **Beats (工作台 1:1 动量推进)**:
-  - **Beat 1**: `From 0.00s space lock already engaged: he supine legs open; she prone belly-down between his legs or at his hip—not kneeling. Lips sealed mid-shaft, penis ≥ half in (not hovering tip, not empty mouth, not tongue blocking, not chin-rest). Hands brace his outer thighs or the surface (not gripping shaft). Continuous readable bobbing; glans never exits on shallow end; his arms at his sides`
-  - **Beat 2**: `Prone bobbing: belly-down head pumps; ≥ half stays inside, glans never exits lips; saliva strings; hands brace, not on shaft; his hips may lift slightly; camera locks mouth-shaft junction`
-  - **Beat 3**: `Deeper prone: face closer to lower belly, more than half to near-throat then back to half still enclosed; body flat on his thighs; brief eye contact then back down; glans never exposed`
-- **SFX (环境音效)**: `sucking, soft breathy moans, light fabric/surface rustle`
-- **Line (参考喘息/台词)**: `嗯，啊，嗯，啊，`
-
-#### 编号: `penis_slap` | 阴茎拍脸 (Cock tapping on face)
-- **Framing (机位与景别死锁)**:
-  `MCU close-up (she kneels, face at his crotch looking up; his hand grips the base of his erect penis the whole time and the shaft itself taps and bounces against her cheeks and lips; only the penis touches her face, his hand never does)`
-- **Beats (工作台 1:1 动量推进)**:
-  - **Beat 1**: `From 0.00s: she kneels directly in front of the standing man, face level with his crotch, eyes looking up; his right hand grips the base of his erect penis the whole time and never leaves it or touches her face, his left hand rests lightly on top of her head; he sways his hips so the shaft swings side to side and the penis itself taps softly against her left cheek, then her right cheek, about once per second, a clearly countable rhythm; each time the shaft meets her cheek, the cheek dents slightly and springs back, and the penis bounces away and wobbles naturally; only the penis touches her face, his hand never does; her hands rest on her thighs, not gripping`
-  - **Beat 2**: `Keeping the rhythm: the glans dabs lightly on her parted lips and outstretched tongue tip, three or four times in a row, the penis bouncing up and down, lips pressing flat and rebounding, a thin saliva strand stretching; she blinks and her shoulders flinch slightly each time it touches her; his right hand still grips the base, his left hand still rests on her head`
-  - **Beat 3**: `She looks up and breaks into a smile, sticks out her tongue toward the glans; the glans comes to rest on her tongue; only a faint natural blush; the penis does not enter her mouth and stays attached to his body; only the penis ever touches her face`
-- **SFX (环境音效)**: `阴茎轻碰脸颊的轻微皮肤接触声, 气声轻喘, 女声轻笑`
-- **Line (参考喘息/台词)**: `嗯…（吸气）啊～…哈啊…嘻～`
-
-#### 编号: `tip_lick` | 舔龟头 (Tip licking)
-- **Framing (机位与景别死锁)**:
-  `MCU close-up (tongue already on glans from 0.00s; readable lick motion)`
-- **Beats (工作台 1:1 动量推进)**:
-  - **Beat 1**: `From 0.00s: tongue already flat on the glans/corona in continuous licking (not hovering prelude, not insertion-first); one hand may hold the base, other on his thigh; lips close to the tip; saliva gloss and lick path clearly readable; his arms at his sides`
-  - **Beat 2**: `Faster circling: tongue spins corona and frenulum; brief soft suck on the tip then back to licking; eye contact up`
-  - **Beat 3**: `Sustained readable licking: flat licks up/down the tip and front shaft; lips briefly envelope then release—lick stays primary, not full deepthroat`
-- **SFX (环境音效)**: `舔弄水声, 气声轻喘`
-- **Line (参考喘息/台词)**: `嗯，啊，嗯，啊，`
-
-#### 编号: `deepthroat` | 深喉 (Deepthroat)
-- **Framing (机位与景别死锁)**:
-  `MCU (face + ≥2/3 already buried toward throat from 0.00s; no head press; glans hidden)`
-- **Beats (工作台 1:1 动量推进)**:
-  - **Beat 1**: `From 0.00s: penis already ≥ two-thirds deep toward the throat (NO hand pressing her head; NO tip-at-lips push-in prelude; NO empty open mouth); her hands on his thighs; his arms at his sides—not holding or pressing her head; lips sealed on shaft, slight throat bulge, glans fully inside; continuous deep-shallow strokes readable; on the shallow end glans still never exits the lips`
-  - **Beat 2**: `Deepthroat bobbing: withdraw only to mostly-still-in then drive deep again; glans never exits; in-out readable; hands stay on his thighs`
-  - **Beat 3**: `Hold deep half a beat then ease to mostly-in while gasping; saliva strings; take deep again; no shaft grip, no head press`
-- **SFX (环境音效)**: `含弄吮吸声, 呕吐反射轻声, 气声喘息`
-- **Line (参考喘息/台词)**: `嗯，啊，嗯，啊，`
-
-#### 编号: `head_thrust` | 按头抽插 (Head-held thrusting)
-- **Framing (机位与景别死锁)**:
-  `MCU side/slight high (hand on occiput + hip thrust oral in-out; already inserted from 0.00s; glans hidden)`
-- **Beats (工作台 1:1 动量推进)**:
-  - **Beat 1**: `From 0.00s: his one hand on her occiput (back of head) AND hips already thrusting; penis already ≥ half inside, lips sealed on shaft, glans fully inside not exposed (not empty open mouth, not tongue blocking, not chin-rest, not tip-hover push-in); she grips his thighs (not the shaft); in-out clearly readable`
-  - **Beat 2**: `Head-held + hip piston: each stroke keeps ≥ half inside; glans never exits on the shallow end; shaft entering/leaving mouth clearly readable; spit overflows; she grips his thighs`
-  - **Beat 3**: `Harder rhythm: drives fully buried then pulls back to half still enclosed; in-out clear; muffled whimpers; his rough panting intensifies`
-- **SFX (环境音效)**: `含弄吮吸声, 肉体拍击轻声, 男声粗喘`
-- **Line (参考喘息/台词)**: `嗯，啊，嗯，啊，`
-
-#### 编号: `facefuck` | 打桩口交 (Facefuck)
-- **Framing (机位与景别死锁)**:
-  `MCU close-up (face + penis already in mouth; HIS violent hip piston ~3–4 thrusts/sec, large travel; both hands clamp her head fixed; SHE does not bob; glans never exits on shallow; from 0.00s slamming)`
-- **Beats (工作台 1:1 动量推进)**:
-  - **Beat 1**: `From 0.00s violent hip piston already continuous: both hands clamp the sides of her head locked (her head/neck nearly still — she does NOT actively bob/thrust her head); HIS hips alone drive all motion with large-amplitude slamming ~3–4 thrusts/sec, half-to-hilt travel; penis already ≥ half inside, lips sealed on shaft, shaft visibly slamming in-out of mouth; glans never exits on the shallow end (ban: gentle, slow, lick-only, tip-hover, empty open-mouth aim-then-push, tongue blocking, chin-rest, soft bobbing of only her head); her hands on his outer thighs not gripping shaft`
-  - **Beat 2**: `Hard continuous violent facefuck: hips keep large piston strokes ~3–4/sec; buries most-to-hilt then pulls to half still enclosed; glans never exits on shallow end; hands stay clamping head fixed, she does not bob; shaft slam in-out clearly readable; spit flying; camera locks on mouth and thrusting shaft`
-  - **Beat 3**: `Deeper skull-clamped violent thrusts: hands still clamp head; he slams fully buried, hold half-beat, pulls to half still enclosed, then resumes ~3–4/sec slamming; she gasps with spit strings; he growls and drives back in (ban slowing into gentle licking)`
-- **SFX (环境音效)**: `含弄吮吸声, 气声喘息, 男声低吼`
-- **Line (参考喘息/台词)**: `嗯，啊，嗯，啊，`
-
-#### 编号: `sixty_nine` | 69互相舔 (69)
-- **Framing (机位与景别死锁)**:
-  `side MS (both lower bodies + faces; mutual oral readable from 0.00s)`
-- **Beats (工作台 1:1 动量推进)**:
-  - **Beat 1**: `From 0.00s mutual oral already engaged and readable: she on top with hands bracing bed/his thighs (not gripping shaft); penis ≥ half in her mouth, lips sealed, glans hidden; his hands spread her hips, mouth already on her vulva licking; both junctions readable in frame`
-  - **Beat 2**: `Synced mutual oral: she keeps ≥ half enclosed bobbing; he keeps licking; hands stable; no freeze`
-  - **Beat 3**: `Deeper mutual: she takes more still without gripping shaft; he pulls her hips onto his face; continuous mutual oral`
-- **SFX (环境音效)**: `舔弄水声, 含弄吮吸声, 男声压抑喘息`
-- **Line (参考喘息/台词)**: `嗯，啊，嗯，啊，`
-
-#### 编号: `ball_lick` | 舔蛋吮囊 (Ball licking)
-- **Framing (机位与景别死锁)**:
-  `close-up (tongue already on sack from 0.00s; readable lick)`
-- **Beats (工作台 1:1 动量推进)**:
-  - **Beat 1**: `From 0.00s: tongue already on the scrotum in continuous lick-suck (not hovering approach); lips may suck one side; one hand may cup sack or hold base, other braces thigh/bed—lick is primary, not full BJ; motion clearly readable`
-  - **Beat 2**: `Alternates left/right balls; occasional lick at shaft root then back to sack; saliva glosses sack and lips`
-  - **Beat 3**: `Faster lick-suck rhythm; his restrained panting rises; she looks up; hands stay cupping/bracing; sack-lick stays primary`
-- **SFX (环境音效)**: `舔弄水声, 男声压抑喘息`
-- **Line (参考喘息/台词)**: `嗯，啊，嗯，啊，`
+| ID | 中文名 | 英文名 |
+|---|---|---|
+| `bj` | 跪姿口交 | Kneeling BJ |
+| `squat_bj` | 站立蹲姿口交 | Standing squat BJ |
+| `prone_bj` | 趴姿口交 | Prone BJ |
+| `deepthroat` | 深喉 | Deepthroat |
+| `head_thrust` | 按头抽插 | Head-held thrusting |
+| `facefuck` | 打桩口交 | Facefuck |
+| `sixty_nine` | 69互相舔 | 69 |
+| `tip_lick` | 舔龟头 | Tip licking |
+| `ball_lick` | 舔蛋吮囊 | Ball licking |
+| `penis_slap` | 阴茎拍脸 | Cock tapping on face |
 
 
-### 【主力后入位】
+## 指插 / 撩拨前戏
 
-#### 编号: `doggy` | 后入趴跪 (Doggy)
-- **Framing (机位与景别死锁)**:
-  `cinematic MS rear-side (back + butt + hair + his hips + penis in-out)`
-- **Beats (工作台 1:1 动量推进)**:
-  - **Beat 1**: `Camera: his thick erect penis thrusts in and out of her vagina at high speed with a steady rhythm. Her full breasts bounce hard with every impact; long hair swings front to back. Her butt jiggles and spreads as his pelvis slams into her ass. With each thrust her butt shakes and bounces; mouth open in pleasure moans and screams. Intense dynamic motion of friction and their lower bodies. No unrealistic anatomy; she holds the pose; penis stays attached to his body`
-  - **Beat 2**: `As the scene continues he speeds up: faster and harder thrusts, his groin smacking her butt, jolting her body. Breasts bounce, hair swings, butt jiggles and spreads; clear friction; still inserted; she keeps doggy pose; penis stays attached`
-  - **Beat 3**: `Peak pounding: thick erect penis thrusting fast and rhythmic in her vagina, groin slamming her ass, butt violently jiggling and spreading, breasts bouncing, hair swinging; mouth open moaning and screaming; camera locked with only impact micro-shake; she holds pose; penis stays attached`
-- **SFX (环境音效)**: `湿润抽插声, 肉体拍击声, 床板轻响, 女声浪叫`
-- **Line (参考喘息/台词)**: `嗯，啊，嗯，啊，`
-
-#### 编号: `table_doggy` | 桌上后入 (Bent over the table)
-- **Framing (机位与景别死锁)**:
-  `full side shot at tabletop height (her upper body on the table, feet on the floor, he stands behind her)`
-- **Beats (工作台 1:1 动量推进)**:
-  - **Beat 1**: `table doggy beat 1`
-- **SFX (环境音效)**: `湿润抽插声, 肉体拍击声, 女声浪叫, 喘息`
-- **Line (参考喘息/台词)**: `嗯……啊……嗯……啊……`
-
-#### 编号: `stand_doggy_wall` | 站立后入撑墙 (Standing doggy wall)
-- **Framing (机位与景别死锁)**:
-  `MS rear-side (wall + hips + junction)`
-- **Beats (工作台 1:1 动量推进)**:
-  - **Beat 1**: `Woman A hands on wall, arched; Man A enters from behind slowly to the hilt`
-  - **Beat 2**: `Standing doggy steady strokes; palms press wall; hip ripples; heels lift; breasts sway`
-  - **Beat 3**: `Faster hard thrusts; one hand on waist one on shoulder against the wall; full-depth slams; forehead near wall`
-- **SFX (环境音效)**: `湿润抽插声, 肉体拍击声, 女声浪叫, 床板轻响`
-- **Line (参考喘息/台词)**: `嗯，啊，嗯，啊，`
-
-#### 编号: `stand_bend_doggy` | 站立弯腰后入 (Standing bent-over doggy)
-- **Framing (机位与景别死锁)**:
-  `MCU (she on tiptoes, bent over standing, he enters from behind; penis straight in vagina, junction visible)`
-- **Beats (工作台 1:1 动量推进)**:
-  - **Beat 1**: `Standing bent-over doggy; she stands on tiptoes, feet apart, torso bent forward, arms reaching back behind her, back arched, buttocks raised; he stands behind, hands gripping her wrists, crotch pressed to her buttocks; penis straight inside her vagina, fully inserted with no bending, junction clearly visible`
-  - **Beat 2**: `Standing thrusts; he grips her wrists, thrusting back and forth; she arches to meet him; penis moving straight in and out, staying inside, clearly visible`
-  - **Beat 3**: `Fast pounding; he grips her wrists, short hard strokes quicken; she arches, breathing quickens`
-- **SFX (环境音效)**: `湿润抽插声, 肉体拍击声, 女声浪叫, 喘息`
-- **Line (参考喘息/台词)**: `嗯，啊，嗯，啊，`
-
-#### 编号: `bedside_stand` | 床边站立插入 (Bedside standing insertion)
-- **Framing (机位与景别死锁)**:
-  `MCU (he stands at bedside, she on back at edge, legs on his shoulders; penis in vagina, junction visible)`
-- **Beats (工作台 1:1 动量推进)**:
-  - **Beat 1**: `Bedside standing insertion; he stands at the bedside, she lies on her back at the edge, legs spread on his shoulders, hands on her hips, pressing forward; penis inside her vagina, junction clearly visible`
-  - **Beat 2**: `Standing thrusts; hands steady on her hips, strokes shallow to deep; her legs sway on his shoulders; penis moving in and out, clearly visible`
-  - **Beat 3**: `Faster; he leans in, quick short thrusts; she grips the sheets, breathing quickens`
-- **SFX (环境音效)**: `湿润抽插声, 肉体拍击声, 女声浪叫, 喘息`
-- **Line (参考喘息/台词)**: `嗯，啊，嗯，啊，`
-
-#### 编号: `anal` | 后入肛交 (Anal doggy)
-- **Framing (机位与景别死锁)**:
-  `cinematic MS (hip line + junction)`
-- **Beats (工作台 1:1 动量推进)**:
-  - **Beat 1**: `On all fours; glans presses and slowly enters the anus; she tenses then adapts`
-  - **Beat 2**: `Rhythmic thrusting with clear in-out; butt ripples; hair swinging`
-  - **Beat 3**: `Fast thrusts then sudden pull-out; cum on buttocks if needed`
-- **SFX (环境音效)**: `湿润抽插声, 肉体拍击声, 压抑呻吟, 喘息`
-- **Line (参考喘息/台词)**: `嗯，啊，嗯，啊，`
+| ID | 中文名 | 英文名 |
+|---|---|---|
+| `fingering` | 手指扣插女穴 | Fingering |
+| `handjob` | 撸管 | Handjob |
+| `titjob` | 乳交 | Titjob |
+| `breast_rub` | 揉胸 | Breast rub |
+| `nipple_lick` | 舔乳头 | Nipple lick |
 
 
-### 【主力骑乘与坐位】
+## 亲吻与剥离
 
-#### 编号: `cowgirl` | 女上位骑乘 (Cowgirl)
-- **Framing (机位与景别死锁)**:
-  `Side or slight high MCU: man supine under her, she straddles face-to-face; waist to junction; no tandem sit facing camera`
-- **Beats (工作台 1:1 动量推进)**:
-  - **Beat 1**: `Spatial lock: Man A lies on his back; Woman A straddles him face-to-face (facing him, not reverse lap-sit). She guides the penis in, hands on his chest, sinks to the base; side/slight high angle shows full insertion`
-  - **Beat 2**: `Short in-body up-down riding; mostly stays inserted; breasts and butt bounce; hands stay on his chest; no floating penis; man stays under her`
-  - **Beat 3**: `Faster grinding with short strokes, squeezing; she looks at his face or glances at camera; hands on his chest or her own thighs`
-- **SFX (环境音效)**: `湿润抽插声, 肉体拍击声, 女声浪叫`
-- **Line (参考喘息/台词)**: `嗯，啊，嗯，啊，`
-
-#### 编号: `cowgirl_upright` | 女骑乘直立上身 (Upright cowgirl)
-- **Framing (机位与景别死锁)**:
-  `First-person POV: man supine, she straddles facing camera with upright torso`
-- **Beats (工作台 1:1 动量推进)**:
-  - **Beat 1**: `First-person: his eyes look up from his chest; she straddles facing the camera, torso upright and straight, guides him in and sinks to the base; hands on his chest or her thighs`
-  - **Beat 2**: `Upright riding: she stays vertical, up-down strokes mostly in-body; breasts bounce; his hands stay at his sides`
-  - **Beat 3**: `Faster riding with grinding; she bites her lip and looks into the camera; torso never leans forward`
-- **SFX (环境音效)**: `湿润抽插声, 肉体拍击声, 女声浪叫`
-- **Line (参考喘息/台词)**: `嗯，啊，嗯，啊，`
-
-#### 编号: `reverse_cowgirl` | 反向骑乘（背对他） (Seated lap ride)
-- **Framing (机位与景别死锁)**:
-  `side MCU: sitting on lap, reverse upright straddle, man on edge of bed, woman back against his chest, both same direction, half penetration, glans inside not visible, half shaft visible at junction; not face-to-face`
-- **SFX (环境音效)**: `湿润抽插声, 肉体拍击声, 女声浪叫, 喘息`
-- **Line (参考喘息/台词)**: `嗯，啊，嗯，啊，`
-
-#### 编号: `squat_cowgirl` | 蹲坐骑乘 (Squatting cowgirl)
-- **Framing (机位与景别死锁)**:
-  `MCU (she squats over him, rising and falling; penis in vagina, junction visible)`
-- **Beats (工作台 1:1 动量推进)**:
-  - **Beat 1**: `Squatting cowgirl; he lies on his back, she squats face to face over his hips, feet on the bed, hands on his chest, sinking down onto him; penis inside her vagina, junction clearly visible`
-  - **Beat 2**: `Squatting motion; she rises and falls in a squat, range growing; his hands steady her waist; penis moving in and out, clearly visible`
-  - **Beat 3**: `Faster riding; she quickens, sometimes grinding forward and back; he thrusts up to meet her; her breathing quickens`
-- **SFX (环境音效)**: `湿润抽插声, 肉体拍击声, 女声浪叫, 喘息`
-- **Line (参考喘息/台词)**: `嗯，啊，嗯，啊，`
-
-#### 编号: `lap_sit_back` | 坐怀背对 (Reverse lap sit insertion)
-- **Framing (机位与景别死锁)**:
-  `MCU (she sits back-to him in his lap, rising and falling; penis in vagina, junction visible)`
-- **Beats (工作台 1:1 动量推进)**:
-  - **Beat 1**: `Reverse lap sit; he sits at the bed edge, she sits back-to him in his lap, legs spread, hands on his knees, his arms around her waist from behind, sinking down; penis inside her vagina, junction clearly visible`
-  - **Beat 2**: `Seated motion; she rises and falls holding his knees; his hands assist at her waist; penis moving in and out, clearly visible`
-  - **Beat 3**: `Faster; he thrusts upward matching her quickening pace; she leans back on his chest, breathing quickens`
-- **SFX (环境音效)**: `湿润抽插声, 肉体拍击声, 女声浪叫, 喘息`
-- **Line (参考喘息/台词)**: `嗯，啊，嗯，啊，`
+| ID | 中文名 | 英文名 |
+|---|---|---|
+| `kiss_fondle` | 揉胸舌吻 | Tongue kiss with breast fondling |
+| `kiss_pin` | 按住接吻 | Pinned kiss |
+| `kiss_force` | 强吻 | Forced kiss |
+| `kiss_her` | 女主动接吻 | She initiates the kiss |
+| `cunnilingus` | 舔阴 | Cunnilingus |
+| `sofa_cunni` | 沙发舔阴 | Sofa cunnilingus |
+| `undress` | 脱衣诱惑 | Strip tease |
+| `pov_insert` | POV抽插 | POV thrusting |
 
 
-### 【主力传教士与立位】
+## 主力后入位
 
-#### 编号: `missionary` | 传教士 (Missionary)
-- **Framing (机位与景别死锁)**:
-  `front-side MCU (face-chest-junction)`
-- **Beats (工作台 1:1 动量推进)**:
-  - **Beat 1**: `Woman A on her back, knees open; Man A sinks in slowly until base flush`
-  - **Beat 2**: `Medium short in-body strokes; labia snugly wrapped, natural fit; light sweat`
-  - **Beat 3**: `Faster deep thrusts; she grips sheets; moans rise`
-- **SFX (环境音效)**: `湿润抽插声, 肉体拍击声, 女声浪叫, 喘息`
-- **Line (参考喘息/台词)**: `嗯，啊，嗯，啊，`
-
-#### 编号: `stand_face_hug` | 面对面抱着站立 (Standing embrace)
-- **Framing (机位与景别死锁)**:
-  `MCU front slight side (embrace, hips pressed; penis clamped, no insertion)`
-- **Beats (工作台 1:1 动量推进)**:
-  - **Beat 1**: `Standing face to face; her crotch pressed tight against his, torso upright; his arms around her waist from both sides; his penis clamped and hidden by her crotch, no insertion`
-  - **Beat 2**: `Close grinding; his arms hold her waist guiding small back-and-forth movements; hips stay pressed together; penis rubs clamped between them, no insertion`
-  - **Beat 3**: `Faster grinding; he pulls her tight against him; hips pressed and rubbing fast; her torso sways upright; breathing quickens`
-- **SFX (环境音效)**: `肉体摩擦声, 肉体拍击声, 女声浪叫, 喘息, 湿吻声`
-- **Line (参考喘息/台词)**: `嗯，啊，嗯，啊，`
-
-#### 编号: `carry_insert` | 抱起插入 (Standing carry insertion)
-- **Framing (机位与景别死锁)**:
-  `MCU (he carries her standing, her legs around his waist; penis in vagina, junction visible)`
-- **Beats (工作台 1:1 动量推进)**:
-  - **Beat 1**: `Standing carry insertion; he stands steady, she is lifted face to face, legs wrapped around his waist, arms around his neck, his hands under her buttocks, hips thrust up; penis inside her vagina, junction clearly visible`
-  - **Beat 2**: `Carry thrusts; he bounces her on his hands, hips thrusting up; she tightens around his waist; penis moving in and out, clearly visible`
-  - **Beat 3**: `Faster; he holds her tight, quick short upward thrusts; she clings to his neck, breathing quickens`
-- **SFX (环境音效)**: `湿润抽插声, 肉体拍击声, 女声浪叫, 喘息`
-- **Line (参考喘息/台词)**: `嗯，啊，嗯，啊，`
-
-#### 编号: `side_face` | 侧卧面对面插入 (Side-lying face-to-face insertion)
-- **Framing (机位与景别死锁)**:
-  `MCU (side-lying face to face, her upper leg on his waist; penis in vagina, junction visible)`
-- **Beats (工作台 1:1 动量推进)**:
-  - **Beat 1**: `Side-lying face-to-face insertion; both on their sides face to face, her lower leg straight, upper leg bent on his waist, his arm around her waist, hips pressed; penis inside her vagina, junction clearly visible`
-  - **Beat 2**: `Side-lying thrusts; small strokes holding her waist, her leg sways on his waist; penis moving in and out, clearly visible`
-  - **Beat 3**: `Faster grinding; hips pressed tight, grinding thrusts; she tilts her head back, breathing quickens`
-- **SFX (环境音效)**: `湿润抽插声, 肉体拍击声, 女声浪叫, 喘息`
-- **Line (参考喘息/台词)**: `嗯，啊，嗯，啊，`
-
-#### 编号: `face_insert` | 面对面抬腿插入 (Face-to-face leg-lift insertion)
-- **Framing (机位与景别死锁)**:
-  `MCU (standing face to face; he grips and lifts one leg, one hand on her waist; penis in vagina, junction visible)`
-- **Beats (工作台 1:1 动量推进)**:
-  - **Beat 1**: `Standing face-to-face insertion; he grips one of her thighs with one hand and lifts it, the other arm around her waist, hips pressed tight; penis fully inside her vagina, shaft wrapped with only the base showing, no gap between their hips`
-  - **Beat 2**: `Standing thrusts; one hand grips her raised thigh, the other her waist; short strokes, penis staying inside her vagina throughout, never slipping out, hips stay pressed; her raised leg stays up`
-  - **Beat 3**: `Faster; he grips her thigh and pulls her close keeping her leg lifted; quick short thrusts, penis never leaving her vagina; her torso sways upright; breathing quickens`
-- **SFX (环境音效)**: `湿润抽插声, 肉体拍击声, 女声浪叫, 喘息`
-- **Line (参考喘息/台词)**: `嗯，啊，嗯，啊，`
+| ID | 中文名 | 英文名 |
+|---|---|---|
+| `doggy` | 后入趴跪 | Doggy |
+| `table_doggy` | 桌上后入 | Bent over the table |
+| `stand_doggy_wall` | 站立后入撑墙 | Standing doggy wall |
+| `stand_bend_doggy` | 站立弯腰后入 | Standing bent-over doggy |
+| `bedside_stand` | 床边站立插入 | Bedside standing insertion |
+| `anal` | 后入肛交 | Anal doggy |
 
 
-### 【前戏剥离与调情】
+## 主力骑乘与坐位
 
-#### 编号: `kiss_fondle` | 揉胸舌吻 (Tongue kiss with breast fondling)
-- **Framing (机位与景别死锁)**:
-  `MCU (locked lips + breasts + hands)`
-- **Beats (工作台 1:1 动量推进)**:
-  - **Beat 1**: `Man A holds the back of her head, other hand fondling her breast; deep tongue kiss, tongues intertwined; her arms around his neck`
-  - **Beat 2**: `Deeper kiss, his tongue exploring her mouth, saliva exchange audible; fondling hand squeezes harder, nipples rolled`
-  - **Beat 3**: `Kissing while kneading both breasts, flesh spilling between fingers; her breath escapes between lips`
-- **SFX (环境音效)**: `吻声, 气声喘息, 皮肤摩擦声`
-- **Line (参考喘息/台词)**: `唔……唔……`
-
-#### 编号: `kiss_pin` | 按住接吻 (Pinned kiss)
-- **Framing (机位与景别死锁)**:
-  `MS (he presses her down, hands pinning her)`
-- **Beats (工作台 1:1 动量推进)**:
-  - **Beat 1**: `Man A pins her shoulders/wrists, pressing her onto the bed/wall, kissing her lips; she is held still, head tilted back`
-  - **Beat 2**: `One hand keeps her pinned, the other slides to her lower back pulling her tight; his tongue pushes past her lips`
-  - **Beat 3**: `Heavier pinned kiss, his weight forward; she is kissed breathless, whimpers escaping; his hands never release`
-- **SFX (环境音效)**: `吻声, 气声喘息`
-- **Line (参考喘息/台词)**: `唔……唔……`
-
-#### 编号: `kiss_force` | 强吻 (Forced kiss)
-- **Framing (机位与景别死锁)**:
-  `CU (he grips her chin, forces the kiss)`
-- **Beats (工作台 1:1 动量推进)**:
-  - **Beat 1**: `Man A grabs her chin (or the back of her head) and forces a kiss on her; her eyes widen, hands pushing at his chest`
-  - **Beat 2**: `Forced kiss continues, his tongue pushing past her closed lips, sucking her lower lip; her pushing hands weaken, clutching his shirt`
-  - **Beat 3**: `She stops resisting, closes her eyes and responds, tongues intertwining; his grip softens into a caress, force turning deep`
-- **SFX (环境音效)**: `吻声, 气声喘息`
-- **Line (参考喘息/台词)**: `唔……不要……唔……`
-
-#### 编号: `kiss_her` | 女主动接吻 (She initiates the kiss)
-- **Framing (机位与景别死锁)**:
-  `MS (she cups his face, kisses him)`
-- **Beats (工作台 1:1 动量推进)**:
-  - **Beat 1**: `Woman A cups his face (or pulls him close by the neck), kissing his lips; he freezes, hands hovering`
-  - **Beat 2**: `Her tongue slips into his mouth, sucking his lower lip; he recovers, one hand on her lower back, one on the back of her head, deepening it`
-  - **Beat 3**: `Locked in the kiss, tongues intertwined, saliva exchange audible; she pulls back half an inch to breathe, then kisses him again`
-- **SFX (环境音效)**: `吻声, 气声喘息`
-- **Line (参考喘息/台词)**: `唔……唔……`
-
-#### 编号: `breast_rub` | 揉胸 (Breast rub)
-- **Framing (机位与景别死锁)**:
-  `MCU (breasts + hands + face)`
-- **Beats (工作台 1:1 动量推进)**:
-  - **Beat 1**: `Man A cups both breasts, kneads, thumbs tease nipples; cleavage shifts`
-  - **Beat 2**: `Harder squeeze-push-release; nipples pinched and rolled; her chest heaving`
-  - **Beat 3**: `Fondling while kissing collarbone and neck; flesh spills between fingers`
-- **SFX (环境音效)**: `气声喘息, 女声浪叫, 皮肤摩擦声`
-- **Line (参考喘息/台词)**: `嗯，啊，嗯，啊，`
-
-#### 编号: `nipple_lick` | 舔乳头 (Nipple lick)
-- **Framing (机位与景别死锁)**:
-  `CU (mouth + nipple)`
-- **Beats (工作台 1:1 动量推进)**:
-  - **Beat 1**: `Man A sucks one nipple, tongue circles areola; other hand lifts the breast`
-  - **Beat 2**: `Stronger suck-pull; saliva shine; she arches to push chest forward`
-  - **Beat 3**: `Switches sides; light teeth graze; other breast kneaded; breathing quickens`
-- **SFX (环境音效)**: `舔弄水声, 吮吸声, 女声浪叫, 气声喘息`
-- **Line (参考喘息/台词)**: `嗯，啊，嗯，啊，`
-
-#### 编号: `cunnilingus` | 舔阴 (Cunnilingus)
-- **Framing (机位与景别死锁)**:
-  `top-down MCU (vulva centered)`
-- **Beats (工作台 1:1 动量推进)**:
-  - **Beat 1**: `Woman A on her back legs open; Man A licks outer labia lightly`
-  - **Beat 2**: `Tongue on clit; hands spread labia; full genital visibility`
-  - **Beat 3**: `Faster licking and sucking; she arches; no finger insertion unless specified`
-- **SFX (环境音效)**: `舔弄水声, 女声浪叫, 气声喘息`
-- **Line (参考喘息/台词)**: `嗯，啊，嗯，啊，`
-
-#### 编号: `sofa_cunni` | 沙发舔阴 (Sofa cunnilingus)
-- **Framing (机位与景别死锁)**:
-  `side close-up at sofa-seat height (she sits on the sofa edge, he kneels on the rug)`
-- **Beats (工作台 1:1 动量推进)**:
-  - **Beat 1**: `sofa cunni beat 1`
-- **SFX (环境音效)**: `舔弄水声, 女声浪叫, 气声喘息`
-- **Line (参考喘息/台词)**: `嗯……啊……嗯……啊……`
-
-#### 编号: `handjob` | 撸管 (Handjob)
-- **Framing (机位与景别死锁)**:
-  `MCU (hands + shaft; glans may show)`
-- **Beats (工作台 1:1 动量推进)**:
-  - **Beat 1**: `She kneels or sits beside him, both hands stroking the shaft up and down (handjob); his hands at sides or lightly guiding her wrists`
-  - **Beat 2**: `Faster stroking: hands alternate along the full shaft, precum visible; she never lets go`
-  - **Beat 3**: `Sprint to the edge: root-to-glans strokes, tight and quick; he may guide one wrist`
-- **SFX (环境音效)**: `wet stroking, restrained male breath`
-- **Line (参考喘息/台词)**: `嗯，啊，嗯，啊，`
-
-#### 编号: `titjob` | 乳交 (Titjob)
-- **Framing (机位与景别死锁)**:
-  `MCU close-up (cleavage + penis)`
-- **Beats (工作台 1:1 动量推进)**:
-  - **Beat 1**: `Breasts wrap the shaft; cleavage slides up and down`
-  - **Beat 2**: `Faster squeeze-stroke; glans peeking from cleavage; glossy lube and saliva`
-  - **Beat 3**: `She licks the tip while still squeezing with breasts`
-- **SFX (环境音效)**: `乳肉滑动声, 舔弄水声, 喘息`
-- **Line (参考喘息/台词)**: `嗯，啊，嗯，啊，`
-
-#### 编号: `undress` | 脱衣诱惑 (Strip tease)
-- **Framing (机位与景别死锁)**:
-  `front MCU standing solo woman; vulva naturally visible after nude`
-- **Beats (工作台 1:1 动量推进)**:
-  - **Beat 1**: `One woman only, standing facing camera; quickly pulls off top and bottoms within 0-4s, clothes fall or tossed aside; after nude her vulva is naturally visible`
-  - **Beat 2**: `After nude, show body: lift chest, gather breasts with both hands, slow waist sway showing waist and hips; vulva stays readable in standing pose`
-  - **Beat 3**: `Continue sexy display: hold breasts, or one hand on breast and one along waist/inner thigh, tiptoe and lift hips, or lift hair then return to holding breasts; vulva stays visible; striptease display only`
-- **SFX (环境音效)**: `布料摩擦声, 衣物落地声, 呼吸`
-- **Line (参考喘息/台词)**: `嗯…都脱掉…给你看`
-
-#### 编号: `pov_insert` | POV抽插 (POV thrusting)
-- **Framing (机位与景别死锁)**:
-  `male POV looking down at junction`
-- **Beats (工作台 1:1 动量推进)**:
-  - **Beat 1**: `Male POV; penis presses entrance then thrusts fully in and holds`
-  - **Beat 2**: `Hard short in-body strokes; belly rising; entrance wet and snug, natural proportions`
-  - **Beat 3**: `Nonstop hard thrusting; balls slap; her legs open or wrapped`
-- **SFX (环境音效)**: `湿润抽插声, 肉体拍击声, 女声浪叫`
-- **Line (参考喘息/台词)**: `嗯，啊，嗯，啊，`
+| ID | 中文名 | 英文名 |
+|---|---|---|
+| `cowgirl` | 女上位骑乘 | Cowgirl |
+| `cowgirl_upright` | 女骑乘直立上身 | Upright cowgirl |
+| `reverse_cowgirl` | 反向骑乘（背对他） | Seated lap ride |
+| `squat_cowgirl` | 蹲坐骑乘 | Squatting cowgirl |
+| `lap_sit_back` | 坐怀背对 | Reverse lap sit insertion |
+| `lap_sit` | 坐怀面对面 | Lap sitting |
+| `facesit` | 骑脸 | Facesitting |
 
 
-### 【绝顶清算与余波】
+## 主力传教士与立位
 
-#### 编号: `creampie` | 内射 (Creampie)
-- **Framing (机位与景别死锁)**:
-  `MCU (junction; visible penis in vagina during creampie)`
-- **Beats (工作台 1:1 动量推进)**:
-  - **Beat 1**: `Penis buried to the hilt in the vagina and holds; junction stretched and clearly visible`
-  - **Beat 2**: `Creampie pulses: he cums deep inside with base twitching; a little cum may leak at the seal while still inserted`
-  - **Beat 3**: `After: slow pull-out or stay buried; white cum slowly leaks from the vagina when he withdraws`
-- **SFX (环境音效)**: `射精脉动与液体声, 湿润抽插声, 男声低吼, 女声浪叫, 气声喘息`
-- **Line (参考喘息/台词)**: `嗯，啊，嗯，啊，`
-
-#### 编号: `cum_face` | 射在脸上 (Facial)
-- **Framing (机位与景别死锁)**:
-  `MCU close-up (face + cum landing; male self-stroke)`
-- **Beats (工作台 1:1 动量推进)**:
-  - **Beat 1**: `male masturbation, stroking his own penis, rapid handjob on himself. Opening: hips pull back while his hand guides the shaft sliding quickly out of her (penis stays attached to his body; no tearing off or detached genitals), then stays out not inserted; his own hand pumps the shaft base-to-glans about 3-4 strokes per second aiming at her face; she looks up and does not stroke for him; fist sliding on shaft must be visible, not a static grip`
-  - **Beat 2**: `He keeps rapid self-stroking without pause; precum may show; tip aimed at her face; she receives with half-open eyes`
-  - **Beat 3**: `He strokes into orgasm: pulsing cum on cheeks, nose, lips, chin; two final fast strokes to empty`
-- **SFX (环境音效)**: `射精脉动与液体声, 男声低吼, 气声喘息, 女声浪叫`
-- **Line (参考喘息/台词)**: `嗯，啊，嗯，啊，`
-
-#### 编号: `cum_chest` | 射在胸口 (Cum on chest)
-- **Framing (机位与景别死锁)**:
-  `MCU (breasts + cum landing)`
-- **Beats (工作台 1:1 动量推进)**:
-  - **Beat 1**: `Man A pulls out, aims at her chest and cleavage; she may cup her breasts`
-  - **Beat 2**: `Pulsing ejaculation: cum coats breasts, cleavage and collarbone; nipples wet and shiny`
-  - **Beat 3**: `Cum slides down breast curves; she looks down breathing; he squeezes out the last drops`
-- **SFX (环境音效)**: `射精脉动与液体声, 男声粗喘, 气声喘息, 女声浪叫`
-- **Line (参考喘息/台词)**: `嗯，啊，嗯，啊，`
-
-#### 编号: `cum_belly` | 射在腹部 (Cum on belly)
-- **Framing (机位与景别死锁)**:
-  `MCU (lower belly + cum landing; male self-stroke)`
-- **Beats (工作台 1:1 动量推进)**:
-  - **Beat 1**: `male masturbation, stroking his own penis, rapid handjob on himself. Opening: hips pull back while his hand guides the shaft sliding quickly out of her vagina (penis stays attached to his body; no tearing off), then stays out; his own hand pumps shaft base-to-glans ~3-4/sec aiming at her lower belly; she does not stroke for him`
-  - **Beat 2**: `He keeps rapid self-stroking aimed at the belly; her abdomen exposed`
-  - **Beat 3**: `He strokes into orgasm: cum lands below the navel along the abs; two final fast strokes`
-- **SFX (环境音效)**: `射精脉动与液体声, 湿润抽插余声, 女声浪叫, 气声喘息`
-- **Line (参考喘息/台词)**: `嗯，啊，嗯，啊，`
-
-#### 编号: `cum_butt` | 射在臀部 (Cum on butt)
-- **Framing (机位与景别死锁)**:
-  `cinematic MS rear-side (butt + cum landing; no handjob)`
-- **Beats (工作台 1:1 动量推进)**:
-  - **Beat 1**: `pull-out cumshot on butt, no handjob. Sudden full yank-out: hands on her waist, hips snap back, penis slides fully out (stays attached at his pelvis; no tearing off; no second floating phallus); tip aims at butt cleft; do not stroke`
-  - **Beat 2**: `He cums immediately without stroking: visible spurts land on butt cheeks and cleft; pull-out path realistic; penis stays attached`
-  - **Beat 3**: `She trembles and collapses soft onto the bed, still doggy back to camera; cum trails on her butt; camera locked to the end`
-- **SFX (环境音效)**: `射精脉动与液体声, 男声低吼, 肉体拍击轻声, 气声喘息`
-- **Line (参考喘息/台词)**: `嗯，啊，嗯，啊，`
+| ID | 中文名 | 英文名 |
+|---|---|---|
+| `missionary` | 传教士 | Missionary |
+| `missionary_legup` | 扛腿传教士 | Missionary legs up |
+| `stand_face_hug` | 面对面抱着站立 | Standing embrace |
+| `carry_insert` | 抱起插入 | Standing carry insertion |
+| `face_insert` | 面对面抬腿插入 | Face-to-face leg-lift insertion |
+| `side_face` | 侧卧面对面插入 | Side-lying face-to-face insertion |
+| `side_spoon` | 侧卧后入 | Spooning |
+| `ass_rub` | 臀缝摩擦 | Butt crack grinding |
+| `footjob` | 足交 | Footjob |
 
 
-### 【其他特化姿势】
+## 绝顶清算与余波
 
-#### 编号: `ass_rub` | 臀缝摩擦 (Butt crack grinding)
-- **Framing**: `中景侧后（臀缝+阴茎摩擦；不插入阴道）`
+| ID | 中文名 | 英文名 |
+|---|---|---|
+| `creampie` | 内射 | Creampie |
+| `cum_face` | 射在脸上 | Facial |
+| `cum_chest` | 射在胸口 | Cum on chest |
+| `cum_belly` | 射在腹部 | Cum on belly |
+| `cum_butt` | 射在臀部 | Cum on butt |
 
-#### 编号: `side_spoon` | 侧卧后入 (Spooning)
-- **Framing**: `侧面中景（两人同向侧卧；看得见阴茎从后方插入阴道）`
 
-#### 编号: `footjob` | 足交 (Footjob)
-- **Framing**: `中近景（双脚+阴茎；脚底摩擦柱身）`
+---
 
-#### 编号: `facesit` | 骑脸 (Facesitting)
-- **Framing**: `中近景（她跨坐他脸上；看得见他舔舐）`
+## 二、逐姿势物理动量原文（workbench beats 1:1）
 
-#### 编号: `lap_sit` | 坐怀面对面 (Lap sitting)
-- **Framing**: `正面略侧中近景（她坐他腿上；看得见阴茎插入阴道）`
+### `bj` — 跪姿口交 (Kneeling BJ)
+- **机位景别（中）**：中近景特写（脸+阴茎已插入口腔；嘴唇箍住柱身；从0.00s已含入）
+- **机位景别（英）**：`MCU (face + mouth; lips sealed on shaft; already engaged from 0.00s; glans hidden)`
+- **动量节拍（工作台原文）**：
+  - **Beat 1**：从0.00秒起嘴唇已箍住柱身、阴茎已含入至少一半（禁止龟头悬在唇外试探、禁止只张嘴不含、禁止舌外伸挡入口、禁止停在下巴）；双手扶他大腿前侧或撑膝（不握阴茎）；连续浅深吞吐清晰可读，浅端仍至少半根含住、龟头不退出唇外；男子A双手自然放下，不扶她头脸、不挡嘴
+  - **Beat 2**：浅含吞吐：进出清晰，始终≥一半含入，唇环贴紧柱身，唾液拉丝；抬头眼神上挑；双手仍扶他大腿或撑膝，不握阴茎
+  - **Beat 3**：加深含弄：大半到近喉，头随进出带动，偶停半拍再退到半根仍含住喘息；龟头全程不外露；双手扶大腿稳住
+- **音效**：含弄吮吸声、气声轻喘
+- **参考台词**：嗯，啊，嗯，啊，
 
-#### 编号: `missionary_legup` | 扛腿传教士 (Missionary legs up)
-- **Framing**: `侧前方中近景（她双腿扛他肩上；看得见阴茎深插）`
+### `squat_bj` — 站立蹲姿口交 (Standing squat BJ)
+- **机位景别（中）**：中近景特写（男子A站立；女子A蹲在他正前方；阴茎已插入口腔一半；从0.00s已含入）
+- **机位景别（英）**：`MCU (he stands upright; she squats on the floor right in front of him; penis half inside her mouth from 0.00s; glans hidden)`
+- **动量节拍（工作台原文）**：
+  - **Beat 1**：从0.00秒起空间锁死且已含入：男子A身体垂直地面站直，双脚站在地板上；女子A蹲在他正前方，双膝分开、脚掌着地、臀部贴近脚后跟、上身挺直；嘴唇已箍住柱身、阴茎已含入至少一半（禁止龟头悬在唇外试探、禁止只张嘴不含、禁止舌外伸挡入口、禁止停在下巴）；女子A双手放在身体两侧（不握阴茎、不做乳交）；连续浅深吞吐清晰可读，浅端仍至少半根含住、龟头不退出唇外；男子A双手自然放下，不扶她头脸、不挡嘴
+  - **Beat 2**：浅含吞吐：保持蹲姿，进出清晰，始终≥一半含入，唇环贴紧柱身，唾液拉丝；抬眼向上看他；双手仍放在身体两侧，不握阴茎
+  - **Beat 3**：加深含弄：大半到近喉，头随进出带动，偶停半拍再退到半根仍含住喘息；龟头全程不外露；蹲姿稳住，上身挺直
+- **音效**：含弄吮吸声、气声轻喘
+- **参考台词**：嗯，啊，嗯，啊，
+
+### `prone_bj` — 趴姿口交 (Prone BJ)
+- **机位景别（中）**：男子A仰卧；女子A俯卧趴在他胯下；阴茎已插入口腔，嘴唇箍住柱身；从0.00s已含入
+- **机位景别（英）**：`side MCU / slight high (him supine; her prone at his crotch; mouth already on shaft from 0.00s; glans hidden)`
+- **动量节拍（工作台原文）**：
+  - **Beat 1**：从0.00秒起空间锁死且已含入：男子A仰卧双腿分开；女子A俯卧（肚子贴承托面）趴在两腿之间或胯侧（不是跪/坐）；嘴唇已箍住柱身、阴茎已含入至少一半（禁止唇外试探、禁止空张嘴、禁止舌外挡、禁止下巴搁柱）；双手撑他大腿外侧或承托面（不握阴茎）；连续吞吐可读，浅端仍≥一半、龟头不退出唇外；男子A双手自然放下
+  - **Beat 2**：趴着吞吐：保持俯卧头上下点动，进出仍至少半根含入，龟头不外露，唾液拉丝；双手继续撑腿/承托面；他髋可轻上送；嘴与柱身交界处清晰可读
+  - **Beat 3**：加深趴含：脸更贴近小腹，大半到近喉再退到半根仍含住喘息；俯卧贴紧腿根；偶抬头再趴回；龟头全程不外露
+- **音效**：含弄吮吸声、气声轻喘、布料/承托面摩擦轻声
+- **参考台词**：嗯，啊，嗯，啊，
+
+### `deepthroat` — 深喉 (Deepthroat)
+- **机位景别（中）**：中近景（脸+至少2/3没入近喉；龟头不外露；禁止按头）
+- **机位景别（英）**：`MCU (face + ≥2/3 already buried toward throat from 0.00s; no head press; glans hidden)`
+- **动量节拍（工作台原文）**：
+  - **Beat 1**：从0.00秒起阴茎已深入至少三分之二近喉（禁止按头/压头；禁止从唇外推进预演；禁止空张嘴）；她双手扶他大腿（不握阴茎）；男子双手自然放下、不扶不压头；唇箍柱身，侧面可见没入，龟头完全在嘴里不外露；连续深浅吞吐可读，浅端龟头也不退出唇外；全程嘴唇与柱身保持接触、零空隙，一次不分开
+  - **Beat 2**：深喉吞吐不停：嘴唇始终箍住柱身不松口，头部前后小幅移动混入左右轻摆，唇与柱身零空隙，龟头全程不退出唇外，进出可见；双手仍扶大腿稳住；禁止嘴唇离开柱身
+  - **Beat 3**：持续深含、节奏不变不休息：嘴唇始终箍住柱身不离开，头部保持小幅前后加左右摆动，喉咙做吞咽；呼吸走鼻腔、不张嘴喘息；不拉丝、不退出口外、不停顿；双手撑他腿或床面，不握阴茎、无人按头
+- **音效**：含弄吮吸声、呕吐反射轻声、气声喘息
+- **参考台词**：嗯，啊，嗯，啊，
+
+### `head_thrust` — 按头抽插 (Head-held thrusting)
+- **机位景别（中）**：中近景侧俯（手按后脑+髋抽送口交进出；龟头不外露；从0.00s已插入）
+- **机位景别（英）**：`MCU side/slight high (hand on occiput + hip thrust oral in-out; already inserted from 0.00s; glans hidden)`
+- **动量节拍（工作台原文）**：
+  - **Beat 1**：从0.00秒起：男子A一手按住她后脑（枕骨），髋部已在前后抽送；阴茎已插入口腔至少一半，嘴唇箍住柱身，龟头完全没入不外露（禁止空张嘴、禁止舌外挡、禁止停在下巴、禁止唇外试探）；她双手抓紧他大腿（不握阴茎）；进出清晰可读
+  - **Beat 2**：按头+髋活塞：每次进出仍至少半根含入，浅端龟头不退出唇外；柱身进出口腔全程看得见，唾液外溢；她抓紧大腿
+  - **Beat 3**：节奏加重：按头让阴茎整根没入再抽到半根仍含住，进出清晰；她含糊呜咽，他粗喘加重
+- **音效**：含弄吮吸声、肉体拍击轻声、男声粗喘
+- **参考台词**：嗯，啊，嗯，啊，
+
+### `facefuck` — 打桩口交 (Facefuck)
+- **机位景别（中）**：中近景特写（脸+阴茎已插入；男髋暴力活塞进出可见约3–4次/秒；双手夹头固定；她头不主动吞吐；龟头浅端不外露；从0.00s已含入猛抽）
+- **机位景别（英）**：`MCU close-up (face + penis already in mouth; HIS violent hip piston ~3–4 thrusts/sec, large travel; both hands clamp her head fixed; SHE does not bob; glans never exits on shallow; from 0.00s slamming)`
+- **动量节拍（工作台原文）**：
+  - **Beat 1**：从0.00秒起暴力髋活塞已连续开动：男子A双手从两侧死死夹住她头颅固定（她头与颈几乎不动，禁止她主动前后吞吐/软绵点头）；全靠他髋部大幅度前后打桩驱动，约每秒3–4次猛烈抽送，行程大半到整根；阴茎已在口腔内至少一半，唇箍柱身，柱身进出口腔全程看得见猛插猛抽；浅端龟头绝不退出唇外（禁止轻柔慢抽、禁止只舔、禁止龟头悬停试探、禁止空张嘴再推进、禁止舌外挡、禁止下巴搁柱、禁止只有她头轻点吞吐）；她双手扶他大腿外侧不握阴茎
+  - **Beat 2**：持续暴力打桩：髋部大幅活塞不停，约3–4次/秒；反复大半到整根没入再抽到半根仍含住，浅端龟头不退出唇外；双手始终夹头固定，她不主动前后吞吐；柱身猛进出清晰可见，唾液飞溅；嘴与进出柱身清晰可读
+  - **Beat 3**：按住头更深暴力打桩：仍双手夹头固定，他髋砸入整根没入停半拍再抽到半根仍含住，立刻继续3–4次/秒猛抽；她大口喘息、唾液拉丝，他低吼再顶回嘴里继续暴力活塞（禁止放慢成温柔舔弄）
+- **音效**：含弄吮吸声、气声喘息、男声低吼
+- **参考台词**：嗯，啊，嗯，啊，
+
+### `sixty_nine` — 69互相舔 (69)
+- **机位景别（中）**：侧中景（双方下身+脸；互含互舔可读；口交侧龟头不外露）
+- **机位景别（英）**：`side MS (both lower bodies + faces; mutual oral readable from 0.00s)`
+- **动量节拍（工作台原文）**：
+  - **Beat 1**：从0.00秒起双方口交已咬合可读：女子A趴在男子A身上，双手撑床或扶他大腿外侧（不握阴茎）；她已含入阴茎至少一半、唇箍柱身、龟头不外露；他双手扶她臀分开，口部已贴她阴部舔弄；互含互舔同框
+  - **Beat 2**：同步：她吞吐保持至少半根含入、龟头不外露；他持续舔阴；双手稳定；双方动作不停机
+  - **Beat 3**：加深：她含得更深仍不握阴茎；他双手扣臀把她往自己脸上带；互含互舔连续可读
+- **音效**：舔弄水声、含弄吮吸声、男声压抑喘息
+- **参考台词**：嗯，啊，嗯，啊，
+
+### `tip_lick` — 舔龟头 (Tip licking)
+- **机位景别（中）**：中近景特写（舌面贴龟头连续舔弄；从0.00s已接触）
+- **机位景别（英）**：`MCU close-up (tongue already on glans from 0.00s; readable lick motion)`
+- **动量节拍（工作台原文）**：
+  - **Beat 1**：从0.00秒起舌面已贴住龟头冠状沟连续舔弄（禁止悬空试探、禁止只含不舔的插入预演）；一手可握根固定柱身，另一手扶他大腿；唇贴近龟头，唾液光泽与舔动轨迹清晰可读；男子A双手自然放下，不扶她头脸
+  - **Beat 2**：加快舔圈：舌尖绕冠状沟与系带打圈，偶轻吮龟头顶端再继续舔；抬头眼神上挑；双手姿势不变
+  - **Beat 3**：持续可读舔弄：舌面上下刮过龟头与前段，唇轻包再放开仍以舔为主；唾液拉丝；不以整根深含为主
+- **音效**：舔弄水声、气声轻喘
+- **参考台词**：嗯，啊，嗯，啊，
+
+### `ball_lick` — 舔蛋吮囊 (Ball licking)
+- **机位景别（中）**：近景特写（舌面贴囊连续舔吮；从0.00s已接触）
+- **机位景别（英）**：`close-up (tongue already on sack from 0.00s; readable lick)`
+- **动量节拍（工作台原文）**：
+  - **Beat 1**：从0.00秒起舌面已贴住阴囊连续舔吮（禁止悬空靠近试探）；唇可包住一侧轻吮；一手可托囊或轻握柱根，另一手扶大腿内侧或床面（不以整根口交为主）；舔动轨迹清晰可读
+  - **Beat 2**：左右交替舔吮蛋囊，偶抬头轻舔柱身根部再回到囊袋；唾液把囊袋与唇周弄湿发亮；男子A可轻扶床沿
+  - **Beat 3**：加快吮舔节奏，他压抑喘息加重；她眼神上挑；双手仍托囊/扶腿，保持舔囊为主
+- **音效**：舔弄水声、男声压抑喘息
+- **参考台词**：嗯，啊，嗯，啊，
+
+### `penis_slap` — 阴茎拍脸 (Cock tapping on face)
+- **机位景别（中）**：中近景特写（她跪地、脸在他胯部高度仰视；他一手始终握住阴茎根部，用勃起的阴茎柱身本身轻敲、轻点她的脸颊与嘴唇；接触脸部的只有阴茎，手从不碰她的脸）
+- **机位景别（英）**：`MCU close-up (she kneels, face at his crotch looking up; his hand grips the base of his erect penis the whole time and the shaft itself taps and bounces against her cheeks and lips; only the penis touches her face, his hand never does)`
+- **动量节拍（工作台原文）**：
+  - **Beat 1**：从0.00秒起女子A双膝跪在站立的男子A正前方，脸正对他胯部高度，抬眼仰视；男子A右手始终握住自己勃起阴茎的根部，手不离开阴茎、不碰她的脸，左手轻搭她头顶；他晃动胯部，让阴茎柱身左右摆动，用阴茎本身轻轻敲在她左脸颊、再敲右脸颊，大约每秒一下，节奏清楚可数；每次柱身碰到脸颊，脸颊肉被压出轻微凹陷随即回弹，阴茎弹开后自然晃动；接触脸部的只有阴茎，手从不碰她的脸；她双手放在自己大腿上，不握阴茎
+  - **Beat 2**：继续有节奏：阴茎龟头轻轻点在她微张的嘴唇和伸出的舌尖上，连点三四下，阴茎上下弹跳，唇肉被压扁再回弹，拉出细唾液丝；她每被碰一下都下意识眨眼、肩膀轻缩；他右手仍握住阴茎根部，左手仍轻搭她头顶
+  - **Beat 3**：她抬眼笑出来，主动伸舌迎向龟头；龟头贴在她舌面上停住；脸颊只有淡淡自然红晕；阴茎不插入嘴里，全程连在他身上；接触她脸部的始终只有阴茎
+- **音效**：阴茎轻碰脸颊的轻微皮肤接触声、气声轻喘、女声轻笑
+- **参考台词**：嗯…（吸气）啊～…哈啊…嘻～
+
+### `fingering` — 手指扣插女穴 (Fingering)
+- **机位景别（中）**：中近景阴部+男方手指进出扣插，湿润可见
+- **机位景别（英）**：`MCU (vulva centered + his fingers; fingers curling inside; already inserted from 0.00s; clit thumbed)`
+- **动量节拍（工作台原文）**：
+  - **Beat 1**：从0.00秒起男方食指中指已并拢探入女穴，手掌朝上手腕贴她耻骨；拇指或另一手按揉阴蒂；手指在穴内弯勾起落，屈指抵住前壁轻轻抠刮；女方仰躺双腿张开，腰微抬迎合
+  - **Beat 2**：手指加快抽送与弯勾，指节带出湿润水光；拇指持续揉压阴蒂；女方咬唇挺腰，脚趾绷紧抠床单
+  - **Beat 3**：两指并拢仍保持深而密的弯勾抠插，节奏略快，水声加大；女方濒临绝顶，全身绷紧颤抖
+- **音效**：湿润水声、气声喘息、女声浪叫
+- **参考台词**：啊…手指…进得好深…好舒服…
+
+### `handjob` — 撸管 (Handjob)
+- **机位景别（中）**：中近景特写（双手+阴茎柱身；图片可露龟头）
+- **机位景别（英）**：`MCU (hands + shaft; glans may show)`
+- **动量节拍（工作台原文）**：
+  - **Beat 1**：女子A跪或坐在身侧，双手握住阴茎柱身环握上下套弄（撸管）；男子A双手放在身侧或轻扶她手腕，不挡镜头
+  - **Beat 2**：加快撸管：双手交替上下滑动套弄整根柱身，带出一点前液可见；她双手始终握柱套弄，不松不空垂
+  - **Beat 3**：冲刺撸管至射精边缘：双手从根部撸到龟头来回，节奏急促收紧；男子A一手可扶她手腕协助，另一手自然放身侧
+- **音效**：润滑套弄水声、男声压抑喘息
+- **参考台词**：嗯，啊，嗯，啊，
+
+### `titjob` — 乳交 (Titjob)
+- **机位景别（中）**：中近景特写（乳沟+阴茎）
+- **机位景别（英）**：`MCU close-up (cleavage + penis)`
+- **动量节拍（工作台原文）**：
+  - **Beat 1**：女子A双手全程托住自己乳房外侧向中间挤压夹住柱身（双手不离开乳房，不放到他腿上或身侧）；阴茎夹在乳沟里，龟头从乳沟顶出清楚可见；男子A双手全程放在自己身体两侧不动，绝不伸手碰她乳房；她上半身小幅前后移动，带动夹紧的乳房上下摩擦柱身，阴茎与男子身体保持静止
+  - **Beat 2**：稳态乳交：她双手持续挤乳夹住不松手，上半身小幅起伏带动乳沟摩擦柱身，进出乳沟可见；男子双手仍放身侧不动
+  - **Beat 3**：加速：双手更用力夹紧乳沟，上半身起伏加快，龟头反复顶出；双手仍托乳不放；男子双手始终放身侧
+- **音效**：乳肉滑动声、舔弄水声、喘息
+- **参考台词**：嗯，啊，嗯，啊，
+
+### `breast_rub` — 揉胸 (Breast rub)
+- **机位景别（中）**：中近景特写（胸+手+侧脸）
+- **机位景别（英）**：`MCU (breasts + hands + face)`
+- **动量节拍（工作台原文）**：
+  - **Beat 1**：男子A双手托住女子A双乳，掌心揉压乳肉，拇指拨弄乳尖，乳沟随揉动变形
+  - **Beat 2**：加重揉捏：向上推挤再松开，乳尖被捻转拉扯，她细汗、胸口起伏
+  - **Beat 3**：一边揉胸一边贴近亲吻锁骨与侧颈，乳肉在指缝间溢出，节奏由轻到重
+- **音效**：气声喘息、女声浪叫、皮肤摩擦声
+- **参考台词**：嗯，啊，嗯，啊，
+
+### `nipple_lick` — 舔乳头 (Nipple lick)
+- **机位景别（中）**：近景特写（嘴+乳尖）
+- **机位景别（英）**：`CU (mouth + nipple)`
+- **动量节拍（工作台原文）**：
+  - **Beat 1**：男子A低头含住一侧乳尖，舌尖绕乳晕轻舔，另一手托住乳房送近；她一手轻按他后脑
+  - **Beat 2**：吮吸加重：唇包住乳尖拉扯再松开，唾液发亮，她弓背把胸口送过去
+  - **Beat 3**：左右切换舔吸，偶用牙齿轻刮，手同时揉另一侧乳房，她喘息变急；她另一手可抓紧床单
+- **音效**：舔弄水声、吮吸声、女声浪叫、气声喘息
+- **参考台词**：嗯，啊，嗯，啊，
+
+### `kiss_fondle` — 揉胸舌吻 (Tongue kiss with breast fondling)
+- **机位景别（中）**：中近景特写（脸+胸+手；两人嘴唇贴合深吻）
+- **机位景别（英）**：`MCU (locked lips + breasts + hands)`
+- **动量节拍（工作台原文）**：
+  - **Beat 1**：男子A一手托住女子A后脑、一手覆上她胸口揉压，双唇贴合深吻、舌尖交缠；她双手环住他脖子，仰头迎合
+  - **Beat 2**：舌吻加深：他舌尖探入她口中搅动，唾液交换声清晰；揉胸的手加重揉捏、捻转乳尖，她胸口起伏、细汗
+  - **Beat 3**：一边深吻一边双手揉挤双乳，乳肉在指缝间溢出；她喘息从唇缝漏出，偶退开半寸喘息又吻回去
+- **音效**：吻声、气声喘息、皮肤摩擦声
+- **参考台词**：唔……唔……
+
+### `kiss_pin` — 按住接吻 (Pinned kiss)
+- **机位景别（中）**：中近景（他上身压住她，双手按住她肩膀/手腕，嘴唇贴合深吻）
+- **机位景别（英）**：`MS (he presses her down, hands pinning her)`
+- **动量节拍（工作台原文）**：
+  - **Beat 1**：男子A双手按住女子A肩膀或手腕，将她压在床上/墙上，低头吻住她双唇；她身体被固定、仰头承接
+  - **Beat 2**：他一手继续按住她，另一手滑到她腰后扣紧，舌尖顶开她唇缝深入；她双腿微屈、脚尖绷紧
+  - **Beat 3**：按住深吻加重：他体重前压，她被吻得喘不上气、唇间漏出呜咽；他的手始终没有松开对她的压制
+- **音效**：吻声、气声喘息
+- **参考台词**：唔……唔……
+
+### `kiss_force` — 强吻 (Forced kiss)
+- **机位景别（中）**：近景特写（他捏住她下巴/扣住后脑强吻，她先抗拒后软化）
+- **机位景别（英）**：`CU (he grips her chin, forces the kiss)`
+- **动量节拍（工作台原文）**：
+  - **Beat 1**：男子A一把捏住女子A下巴（或扣住她后脑），不由分说吻上去；她瞪大眼、双手推他胸口
+  - **Beat 2**：强吻持续：他舌尖强行顶开她紧闭的唇，吮吸她下唇；她推拒的手渐渐没力，改成攥住他衣襟
+  - **Beat 3**：她放弃抵抗、闭眼仰头回应，舌尖开始与他交缠；他扣后脑的手放松成抚摸，吻由强转深
+- **音效**：吻声、气声喘息
+- **参考台词**：唔……不要……唔……
+
+### `kiss_her` — 女主动接吻 (She initiates the kiss)
+- **机位景别（中）**：中近景（她主动捧住他的脸/勾住脖子吻上去）
+- **机位景别（英）**：`MS (she cups his face, kisses him)`
+- **动量节拍（工作台原文）**：
+  - **Beat 1**：女子A主动双手捧住男子A的脸（或勾住他脖子拉近），仰头吻上他的唇；他愣住、手悬在半空
+  - **Beat 2**：她舌尖主动探入他口中，吮吸他下唇；他回过神，一手扶住她后腰、一手扣住她后脑加深这个吻
+  - **Beat 3**：两人吻得难分难解，她贴紧他、舌尖交缠，唾液交换声清晰；她偶退开半寸喘息又吻回去
+- **音效**：吻声、气声喘息
+- **参考台词**：唔……唔……
+
+### `cunnilingus` — 舔阴 (Cunnilingus)
+- **机位景别（中）**：俯拍中近景（阴部居中完整）
+- **机位景别（英）**：`top-down MCU (vulva centered)`
+- **动量节拍（工作台原文）**：
+  - **Beat 1**：女子A仰躺张腿，双手可按床单或轻按他后脑；男子A趴胯下，舌尖轻舔阴唇外侧
+  - **Beat 2**：舌面上下舔阴蒂，男子A双手分开阴唇，阴部完整可见
+  - **Beat 3**：加快舔吸，她弓腰夹腿又分开，浪叫加重（不要手指插入，除非介绍写了）；男子双手仍扶她大腿外侧
+- **音效**：舔弄水声、女声浪叫、气声喘息
+- **参考台词**：嗯，啊，嗯，啊，
+
+### `sofa_cunni` — 沙发舔阴 (Sofa cunnilingus)
+- **机位景别（中）**：侧面近景（镜头与沙发座面齐高；她坐在沙发边缘，他跪在沙发前的地毯上）
+- **机位景别（英）**：`side close-up at sofa-seat height (she sits on the sofa edge, he kneels on the rug)`
+- **动量节拍（工作台原文）**：
+  - **Beat 1**：sofa cunni beat 1
+- **音效**：舔弄水声、女声浪叫、气声喘息
+- **参考台词**：嗯……啊……嗯……啊……
+
+### `undress` — 脱衣诱惑 (Strip tease)
+- **机位景别（中）**：中近景全身站姿：单人女子面向镜头；脱光后外阴自然可见
+- **机位景别（英）**：`front MCU standing solo woman; vulva naturally visible after nude`
+- **动量节拍（工作台原文）**：
+  - **Beat 1**：0–4秒内快速脱光：正对镜头站定，立刻扯掉上衣、褪下下装，动作干脆不拖沓，4秒内身上衣物全部脱完落在地上或甩开；脱光后外阴自然可见
+  - **Beat 2**：脱光后立刻展示身材：挺胸收腹侧转或正面站定，双手托握双乳向上聚拢挤压，乳沟与身体曲线清晰入画，缓慢扭腰展示腰线与臀形；外阴随站姿清晰可见
+  - **Beat 3**：接着换其他性感姿势：双手继续握乳或一手握乳一手抚过侧腰/大腿内侧，微微踮脚挺臀，或双手上举撩发再回到握乳展示；外阴保持可见，只做脱衣后的展示与诱惑
+- **音效**：布料摩擦声、衣物落地声、呼吸
+- **参考台词**：嗯…都脱掉…给你看
+
+### `pov_insert` — POV抽插 (POV thrusting)
+- **机位景别（中）**：第一人称俯视：清楚看见阴茎插入阴道
+- **机位景别（英）**：`male POV looking down at junction`
+- **动量节拍（工作台原文）**：
+  - **Beat 1**：男子A第一人称俯视POV，镜头即他的眼睛，清楚看见自己的阴茎抵住穴口，整根猛插入阴道停半拍；他双手扶她大腿或腰侧
+  - **Beat 2**：用力抽插（大部分保持体内），POV下阴茎进出阴道全程可见，穴口湿亮贴合、比例自然，小腹起伏；她双手抓紧他手臂或床单
+  - **Beat 3**：全程不减速猛插，囊袋拍击，交合处始终居中清晰，她腿环腰或外开；双方手位保持扶腿/抓床单
+- **音效**：湿润抽插声、肉体拍击声、女声浪叫
+- **参考台词**：嗯，啊，嗯，啊，
+
+### `doggy` — 后入趴跪 (Doggy)
+- **机位景别（中）**：影感中景侧后（必须同时框进：背+臀+侧胸乳房+晃发+他腰胯与进出阴茎；看得见阴茎插入阴道与乳晃）
+- **机位景别（英）**：`cinematic MS rear-side (back + butt + hair + his hips + penis in-out)`
+- **动量节拍（工作台原文）**：
+  - **Beat 1**：影感中景侧后固定：女子A趴跪床上背对镜头，双手撑床、双膝分开塌腰抬臀；男子A跪在她身后双手扶腰窝，阴茎已在阴道中抽送；机位必须看见她侧胸乳房随撞击晃动，不要裁掉胸部
+  - **Beat 2**：机位固定加快：仍后入趴跪，侧胸乳房与臀波同步可见，不要提前抽出
+  - **Beat 3**：最激烈打桩：镜头固定只允许撞击微震，侧胸乳晃与臀撞同时可读，姿势不崩
+- **音效**：湿润抽插声、肉体拍击声、床板轻响、女声浪叫
+- **参考台词**：嗯，啊，嗯，啊，
+
+### `table_doggy` — 桌上后入 (Bent over the table)
+- **机位景别（中）**：侧面全景（镜头与桌面齐高；她上半身趴在桌面、双脚站地，他站在她身后；两人全身侧影+交合处）
+- **机位景别（英）**：`full side shot at tabletop height (her upper body on the table, feet on the floor, he stands behind her)`
+- **动量节拍（工作台原文）**：
+  - **Beat 1**：table doggy beat 1
+- **音效**：湿润抽插声、肉体拍击声、女声浪叫、喘息
+- **参考台词**：嗯……啊……嗯……啊……
+
+### `stand_doggy_wall` — 站立后入撑墙 (Standing doggy wall)
+- **机位景别（中）**：中景侧后（两人皆站立；他站在她身后；墙+臀+交合处；看得见阴茎插入阴道；禁止男跪/男坐）
+- **机位景别（英）**：`MS rear-side (wall + hips + junction)`
+- **动量节拍（工作台原文）**：
+  - **Beat 1**：站立后入：男子A站立在女子A身后（双脚踩地站稳，禁止跪/坐）；女子A面向墙壁双手撑墙（掌心贴墙、手指张开，不要自然下垂），双脚站立微屈膝、微塌腰抬臀；男子双手扶她腰；阴茎已整根没入阴道，进出结合处可见
+  - **Beat 2**：站立后入稳态抽插：两人皆保持站立；阴茎进出清晰，她双手持续撑墙受力，臀波明显，足跟偶尔踮起；男子A站在她身后，一手扶腰一手扶她髋
+  - **Beat 3**：加速用力顶弄：男子A仍站立在她身后，一手扶腰一手按在她肩旁墙面上；短行程贯入阴道，大部分保持体内，进出清楚；她双手始终撑墙站稳
+- **音效**：湿润抽插声、肉体拍击声、女声浪叫、床板轻响
+- **参考台词**：嗯，啊，嗯，啊，
+
+### `stand_bend_doggy` — 站立弯腰后入 (Standing bent-over doggy)
+- **机位景别（中）**：中近景（她踮起脚尖站立弯腰塌臀、他身后插入；阴茎直直插入阴道，交合处可见）
+- **机位景别（英）**：`MCU (she on tiptoes, bent over standing, he enters from behind; penis straight in vagina, junction visible)`
+- **动量节拍（工作台原文）**：
+  - **Beat 1**：站立弯腰后入：女子A踮起脚尖站立、双脚分开，上身前倾弯腰、双手向后伸，塌腰翘臀；男子A在她身后站立，双手抓住她的手腕，胯部贴紧她的臀部；阴茎笔直插入阴道、整根没入，柱身笔直无弯折，交合处清晰可见
+  - **Beat 2**：站立抽插：他抓住她手腕前后抽送；她塌腰翘臀迎合；阴茎笔直进出、始终不脱出阴道，交合处清晰可见
+  - **Beat 3**：加速打桩：他抓住她手腕加快速度短行程打桩；她塌腰翘臀迎合、喘息加重
+- **音效**：湿润抽插声、肉体拍击声、女声浪叫、喘息
+- **参考台词**：嗯，啊，嗯，啊，
+
+### `bedside_stand` — 床边站立插入 (Bedside standing insertion)
+- **机位景别（中）**：中近景（他站床边、她仰卧床沿腿搭他肩；阴茎插入阴道，交合处可见）
+- **机位景别（英）**：`MCU (he stands at bedside, she on back at edge, legs on his shoulders; penis in vagina, junction visible)`
+- **动量节拍（工作台原文）**：
+  - **Beat 1**：床边站立插入：男子A在床边站立承重（双脚踩地）；女子A仰卧在床沿、臀部贴到床沿，双腿分开搭在男子A肩上；男子A双手扶住她的腰胯，身体前顶贴紧；阴茎插入阴道，交合处清晰可见
+  - **Beat 2**：站立抽送：他扶稳她腰胯、前后抽送，幅度由浅到深；她搭在他肩上的腿随之轻晃；阴茎进出清晰可见
+  - **Beat 3**：加速顶弄：他俯身压近、加快速度短行程抽插；她双手抓床单，喘息加重
+- **音效**：湿润抽插声、肉体拍击声、女声浪叫、喘息
+- **参考台词**：嗯，啊，嗯，啊，
+
+### `anal` — 后入肛交 (Anal doggy)
+- **机位景别（中）**：中景影感（臀线+交合处；看得见阴茎插入）
+- **机位景别（英）**：`cinematic MS (hip line + junction)`
+- **动量节拍（工作台原文）**：
+  - **Beat 1**：女子A趴跪或侧趴，双手撑床或抓床单（掌心撑住，不要空垂）；男子A双手扶她臀瓣分开，阴茎抵住肛口缓慢推进没入，侧面看清插入过程
+  - **Beat 2**：稳态短行程抽插：大部分保持体内，进出肛门清晰，她双手继续撑床借力；男子A双手扶腰控制节奏
+  - **Beat 3**：加速深插：他双手扣腰往回拉，进出可见；她双手抓紧床单、手肘微曲支撑
+- **音效**：湿润抽插声、肉体拍击声、压抑呻吟、喘息
+- **参考台词**：嗯，啊，嗯，啊，
+
+### `cowgirl` — 女上位骑乘 (Cowgirl)
+- **机位景别（中）**：侧面或略俯中近景（男子A仰卧在下，女子A面对面跨坐在上；腰腹到交合处；看得见阴茎插入阴道；禁止两人前后叠坐一起正面朝镜头）
+- **机位景别（英）**：`Side or slight high MCU: man supine under her, she straddles face-to-face; waist to junction; no tandem sit facing camera`
+- **动量节拍（工作台原文）**：
+  - **Beat 1**：空间锁死：男子A仰卧在床上，双臂在身体两侧不扶腰；女子A面对面跨坐在他腰腹上方（面向他，不要背对他叠坐朝镜头），身体微微前倾，双手放在男子A胸口撑住。她用手扶阴茎抵住穴口后整根坐下，根部贴紧；镜头侧面或略俯清楚看见阴茎没入阴道
+  - **Beat 2**：她身体仍微微前倾，双手持续按在男子A胸口撑住借力（明确放胸口，不要自然下垂）；主动上下短行程起落，大部分保持体内，进出清晰可见，臀肉颤、乳随动作晃；男子A双手不扶腰、髋部可轻顶；禁止悬空阴茎、禁止男人坐在她背后、禁止跪姿俯视
+  - **Beat 3**：加快研磨与短行程抽送，腰画圈夹紧，交合处湿润贴合清晰；她身体微微前倾，双手仍撑在他胸口，眼神低头看向他；男子A双手始终不扶腰
+- **音效**：湿润抽插声、肉体拍击声、女声浪叫
+- **参考台词**：嗯，啊，嗯，啊，
+
+### `cowgirl_upright` — 女骑乘直立上身 (Upright cowgirl)
+- **机位景别（中）**：第一人称POV中近景（镜头=仰卧男人的双眼，从他胸口向上看；她面对镜头上身直立跨坐；腰腹到交合处；看得见阴茎插入阴道；绝不出现男脸）
+- **机位景别（英）**：`First-person POV: man supine, she straddles facing camera with upright torso`
+- **动量节拍（工作台原文）**：
+  - **Beat 1**：空间锁死：男子A仰卧在床上，双臂在身体两侧不扶腰；女子A面对镜头（他的第一人称视角）跨坐在他腰腹上方，上身直立挺直、腰背挺起（禁止前倾、禁止趴伏），双手撑在他胸口或扶自己大腿。她用手扶阴茎抵住穴口后整根坐下；镜头从他胸口高度向上看，清楚看见阴茎没入阴道
+  - **Beat 2**：她保持上身直立，主动上下起落，大部分保持体内，进出清晰可见；胸部随动作上下晃动，臀肉颤；男子A双手不扶腰、髋部可轻顶；禁止悬空阴茎、禁止上身前倾趴伏
+  - **Beat 3**：加快：起落加速、幅度加大，偶尔研磨腰画圈；她咬唇，低头看向镜头（看他）；上身始终直立不趴伏，男子A双手始终不扶腰
+- **音效**：湿润抽插声、肉体拍击声、女声浪叫
+- **参考台词**：嗯，啊，嗯，啊，
+
+### `reverse_cowgirl` — 反向骑乘（背对他） (Seated lap ride)
+- **机位景别（中）**：侧面中近景（坐姿背骑：男坐床边缘脚踩地；女坐他腿上背贴胸口两人同向脚踩地；一半插入）
+- **机位景别（英）**：`side MCU: sitting on lap, reverse upright straddle, man on edge of bed, woman back against his chest, both same direction, half penetration, glans inside not visible, half shaft visible at junction; not face-to-face`
+- **动量节拍（工作台原文）**：
+  - **Beat 1**：坐姿背骑建立：男子A坐在床边缘，双脚踩地，双手扶她腰；女子A坐在他腿上，背贴他胸口，两人同向，双脚踩地，双手扶自己大腿；阴茎一半插入阴道（龟头在体内不可见，外面只露约一半柱身）；禁止：完全没插入、整根外露、龟头对着镜头、男人仰卧、跪床
+  - **Beat 2**：保持同上姿势与手脚：男扶腰、脚踩地；女扶大腿、脚踩地；一半插入，龟头在体内不可见，外露约一半柱身。短行程上下骑动
+  - **Beat 3**：加快骑动，仍坐床边缘，双脚踩地；一半插入不变；她背贴他胸口
+- **音效**：湿润抽插声、肉体拍击声、女声浪叫、喘息
+- **参考台词**：嗯，啊，嗯，啊，
+
+### `squat_cowgirl` — 蹲坐骑乘 (Squatting cowgirl)
+- **机位景别（中）**：中近景（她深蹲骑跨、上下起伏；阴茎插入阴道，交合处可见）
+- **机位景别（英）**：`MCU (she squats over him, rising and falling; penis in vagina, junction visible)`
+- **动量节拍（工作台原文）**：
+  - **Beat 1**：蹲坐骑乘：男子A仰卧在床上；女子A面对面深蹲骑跨在他胯部上方，双脚踩床，双手撑在他胸口；她下沉坐入；阴茎插入阴道，交合处清晰可见
+  - **Beat 2**：蹲坐起伏：她深蹲上下起伏、幅度由小到大；他双手扶住她的腰辅助；阴茎进出清晰可见
+  - **Beat 3**：加速骑乘：她加快起伏、偶尔前后研磨；他挺胯迎合；她喘息加重
+- **音效**：湿润抽插声、肉体拍击声、女声浪叫、喘息
+- **参考台词**：嗯，啊，嗯，啊，
+
+### `lap_sit_back` — 坐怀背对 (Reverse lap sit insertion)
+- **机位景别（中）**：中近景（她背对坐怀、上下起伏；阴茎插入阴道，交合处可见）
+- **机位景别（英）**：`MCU (she sits back-to him in his lap, rising and falling; penis in vagina, junction visible)`
+- **动量节拍（工作台原文）**：
+  - **Beat 1**：坐怀背对插入：男子A坐在床沿上、双脚踩地；女子A背对他坐进他怀里、双腿分开，双手扶他的膝盖；男子A双手从后搂住她的腰；她下沉坐入；阴茎插入阴道，交合处清晰可见
+  - **Beat 2**：坐怀起伏：她扶着他的膝盖上下起伏；他双手搂腰辅助；阴茎进出清晰可见
+  - **Beat 3**：加速顶弄：他向上挺胯配合她加速起伏；她后仰靠在他胸口、喘息加重
+- **音效**：湿润抽插声、肉体拍击声、女声浪叫、喘息
+- **参考台词**：嗯，啊，嗯，啊，
+
+### `lap_sit` — 坐怀面对面 (Lap sitting)
+- **机位景别（中）**：正面略侧中近景（她坐他腿上；看得见阴茎插入阴道）
+- **动量节拍（工作台原文）**：
+  - **Beat 1**：坐怀面对面：男子A坐在床边或椅上双脚踩地，女子A面对面跨坐他腿上，双臂搂他脖颈；阴茎插入阴道，进出处清晰可见；她双脚踩地或盘住他腰
+  - **Beat 2**：她上下起落骑动，他双手扶她腰或托臀配合上顶；两人胸腹相贴，乳房随起落晃动
+  - **Beat 3**：加速骑乘：她起落越来越快，他上顶配合，交合处进出清晰；她可后仰变换角度，喘息加重
+- **音效**：湿润抽插声、肉体拍击声、女声浪叫、气声喘息
+- **参考台词**：嗯，啊，嗯，啊，
+
+### `facesit` — 骑脸 (Facesitting)
+- **机位景别（中）**：中近景（她跨坐他脸上；看得见他舔舐）
+- **动量节拍（工作台原文）**：
+  - **Beat 1**：骑脸：男子A仰卧，女子A跨跪在他脸上方，外阴贴近他的嘴；他双手扶她大腿外侧，舌头舔弄阴唇与阴蒂；她的脸朝镜头方向，表情可读
+  - **Beat 2**：她前后轻挪，用外阴在他嘴上摩擦；他舌头持续舔舐，双手稳住她大腿不乱动
+  - **Beat 3**：她加快摩擦，身体前倾双手撑床，浪叫加重；他配合舔吸不停，唾液发亮
+- **音效**：舔弄水声、女声浪叫、气声喘息
+- **参考台词**：嗯，啊，嗯，啊，
+
+### `missionary` — 传教士 (Missionary)
+- **机位景别（中）**：侧前方中近景（她仰卧、他双膝跪在她两腿之间；脸-胸乳-交合处；看得见乳房晃动与阴茎插入阴道；看不见后臀全貌，勿写臀波撞臀；禁止理解成女上位或叠坐）
+- **机位景别（英）**：`front-side MCU (face-chest-junction)`
+- **动量节拍（工作台原文）**：
+  - **Beat 1**：传教士（男上女下）：男子A在上方，双膝跪立于女子A两腿之间（禁止男子仰卧、禁止男人躺在她下面、禁止女上位）；女子A在下方仰卧，双膝适度分开抬起，双手放在身侧床单上（勿无力下垂挡镜头，勿搂他肩背）；男子双手撑在她身侧床面；阴茎没入至根部贴紧，阴唇自然包裹；清楚看见他跪姿大腿/膝与紧密贴合的插入
+  - **Beat 2**：中速短行程抽送，阴茎大部分保持在体内、只在根部附近小幅进出，阴唇自然贴合包裹，细汗；男子A保持双膝跪姿，双手撑在她身侧床面；她双手抓紧床单（勿搂肩挡POV）
+  - **Beat 3**：节奏略加快但仍保持短行程深顶，他双膝跪稳借力，小腹起伏，交合处湿润贴合清晰；她双手抓住床单，不要空垂
+- **音效**：湿润抽插声、肉体拍击声、女声浪叫、喘息
+- **参考台词**：嗯，啊，嗯，啊，
+
+### `missionary_legup` — 扛腿传教士 (Missionary legs up)
+- **机位景别（中）**：侧前方中近景（她双腿扛他肩上；看得见阴茎深插）
+- **动量节拍（工作台原文）**：
+  - **Beat 1**：扛腿传教士：女子A仰卧，双腿抬起扛在男子A肩上；男子A跪在她两腿之间，双手扶她腰侧或撑在她身侧床面，阴茎深深插入阴道，进出处清晰可见
+  - **Beat 2**：他髋部大幅前后抽送，每下顶到最深；她身体随撞击轻晃
+  - **Beat 3**：冲刺：他髋部加速大幅抽送、每下顶到最深，骨盆把她往床里压实；她始终仰卧、后背与臀部不离床面，只随撞击轻晃；交合处始终清晰，乳房随撞击晃动
+- **音效**：湿润抽插声、肉体拍击声、女声浪叫、气声喘息
+- **参考台词**：嗯，啊，嗯，啊，
+
+### `stand_face_hug` — 面对面抱着站立 (Standing embrace)
+- **机位景别（中）**：中近景正面略侧（站立面对面拥抱，不是坐着叠坐；胯部贴紧；阴茎被胯部夹住不插入）
+- **机位景别（英）**：`MCU front slight side (embrace, hips pressed; penis clamped, no insertion)`
+- **动量节拍（工作台原文）**：
+  - **Beat 1**：面对面站立：男子A站立承重（双脚踩地，禁止坐/跪）；女子A双腿站立，胯部紧贴男子A胯部（两人胯部之间没有空隙），上身挺直面对镜头；男子A双臂从两侧搂住她的腰；他的阴茎被她的胯部夹住遮挡，不插入阴道
+  - **Beat 2**：贴身磨蹭：他双臂搂住她的腰小幅前后带她，胯部始终贴紧不分开；阴茎夹在两人胯间摩擦，不插入阴道
+  - **Beat 3**：加速摩擦：他搂腰把她往自己怀里带，胯部贴紧快速小幅磨蹭；她上身挺直随之轻晃，喘息加重
+- **音效**：肉体摩擦声、肉体拍击声、女声浪叫、喘息、湿吻声
+- **参考台词**：嗯，啊，嗯，啊，
+
+### `carry_insert` — 抱起插入 (Standing carry insertion)
+- **机位景别（中）**：中近景（站立抱起、她双腿盘腰；阴茎插入阴道，交合处可见）
+- **机位景别（英）**：`MCU (he carries her standing, her legs around his waist; penis in vagina, junction visible)`
+- **动量节拍（工作台原文）**：
+  - **Beat 1**：抱起插入：男子A站立承重（双脚踩地、站稳）；女子A面对面被抱起、双腿盘住男子A的腰，双手搂住他的脖颈；男子A双手托住她的臀部，胯部上顶贴紧；阴茎插入阴道，交合处清晰可见
+  - **Beat 2**：抱起抽送：他托住她臀部上下掂动、配合胯部上顶；她盘紧他的腰随之起伏；阴茎进出清晰可见
+  - **Beat 3**：加速顶弄：他抱紧她加速小幅顶送；她搂紧他脖颈、喘息加重
+- **音效**：湿润抽插声、肉体拍击声、女声浪叫、喘息
+- **参考台词**：嗯，啊，嗯，啊，
+
+### `face_insert` — 面对面抬腿插入 (Face-to-face leg-lift insertion)
+- **机位景别（中）**：中近景（站立面对面；他一手抬她腿、一手搂腰；阴茎插入阴道，交合处可见）
+- **机位景别（英）**：`MCU (standing face to face; he grips and lifts one leg, one hand on her waist; penis in vagina, junction visible)`
+- **动量节拍（工作台原文）**：
+  - **Beat 1**：面对面站立插入：男子A站立承重（双脚踩地，禁止坐/跪）；女子A面对面站立，男子A一只手把住她一侧大腿并抬起、一只手搂住她的腰，胯部紧贴；阴茎整根没入阴道、柱身被阴道包裹只露根部，两人胯部紧贴无空隙
+  - **Beat 2**：站立抽插：他一手把住她抬起的大腿、一手搂腰，小幅前后抽送，阴茎始终插在阴道内进出、不脱出体外，胯部始终贴紧；被抬起的腿不落地
+  - **Beat 3**：加速顶弄：他一手把住她大腿、一手搂腰把她往怀里带，保持抬腿姿势小幅快速抽插，阴茎始终不脱出阴道；她上身挺直轻晃，喘息加重
+- **音效**：湿润抽插声、肉体拍击声、女声浪叫、喘息
+- **参考台词**：嗯，啊，嗯，啊，
+
+### `side_face` — 侧卧面对面插入 (Side-lying face-to-face insertion)
+- **机位景别（中）**：中近景（侧卧面对面、她上腿搭他腰；阴茎插入阴道，交合处可见）
+- **机位景别（英）**：`MCU (side-lying face to face, her upper leg on his waist; penis in vagina, junction visible)`
+- **动量节拍（工作台原文）**：
+  - **Beat 1**：侧卧面对面插入：两人在床上侧卧、面对面贴紧；女子A下面一条腿伸直、上面一条腿屈起搭在男子A腰上；男子A一手搂住她的腰、一手撑床，胯部贴紧；阴茎插入阴道，交合处清晰可见
+  - **Beat 2**：侧卧抽送：他搂腰前后小幅抽送，她搭在他腰上的腿随之轻晃；阴茎进出清晰可见
+  - **Beat 3**：加速研磨：他加快速度、胯部贴紧研磨顶送；她仰头喘息加重
+- **音效**：湿润抽插声、肉体拍击声、女声浪叫、喘息
+- **参考台词**：嗯，啊，嗯，啊，
+
+### `side_spoon` — 侧卧后入 (Spooning)
+- **机位景别（中）**：侧面中景（两人同向侧卧；看得见阴茎从后方插入阴道）
+- **动量节拍（工作台原文）**：
+  - **Beat 1**：侧卧后入：两人都朝同一方向侧卧，她在前他在后；她上腿微屈抬起，他一手从她腰下穿过扶腰、一手扶她上腿，阴茎从后方插入阴道，进出处清晰可见
+  - **Beat 2**：稳态抽送：他髋部前后顶送，她身体随撞击前后轻晃；两人保持侧卧不翻身，被子不盖住交合处
+  - **Beat 3**：加速顶送：他越顶越快，她上腿再抬高一点，进出更深；臀波与喘息同步，交合处始终可读
+- **音效**：湿润抽插声、肉体拍击声、女声浪叫、气声喘息
+- **参考台词**：嗯，啊，嗯，啊，
+
+### `ass_rub` — 臀缝摩擦 (Butt crack grinding)
+- **机位景别（中）**：中景侧后（臀缝+阴茎摩擦；不插入阴道）
+- **动量节拍（工作台原文）**：
+  - **Beat 1**：臀缝摩擦：男子A站立在她身后，双手扶她髋，阴茎放入她臀缝（臀沟）中前后摩擦——柱身被臀瓣夹住，龟头在臀缝里来回滑动，不插入阴道；臀肉随摩擦轻晃；阴茎全程清晰可见，禁止消失、禁止扯断
+  - **Beat 2**：摩擦加速：他髋部小幅前后送，带动阴茎在臀缝里来回滑动，臀波轻晃；她双手撑墙、塌腰抬臀保持站立，双脚不离地
+  - **Beat 3**：冲刺摩擦：节奏达到最快，龟头抵在臀缝深处滑动，臀肉波浪起伏；她被磨得轻颤，可直接衔接射在臀部
+- **音效**：皮肤摩擦声、湿润水声、女声呻吟、气声喘息
+- **参考台词**：嗯，啊，嗯，啊，
+
+### `footjob` — 足交 (Footjob)
+- **机位景别（中）**：中近景（双脚+阴茎；脚底摩擦柱身）
+- **动量节拍（工作台原文）**：
+  - **Beat 1**：足交：女子A坐或躺在他对面，双脚夹住阴茎柱身，脚底前后摩擦套弄；男子A靠坐或躺着，双手撑在身侧；阴茎在双脚间进出清晰可见，不插入任何部位
+  - **Beat 2**：双脚交替：她脚掌夹紧上下套弄，脚趾偶尔拨弄龟头；他身体后仰承接，呼吸加重
+  - **Beat 3**：加速：双脚快速摩擦，柱身在足弓间进出；临近射精时双脚夹紧，可直接衔接射精收束
+- **音效**：皮肤摩擦声、气声喘息、男声粗喘
+- **参考台词**：嗯，啊，嗯，啊，
+
+### `creampie` — 内射 (Creampie)
+- **机位景别（中）**：中近景（交合处；看得见阴茎插入阴道并内射）
+- **机位景别（英）**：`MCU (junction; visible penis in vagina during creampie)`
+- **动量节拍（工作台原文）**：
+  - **Beat 1**：阴茎整根没入阴道最深处停住，男子A双手扣住她腰贴紧，髋部紧贴，交合处贴合清晰可见、比例自然；她双手搂他背或抓床单
+  - **Beat 2**：内射脉动：他埋在里面射精，根部抽动，精液从交合缝隙少量溢出仍看得见插入；双手仍扣腰不松
+  - **Beat 3**：射完后缓缓抽出或继续埋着：穴口合拢时可见白色精液从阴道缓缓流出；她双手仍搂着他或按住小腹
+- **音效**：射精脉动与液体声、湿润抽插声、男声低吼、女声浪叫、气声喘息
+- **参考台词**：嗯，啊，嗯，啊，
+
+### `cum_face` — 射在脸上 (Facial)
+- **机位景别（中）**：中近景特写（脸+精液落点；他自撸）
+- **机位景别（英）**：`MCU close-up (face + cum landing; male self-stroke)`
+- **动量节拍（工作台原文）**：
+  - **Beat 1**：自撸开场：男子A髋部后撤，一手握住柱身把阴茎从穴口快速滑出（阴茎根部仍连在他身上，禁止扯断或脱离身体），滑出后未插入；他自己的手继续握住柱身（不是她在撸），龟头对准女子A脸；她仰脸或跪姿抬头，双手撑床或放自己大腿，不替他撸。拔出后立刻从根部撸到龟头快速上下套弄，大约每秒三到四下，拳头沿柱身滑动可见，禁止只握着不动
+  - **Beat 2**：继续自撸冲刺：男子A自己的手快速上下撸动柱身不停顿，行程短密，前液可见；龟头始终对准她脸；她半睁眼仰脸承接，不伸手替他套弄
+  - **Beat 3**：边撸边射：他自撸几下后射精脉动，精液一股股射在脸颊、鼻梁、嘴唇与下巴；射完仍握根快速抖撸两下挤尽余精，她微张嘴喘息，精液沿脸滑下
+- **音效**：射精脉动与液体声、男声低吼、气声喘息、女声浪叫
+- **参考台词**：嗯，啊，嗯，啊，
+
+### `cum_chest` — 射在胸口 (Cum on chest)
+- **机位景别（中）**：中近景（胸乳+精液落点）
+- **机位景别（英）**：`MCU (breasts + cum landing)`
+- **动量节拍（工作台原文）**：
+  - **Beat 1**：男子A髋部后撤，一手握住柱身把阴茎快速滑出（仍连在他身上，禁止扯断），再对准女子A胸口与乳沟；她双手可托乳或平躺露胸
+  - **Beat 2**：射精脉动：精液射在双乳、乳沟与锁骨，白色液体沾湿乳尖清晰可见
+  - **Beat 3**：余精顺着乳丘滑落，她低头看胸口喘息，他握根最后抖动挤出剩余
+- **音效**：射精脉动与液体声、男声粗喘、气声喘息、女声浪叫
+- **参考台词**：嗯，啊，嗯，啊，
+
+### `cum_belly` — 射在腹部 (Cum on belly)
+- **机位景别（中）**：中近景（小腹+耻骨上方+精液落点；他自撸）
+- **机位景别（英）**：`MCU (lower belly + cum landing; male self-stroke)`
+- **动量节拍（工作台原文）**：
+  - **Beat 1**：自撸开场：男子A髋部后撤，一手握住柱身把阴茎从阴道快速滑出（根部仍连在他身上，禁止扯断或脱离身体），滑出后跪在她两腿之间未插入；他自己的手继续握住柱身，龟头对准她小腹与耻骨上方；她双手按床单或轻触腰侧，微抬头看落点，不替他撸。拔出后立刻从根部到龟头快速上下撸动，大约每秒三到四下，拳头滑动可见，禁止只握着不动
+  - **Beat 2**：继续自撸冲刺：男子A自己的手快速上下撸柱身，短行程密，对准小腹；她小腹露出承接，不伸手套弄
+  - **Beat 3**：边撸边射：他自撸后前倾射精，精液一股股落在小腹与肚脐下方，白浊沿腹线挂淌；射完仍握根快速抖撸两下，落点清楚入镜
+- **音效**：射精脉动与液体声、湿润抽插余声、女声浪叫、气声喘息
+- **参考台词**：嗯，啊，嗯，啊，
+
+### `cum_butt` — 射在臀部 (Cum on butt)
+- **机位景别（中）**：影感中景侧后（臀线+精液落点；无自撸）
+- **机位景别（英）**：`cinematic MS rear-side (butt + cum landing; no handjob)`
+- **动量节拍（工作台原文）**：
+  - **Beat 1**：抽出直接射臀（不撸管）：男子A双手仍扶她腰，突然整根猛抽出：髋部猛后撤，阴茎从穴口整根抽出（根部仍连在他骨盆上，禁止扯断、禁止脱离身体、禁止手里多出第二根阴茎）；抽出全程阴茎始终在画面中可见，禁止阴茎消失；抽出后未插入；龟头对准臀峰与臀缝；禁止用手上下撸管
+  - **Beat 2**：不撸管直接射精：射精脉动，精液真实落在臀瓣、臀缝与腰窝；抽出轨迹合理；阴茎始终连在他身上、在画面中清晰可见
+  - **Beat 3**：收尾：她双腿发抖，瘫软趴在床上，仍背对镜头保持趴姿；余精沿臀滑落；机位固定到结束
+- **音效**：射精脉动与液体声、男声低吼、肉体拍击轻声、气声喘息
+- **参考台词**：嗯，啊，嗯，啊，
+
+
+---
+
+## 三、一键组合模板（仅作转场桥参考，非正式分镜）
+
+| ID | 名称 | 姿势链 |
+|---|---|---|
+| `cg_to_doggy` | 女上位→流畅趴下→后入 | 女上位骑乘→后入趴跪 |
+| `miss_to_doggy` | 传教士→侧翻趴下→后入 | 传教士→后入趴跪 |
+| `bj_to_miss` | 跪姿口交→躺下→传教士 | 跪姿口交→传教士 |
+| `stand_hug_to_wall` | 抱着站立→转向撑墙→站立后入 | 面对面抱着站立→站立后入撑墙 |
+| `cowgirl_grind_creampie` | 女上位研磨→深坐内射 | 女上位骑乘→内射 |
+| `doggy_to_cum_butt` | 后入→抽出→射在屁股上 | 后入趴跪→射在臀部 |
+| `miss_to_cum_belly` | 传教士→抽出→射在腹部 | 传教士→射在腹部 |
+| `bj_to_cum_face` | 跪姿口交→抽出→射在脸上 | 跪姿口交→射在脸上 |
+| `titjob_to_cum_chest` | 乳交→抽出→射在胸上 | 乳交→射在胸口 |
+
+## 四、物理换位配方（40 条，换体位必查）
+
+| 键 | 说明 |
+|---|---|
+| `anal->cum_butt` | 有内置物理换位配方 |
+| `ball_lick->cum_face` | 有内置物理换位配方 |
+| `bj->cowgirl` | 有内置物理换位配方 |
+| `bj->cum_face` | 有内置物理换位配方 |
+| `bj->missionary` | 有内置物理换位配方 |
+| `cowgirl->doggy` | 有内置物理换位配方 |
+| `cowgirl->finish` | 有内置物理换位配方 |
+| `cowgirl->missionary` | 有内置物理换位配方 |
+| `cowgirl->rear_kneel` | 有内置物理换位配方 |
+| `cum_butt->doggy` | 有内置物理换位配方 |
+| `deepthroat->cum_face` | 有内置物理换位配方 |
+| `doggy->cowgirl` | 有内置物理换位配方 |
+| `doggy->cum_butt` | 有内置物理换位配方 |
+| `doggy->missionary` | 有内置物理换位配方 |
+| `facefuck->cum_face` | 有内置物理换位配方 |
+| `handjob->cum_chest` | 有内置物理换位配方 |
+| `handjob->cum_face` | 有内置物理换位配方 |
+| `head_thrust->cum_face` | 有内置物理换位配方 |
+| `kneel_front->finish` | 有内置物理换位配方 |
+| `kneel_oral->finish` | 有内置物理换位配方 |
+| `kneel_oral->supine` | 有内置物理换位配方 |
+| `missionary->bj` | 有内置物理换位配方 |
+| `missionary->cum_belly` | 有内置物理换位配方 |
+| `missionary->cum_chest` | 有内置物理换位配方 |
+| `missionary->doggy` | 有内置物理换位配方 |
+| `penis_slap->bj` | 有内置物理换位配方 |
+| `penis_slap->cum_face` | 有内置物理换位配方 |
+| `rear_kneel->finish` | 有内置物理换位配方 |
+| `rear_kneel->supine` | 有内置物理换位配方 |
+| `side_manual->supine` | 有内置物理换位配方 |
+| `sixty_nine->cum_face` | 有内置物理换位配方 |
+| `stand_doggy_wall->cum_butt` | 有内置物理换位配方 |
+| `stand_face->finish` | 有内置物理换位配方 |
+| `stand_face_hug->cum_butt` | 有内置物理换位配方 |
+| `stand_face_hug->stand_doggy_wall` | 有内置物理换位配方 |
+| `stand_rear->finish` | 有内置物理换位配方 |
+| `supine->finish` | 有内置物理换位配方 |
+| `supine->rear_kneel` | 有内置物理换位配方 |
+| `tip_lick->cum_face` | 有内置物理换位配方 |
+| `titjob->cum_chest` | 有内置物理换位配方 |
