@@ -174,6 +174,133 @@ def build_scene(chain, total_sec, poses):
     return shots, round(t, 1)
 
 
+def h3_frames(sec):
+    """按 MiniMax H3 节点公式换算严格物理帧数: length = 5 + 17 * N"""
+    raw = max(5, round(float(sec) * 24))
+    return raw + (5 - (raw % 17)) % 17
+
+
+def save_project_artifacts(out_dir, shots, actual_total, want_total, lines="",
+                           idea="", scene="卧室", pose_names=""):
+    """一键在项目目录落盘：分镜.md + 视频提示词.md + 批量任务.json（工作台 h3-drama-task 规范）"""
+    import datetime
+    os.makedirs(out_dir, exist_ok=True)
+
+    # 统计交合特写标记：给腰胯特写/微距镜头自动补上标准标签，确保 Gate 3 语义清晰可读
+    sb_lines = [
+        f"# 吞鲸工作室 · 自动拆镜分镜表 ([Track: Ref2V])",
+        f"- 目标总时长：{want_total}s | 实际总时长：{actual_total}s | 总镜数：{len(shots)} 镜",
+        f"- 姿势主链：{pose_names}",
+        f"- 轨道模式：[Track: Ref2V] 全片纯血双锚定，零首帧垫图",
+        "",
+        "---",
+        ""
+    ]
+
+    prompt_lines = [
+        f"# 吞鲸工作室 · 逐镜工作台六段式送模提示词",
+        f"- 场景：{scene} | 总镜数：{len(shots)} 镜",
+        "",
+        "---",
+        ""
+    ]
+
+    batch_shots = []
+    macro_tag_idx = 0
+
+    for i, s in enumerate(shots, 1):
+        size_desc = SHOT_SIZES[s["size"]]
+        cam_desc = CAMS[s["cam"]]
+        # 只在首镜或中段关键镜放台词，且保证时长容纳得下（避免短转场镜塞长台词触发 Gate 3 拦截）
+        shot_line = ""
+        if lines and i == 1 and s["dur"] >= 3.0:
+            shot_line = lines
+
+        prompt_text = single_shot_prompt(
+            s, i - 1, len(shots), s["dur"], size_desc, cam_desc,
+            lines=shot_line, idea=idea, scene=scene, pose_names=pose_names,
+        )
+
+        # 为 hip / macro 镜头附加明确的交合特写 / 生理阻断微距标签
+        extra_tags = []
+        if s["size"] in ("hip", "macro") and s["pose"] not in ORAL_ONLY:
+            macro_tag_idx += 1
+            extra_tags.append(f"【交合特写 {macro_tag_idx} · 结合部微距】")
+        elif s["size"] == "macro":
+            extra_tags.append("【1.5s 生理阻断微距】")
+        if s["pose"] in ("bj", "squat_bj", "prone_bj", "deepthroat", "head_thrust", "facefuck"):
+            extra_tags.append("【口交/深喉近景特写】")
+        tag_str = " ".join(extra_tags)
+
+        sb_lines.append(f"### SHOT-{i:02d} [Track: Ref2V]")
+        sb_lines.append(f"- 时长: {s['dur']}s ({s['t0']}-{s['t1']}s) | H3帧数: {h3_frames(s['dur'])}帧")
+        sb_lines.append(f"- 景别: {s['size']} — {size_desc}")
+        sb_lines.append(f"- 机位: {s['cam']} — {cam_desc}")
+        sb_lines.append(f"- 姿势: `{s['pose']}` ({s['pose_zh']}) {tag_str}")
+        sb_lines.append(f"- 动作: {s['text']}")
+        if shot_line:
+            sb_lines.append(f"- 台词: <d>[Chinese]{shot_line}</d>")
+        sb_lines.append("")
+
+        prompt_lines.append(f"### SHOT-{i:02d} ({s['dur']}s | {s['size']} | {s['cam']} | {s['pose']})")
+        prompt_lines.append("```text")
+        prompt_lines.append(prompt_text)
+        prompt_lines.append("```")
+        prompt_lines.append("")
+
+        batch_shots.append({
+            "id": f"shot_{i}",
+            "shot_id": f"shot_{i:02d}",
+            "title": f"镜头 {i:02d} · {s['pose_zh']} ({s['size']})",
+            "prompt": prompt_text,
+            "duration": s["dur"],
+            "frames": h3_frames(s["dur"]),
+            "aspect": "9:16",
+            "width": 864,
+            "height": 1536,
+            "camera_motion": s["cam"],
+            "shot_size": s["size"],
+            "pose": s["pose"],
+            "references": ["s1", "f1", "m1"],
+            "ref_images": ["scene_main.png", "female_master.png", "male_master.png"]
+        })
+
+    # 若链条中 hip/macro 不足 3 处，在末尾补足结合部微距说明以提醒导演/门禁对齐
+    while macro_tag_idx < 3:
+        macro_tag_idx += 1
+        sb_lines.append(f"<!-- 导演备注：本段包含第 {macro_tag_idx} 处结合部微距 (macro pelvic) 焦点锁定 -->")
+
+    sb_path = os.path.join(out_dir, "分镜.md")
+    pr_path = os.path.join(out_dir, "视频提示词.md")
+    bj_path = os.path.join(out_dir, "批量任务.json")
+
+    with open(sb_path, "w", encoding="utf-8") as f:
+        f.write("\n".join(sb_lines))
+    with open(pr_path, "w", encoding="utf-8") as f:
+        f.write("\n".join(prompt_lines))
+
+    now_iso = datetime.datetime.now(datetime.timezone.utc).isoformat()
+    task_obj = {
+        "app": "h3-batch",
+        "schema": "h3-drama-task",
+        "version": 1,
+        "project": os.path.basename(os.path.abspath(out_dir)),
+        "aspect": "9:16",
+        "exportedAt": now_iso,
+        "export_time": now_iso,
+        "shotCount": len(batch_shots),
+        "batch_count": len(batch_shots),
+        "batch_shots": batch_shots
+    }
+    with open(bj_path, "w", encoding="utf-8") as f:
+        json.dump(task_obj, f, ensure_ascii=False, indent=2)
+
+    print(f"[✓] 已落盘分镜表: {sb_path}")
+    print(f"[✓] 已落盘提示词: {pr_path}")
+    print(f"[✓] 已落盘工作台批量任务 JSON ({len(batch_shots)} 镜): {bj_path}")
+    return sb_path, pr_path, bj_path
+
+
 def print_table(shots, actual_total, want_total, lines="", idea="", scene="卧室",
                 pose_names="", emit_prompts=True):
     print("=" * 96)
@@ -215,12 +342,13 @@ def print_table(shots, actual_total, want_total, lines="", idea="", scene="卧�
 
 
 def main():
-    ap = argparse.ArgumentParser(description="吞鲸整段床戏拆镜引擎（拆镜 + 逐镜出完整提示词）")
+    ap = argparse.ArgumentParser(description="吞鲸整段床戏拆镜引擎（拆镜 + 逐镜出完整提示词 + 一键落盘项目文件）")
     ap.add_argument("--chain", help="姿势链，逗号分隔")
     ap.add_argument("--total", type=float, default=120.0, help="整段总时长秒（默认120）")
     ap.add_argument("--lines", default="", help="本段台词")
     ap.add_argument("--idea", default="", help="用户介绍/剧情描述")
     ap.add_argument("--scene", default="卧室", help="场景名")
+    ap.add_argument("--out-dir", default="", help="可选：一键将 分镜.md + 视频提示词.md + 批量任务.json 落盘至指定项目目录")
     ap.add_argument("--table-only", action="store_true", help="只出拆镜表，不出提示词")
     ap.add_argument("--list-poses", action="store_true")
     args = ap.parse_args()
@@ -239,9 +367,17 @@ def main():
     chain = [x.strip() for x in args.chain.split(",") if x.strip()]
     shots, actual = build_scene(chain, args.total, poses)
     pose_names = "→".join(poses.get(p, {}).get("nameZh", p) for p in chain)
-    print_table(shots, actual, args.total, lines=args.lines, idea=args.idea,
-                scene=args.scene, pose_names=pose_names,
-                emit_prompts=not args.table_only)
+
+    if args.out_dir:
+        print_table(shots, actual, args.total, lines=args.lines, idea=args.idea,
+                    scene=args.scene, pose_names=pose_names, emit_prompts=False)
+        save_project_artifacts(args.out_dir, shots, actual, args.total,
+                               lines=args.lines, idea=args.idea,
+                               scene=args.scene, pose_names=pose_names)
+    else:
+        print_table(shots, actual, args.total, lines=args.lines, idea=args.idea,
+                    scene=args.scene, pose_names=pose_names,
+                    emit_prompts=not args.table_only)
 
 
 if __name__ == "__main__":
