@@ -1,18 +1,18 @@
 ---
 name: tunjing-baodian
-description: 吞鲸宝典·吞鲸工作室精品漫剧全流程极速生产引擎。绑定《大人的工作台》真源，会话中说「吞鲸开始」即刻启动六大刚性门禁流水线。
+description: 吞鲸宝典·吞鲸工作室精品漫剧全流程极速生产引擎。内置50套体位矩阵与六段式装配内核，会话中说「吞鲸开始」即刻启动六大刚性门禁流水线。
 version: 2.0.0
 author: 吞鲸工作室 (Swallowing Whale Studio)
 license: MIT
 metadata:
   hermes:
-    tags: [tunjing, baodian, drama, pure-ref2v, workbench, gatekeeper]
+    tags: [tunjing, baodian, drama, pure-ref2v, gatekeeper]
 ---
 
 # 🐳 吞鲸宝典 · 精品漫剧极速生产引擎 (Tunjing Baodian v2.0)
 
 > **吞鲸宗旨**：**文戏带刀有张力，动作带电有花样，步步门禁不跳步，纯血管线一次过。**
-> 吞鲸工作室权威生产母版。1:1 绑定桌面《大人的工作台》真源数据与装配引擎，零历史补丁、零脑补词汇、跨机器跨大模型 100% 无差别出片。
+> 吞鲸工作室 100% 自包含权威生产母版。内置 50 套体位动量矩阵、40 条物理换位配方与 13 类场地动态适配内核，零外部依赖、零脑补词汇、跨机器跨大模型 100% 无差别出片。
 
 ---
 
@@ -27,7 +27,7 @@ metadata:
 2. **角色定位**：AI 助手自称“鲸鲸”（吞鲸工作室执行导演）；用户为监制/制片人。
 3. **权责分工**：
    - **用户（监制）**：在第 1 步拍板题材方向、选定角色人设、提供或确认定版资产包（角色 2x3 母版与纯净场景底图）；
-   - **鲸鲸（执行导演）**：资产定版后，自主全包后续全流程：三幕式高张力剧本创作、中段势能转折设计、2~6s 短镜拆解（逐镜赋予景别与机位）、13 类场地承托面动态适配、工作台六段式提示词编译、Gate 5 生成前自我终审报告出具、以及 `批量任务.json` 导出。
+   - **鲸鲸（执行导演）**：资产定版后，自主全包后续全流程：三幕式高张力剧本创作、中段势能转折设计、2~6s 短镜拆解（逐镜赋予景别与机位）、13 类场地承托面动态适配、吞鲸标准六段式提示词编译、Gate 5 生成前自我终审报告出具、以及 `批量任务.json` 导出。
 4. **状态机锁死**：强制初始化项目状态文件 `.tunjing_status.json`，严格按顺序推进 Gate 1 ➔ Gate 6，严禁跳步！
 
 ---
@@ -39,11 +39,11 @@ metadata:
 ```text
 [Gate 1：资产死锁门禁] ➔ 校验 00_资产/ 具备男女角色定版 2x3 母版 + 纯净场景底图
          ↓ PASS
-[Gate 2：刀锋剧本门禁] ➔ 校验 剧本.md 具备三幕式结构 + <d>[Chinese]...</d> 台词 + 显式声明工作台体位 ID
+[Gate 2：刀锋剧本门禁] ➔ 校验 剧本.md 具备三幕式结构 + <d>[Chinese]...</d> 台词 + 显式声明吞鲸标准体位 ID
          ↓ PASS
 [Gate 3：拆镜密度门禁] ➔ 校验 分镜.md 逐镜标明景别与机位、平均单镜 ≤8s、含口交特写 + 换体位 + 3次交合微距 + 台词时长咬合
          ↓ PASS
-[Gate 4：六段提示词门禁] ➔ 校验 视频提示词.md 完整包含工作台六段式锚点 + 正向肯定句压油词 + OS 防对口型物理死锁
+[Gate 4：六段提示词门禁] ➔ 校验 视频提示词.md 完整包含吞鲸标准六段式锚点 + 正向肯定句压油词 + OS 防对口型物理死锁
          ↓ PASS
 [Gate 5：生成前终极自审] ➔ 对照 pre-render-audit-standard.md 完成六维度盲检，出具全 PASS 终审报告
          ↓ PASS
@@ -54,15 +54,15 @@ metadata:
 
 ## 三、权威数据真源与文档架构 (Authoritative Architecture)
 
-> **三大铁证数据真源（1:1 提取自《大人的工作台》`h3-app.js`，严禁任何大模型脱稿脑补）**：
-> 1. `references/workbench_poses_matrix.json` — **50 套单体体位矩阵**（含 `framing` 机位景别、`beats` 三节拍物理动量、`sfx` 音效、`line` 喘息原文）
+> **三大铁证数据真源（1:1 提取自吞鲸宝典内置引擎`tunjing_poses_matrix.json`，严禁任何大模型脱稿脑补）**：
+> 1. `references/tunjing_poses_matrix.json` — **50 套单体体位矩阵**（含 `framing` 机位景别、`beats` 三节拍物理动量、`sfx` 音效、`line` 喘息原文）
 > 2. `references/transition_recipes.json` — **40 条物理换位配方**（从抽离、重心转移、支点切换到重新对齐的连续物理路径）
 > 3. `references/oneshot_transitions.json` — **9 套一键组合转换模板**（仅作换位转场桥参考）
 
 ### 核心规范文档 (`references/`)
 | 文件 | 核心职责 |
 |---|---|
-| `official-prompt-assembly-spec.md` | 工作台 `buildOfficialH3Prompt()` **六段式提示词装配真源规格**（唯一合法的送模提示词结构） |
+| `official-prompt-assembly-spec.md` | 吞鲸引擎 `吞鲸六段式标准装配器` **六段式提示词装配真源规格**（唯一合法的送模提示词结构） |
 | `kinetic-positions.md` | 50 套体位矩阵与换位配方的人类可读全集（由 JSON 真源自动生成） |
 | `comfyui-dual-pipeline-spec.md` | **纯血 Ref2V 单轨生产管线规范**（I2V 禁令、腰胯景别收缩防融化、Node 328 负向清零与正向肯定句压油） |
 | `shot-design-and-bounce.md` | **视听弹跳分镜规范**（1.5s 生理阻断微距、四类受控运镜、12~15s 硬件上限与短-中-长心电图呼吸） |
@@ -76,8 +76,8 @@ metadata:
 |---|---|
 | `tunjing_core.py` | **装配与场地适配共享内核**（唯一实现六段式拼装 + `with_scene_surface` 13 类场地承托面与声场动态改写） |
 | `tunjing_scene.py` | **整段床戏自动拆镜主引擎**：将 120s~300s 姿势链拆为 20~30 个 2~6s 短镜，一键落盘 `分镜.md` + `视频提示词.md` + `批量任务.json` |
-| `tunjing_storyboard.py` | **单镜多节拍精修器**：针对单个镜头（3~6 个内部节拍）复刻工作台时间轴切分与六段式输出 |
-| `tunjing_resolver.py` | **自然语言动作速查器**：输入中文口语动作（如“女口交/扣女穴/女上位/射屁股”）秒查对应工作台 ID 与动量 |
+| `tunjing_storyboard.py` | **单镜多节拍精修器**：针对单个镜头（3~6 个内部节拍）复刻吞鲸引擎时间轴切分与六段式输出 |
+| `tunjing_resolver.py` | **自然语言动作速查器**：输入中文口语动作（如“女口交/扣女穴/女上位/射屁股”）秒查对应吞鲸引擎 ID 与动量 |
 | `tunjing_gatekeeper.py` | **六大刚性步进门禁状态机**：逐级核验项目产物并推进 `.tunjing_status.json` |
 | `tunjing_compiler.py` | **六段式提示词体检器**：校验必填结构锚点、正向压油词与毒性词拦截 |
 | `export_comfy_payload.py` | **渲染提交与批量任务核验器**：核验 5 大门禁状态与 `批量任务.json` 物理帧长 `(F-5)%17==0` |
@@ -116,10 +116,10 @@ python scripts/tunjing_scene.py \
   --idea "水汽氤氲中的防线崩塌" \
   --out-dir "./EP01_project"
 ```
-执行后自动在 `./EP01_project` 下生成 100% 符合 Gate 3、Gate 4 与工作台批处理规范的：
+执行后自动在 `./EP01_project` 下生成 100% 符合 Gate 3、Gate 4 与吞鲸引擎批处理规范的：
 1. `分镜.md`（带 `[Track: Ref2V]`、H3 物理帧数、景别机位、3 次交合微距与口交特写标记）
-2. `视频提示词.md`（全套工作台六段式送模提示词，已自动将动作与音效中的“床”改写为“温泉浴室/湿润瓷砖/水声”）
-3. `批量任务.json`（`schema: h3-drama-task`，可直接拖入工作台或交由 `batch_h3.py --run` 批量渲染）
+2. `视频提示词.md`（全套吞鲸标准六段式送模提示词，已自动将动作与音效中的“床”改写为“温泉浴室/湿润瓷砖/水声”）
+3. `批量任务.json`（`schema: h3-drama-task`，可直接拖入吞鲸引擎或交由 `ComfyUI 批量队列` 批量渲染）
 
 ---
 
@@ -128,7 +128,7 @@ python scripts/tunjing_scene.py \
 1. **纯血 Ref2V 单轨铁律**：全片 100% 采用 `Picture 1 (纯净场景底图) + Picture 2/3 (角色 2x3 母版)` 双锚定直通 MiniMax H3。**彻底封杀单镜抽首帧 I2V 垫图**，从根源消灭 Cross-Attention 注意力竞争导致的骨骼漂移与换脸。
 2. **景别收缩防融化铁律**：高难度双人交合严禁全身大全景硬算！取景强制收缩至腰胯中近景 (`mcu`) 或腰胯特写 (`hip`)，面部失神表情交棒给相邻的 1.5s 独立微距镜头 (`face` / `macro`)。
 3. **正向肯定句压油铁律**：工作流底层 Node 328 将负向通道清零（`ConditioningZeroOut`），负向写排油词无效。每条提示词正向必须内嵌：`authentic matte velvet skin finish, powdered dry texture, natural human skin with visible fine pores and subtle imperfections, soft subsurface scattering without surface reflection, non-greasy complexion, heavily diffused soft ambient light`。
-4. **1:1 真源溯源铁律**：所有动作描述必须取自 `workbench_poses_matrix.json`（50 套姿势）与 `transition_recipes.json`（40 条换位配方），装配结构必须遵循 `official-prompt-assembly-spec.md` 六段式，零脱稿脑补。
+4. **1:1 真源溯源铁律**：所有动作描述必须取自 `tunjing_poses_matrix.json`（50 套姿势）与 `transition_recipes.json`（40 条换位配方），装配结构必须遵循 `official-prompt-assembly-spec.md` 六段式，零脱稿脑补。
 5. **13 类场地动态适配铁律**：传入 `--scene` 后，引擎自动调用 `with_scene_surface()` 将动作与声场中的默认“床/床单/床板轻响”改写为当前真实场地（书桌/沙发/浴室/车内/墙边/窗台/地毯/露台等），严禁跨场景穿帮。
 6. **高能戏四项刚性契约**：单集高能段必须包含：① 至少 1 处口交/深喉近景或微距；② 至少 2 种不同体位的中途转换；③ 至少 3 处独立的结合部交合特写；④ 核心冲撞前后嵌入 1.2s~2.0s 生理阻断微距。
 7. **防创作固化轮换铁律**：开场导火索从四大钩子中轮换，中段转折从 M-01~M-06 六大原型（权力倒置/情感破防/筹码加码/空间感官迁移/禁忌崩塌/外部介入）中动态择一；**同一部剧相邻 3 集内严禁重复同一种转折原型**，严禁把“打电话查岗/办公桌”当成固定套路。
