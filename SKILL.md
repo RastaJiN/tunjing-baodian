@@ -42,9 +42,9 @@ metadata:
          ↓ PASS
 [Gate 2：刀锋剧本门禁] ➔ 必须具备实体道具流转 + 三幕式推进 + 显式引用 POS 体位编号 + <d> 台词
          ↓ PASS
-[Gate 3：弹跳分镜门禁] ➔ 必须具备 1.2s~2.0s 生理阻断微距 + [Track: Ref2V / I2V_Pose] 双轨标注 + 换体位 + 3次交合微距 + 深喉口交
+[Gate 3：弹跳分镜门禁] ➔ 必须具备 1.2s~2.0s 生理阻断微距 + [Track: Ref2V] 单轨标注 + 换体位 + 3次交合微距 + 深喉口交
          ↓ PASS
-[Gate 4：提示词编译门禁] ➔ 必须纯英文物理动量正文 + 零毒性油光词 + 继承 kinetic-positions 动量
+[Gate 4：提示词编译门禁] ➔ 必须纯英文物理动量正文 + 必须内嵌工作台正向肯定句压油词 + 继承 kinetic-positions 动量
          ↓ PASS
 [Gate 5：生成前终极自审] ➔ 对照 pre-render-audit-standard.md 执行冷血六维度自检，出具合格终审报告！
          ↓ PASS
@@ -55,43 +55,35 @@ metadata:
 
 ## 三、核心资产与驱动链接 (The Core Engine Assets)
 
-1. **【体位深度图资产库】**：`assets/pose_depth/`（12 张纯灰度深度图 + README 索引）
-   - POS-01 ~ POS-12 全套侧视深度图，供 ControlNet Depth 在生图阶段锁死三维骨骼与肢体接触几何，根治多肢融化；文件名与 `kinetic-positions.md` 严格一一对应。
+1. **【工作台体位真源与姿态词典】**：`references/kinetic-positions.md`
+   - 继承自桌面《大人的工作台/姿势词典/双人缠绵_55组.md》，严格收纳正常位、后入位、骑乘位、面对面坐位、立位贴身、侧卧位等最强中文身体接触点，全量转化为纯英文物理动量。
 2. **【高阶反杀与蛇蝎美人心理模型】**：`references/femme-fatale-reversal.md`
    - 超越市面平庸套路的关键核武：拒绝扁平工具人，肉体交合是蛇蝎反向下套的掩护，事毕脱力瞬间的致命窃取与冷冽眼神，母版切换点物理契约。
-2. **【吞鲸节奏 · 3~5分钟工业级双波浪规范】**：`templates/tunjing_rhythm_300s.md`
+3. **【吞鲸节奏 · 3~5分钟工业级双波浪规范】**：`templates/tunjing_rhythm_300s.md`
    - 专治长时长疲软：单集 180s~300s（20~26镜），独创“第一波初破壁 ➔ 中段大阻断危机 ➔ 第二波换体位失控绝顶 ➔ 终局断崖卡点”双波浪模型。
-3. **【吞鲸节奏 · 120秒极速规范】**：`templates/tunjing_rhythm_120s.md`
+4. **【吞鲸节奏 · 120秒极速规范】**：`templates/tunjing_rhythm_120s.md`
    - 针对 90s~150s 短频快快餐剧，极速收割多巴胺。
-3. **【在制接盘与断点修复规范 (含诊断报告)】**：`references/takeover-and-patching.md`
+5. **【在制接盘与断点修复规范 (含诊断报告)】**：`references/takeover-and-patching.md`
    - 专治半途引入宝典的旧烂摊子：出具《热接盘诊断报告与微创修改方案》供监制审批、保护已合格镜头、逆向推导状态继承、局部细胞级置换、差量增量渲染。
-4. **【高刺激剧作发条指南】**：`references/high-tension-mechanisms.md`
+6. **【高刺激剧作发条指南】**：`references/high-tension-mechanisms.md`
    - 彻底粉碎平淡无聊：极限倒计时（实时连线电话/电梯逼近）、羞耻道具置换（婚戒口含/撕裂衣装反差）、诛心审讯式台词（伴侣习惯复刻与高潮确认），以及 OS 防对口型三大物理原则。
-3. **【高能戏双阶梯提示词编写规范】**：`references/dual-prompt-protocol.md`
-   - 彻底解耦【T2I 静态姿态生图词】与【I2V 动力学动量视频词】，先锁姿态后给动力，提供实战对标模板。
-3. **【在制接盘与断点修复规范】**：`references/takeover-and-patching.md`
-   - 专治半截烂摊子工程：基线盘点、保护已有合格素材、逆向推导状态继承、局部细胞级置换、差量增量渲染。
-3. **【六大步进门禁中枢】**：`scripts/tunjing_gatekeeper.py`
+7. **【工作台纯血 Ref2V 生产管线规范】**：`references/comfyui-dual-pipeline-spec.md`
+   - 继承自桌面《大人的准则_SOP.md》：彻底封杀 I2V 垫图，全片纯血 Ref2V；交合核心镜头强制收缩景别（腰胯中近景/局部微距）；死锁正向肯定句压油词（Node 328 零化负向物理真相）。
+8. **【六大步进门禁中枢】**：`scripts/tunjing_gatekeeper.py`
    - 命令行调用：`python scripts/tunjing_gatekeeper.py <项目目录> [步骤1-6]`
    - 步进拦截：前置步骤不合格时直接抛出 `[X] 阻断拦截`，严禁跳步。
-4. **【生成前自我终极审查标准】**：`references/pre-render-audit-standard.md`
-   - 六大必杀维度（资产实名、音画咬合、四项肉戏契约、运镜防崩、提示词纯净、双轨准备度），不留死角。
-5. **【12套生物力学体位字典】**：`references/kinetic-positions.md`
-   - POS-01 到 POS-12，全套由支点、受力凹陷、脊柱反弓与神经痉挛写成；
-   - 随调随用，支持一键注入分镜与提示词。
-2. **【视听弹跳分镜规范】**：`references/shot-design-and-bounce.md`
-   - 镜头组架构（Inquiry ➔ Denial ➔ Kinetic ➔ Aftermath）；
-   - 1.5s 生理阻断微距（咬唇/抓床单/足弓反弓）+ 双轨（Ref2V / I2V_Pose）分流。
-3. **【ComfyUI 双轨渲染工作流与节点规范】**：`references/comfyui-dual-pipeline-spec.md`
-   - 明确锁死：文戏纯血 Ref2V 与 高危肉戏 I2V 姿态垫图的节点架构与参数（CFG=1.0、Steps=10-12、9:16画幅）。
-4. **【单集工业化生产模板】**：`templates/episode_template.md`
-   - 一键脚手架，标准化三幕式剧本与钩子设定。
-5. **【提示词编译器与体检工具】**：`scripts/tunjing_compiler.py`
-   - 全英文物理动量输出，零废话，自动拦截语法与槽位错误。
-6. **【通用 ComfyUI 跨机分发脚本】**：`scripts/export_comfy_payload.py`
-   - 保证任何机器下载后，只要运行端口 8188 即可 1:1 无损提交渲染队列。
-7. **【一键最小闭环跑通脚本】**：`scripts/dryrun_test.py`
-   - 换到任何新工作机，运行这一个脚本，立刻自动生成标准 EP001 测试用例，换算物理帧长并导出 ComfyUI Payload，验证当前机器是否 100% 具备出片能力。
+9. **【生成前自我终极审查标准】**：`references/pre-render-audit-standard.md`
+   - 六大必杀维度（资产实名、音画咬合、四项肉戏契约、运镜防崩、正向压油纯净、纯血Ref2V单轨规范），不留死角。
+10. **【12套生物力学体位字典】**：`references/kinetic-positions.md`
+   - POS-01 到 POS-12，全套由支点、受力凹陷、脊柱反弓与神经痉挛写成；随调随用，支持一键注入分镜与提示词。
+11. **【视听弹跳分镜规范】**：`references/shot-design-and-bounce.md`
+   - 镜头组架构（Inquiry ➔ Denial ➔ Kinetic ➔ Aftermath）；1.5s 生理阻断微距 + 纯血 Ref2V 单轨；含 12~15s 硬件上限与短-中-长-极短呼吸感心电图表。
+12. **【单集工业化生产模板】**：`templates/episode_template.md`
+13. **【提示词编译器与体检工具】**：`scripts/tunjing_compiler.py`
+14. **【跨机分发与最小闭环脚本】**：`scripts/export_comfy_payload.py`、`scripts/dryrun_test.py`
+   - 目标机先跑 `dryrun_test.py` 验证帧长算力与 Payload 导出，全绿再进批量渲染。
+15. **【GitHub 同步与仓库维护】**：`references/github-sync.md`
+   - 本机 git push 走 HTTPS 易被代理打断 TLS，改用 GitHub REST contents API 逐文件 PUT；提交后必须读回 git tree 验证清单。
 
 ---
 
