@@ -77,7 +77,7 @@ def audit_step_2(project_dir):
     if "<d>" not in content or "</d>" not in content:
         return False, "剧本门禁未通过：台词必须严格使用 <d>[Chinese]...</d> 标签包裹！"
         
-    # 检查是否提及体位（支持工作台 50 个原生 pose id，兼容旧 POS-xx）
+    # 检查是否提及体位（支持吞鲸引擎 50 个原生 pose id，兼容旧 POS-xx）
     KNOWN_IDS = {"bj","squat_bj","prone_bj","deepthroat","head_thrust","facefuck","sixty_nine",
                  "tip_lick","ball_lick","penis_slap","titjob","handjob","fingering","clit_tease",
                  "cunnilingus","sofa_cunni","kiss_fondle","kiss_pin","kiss_force","kiss_her",
@@ -90,9 +90,9 @@ def audit_step_2(project_dir):
     ids_in_script = set(re.findall(r'\b([a-z][a-z_]{1,24})\b', content)) & KNOWN_IDS
     pos_in_script = set(re.findall(r'POS-\d{2}', content))
     if not (ids_in_script or pos_in_script):
-        return False, "剧本门禁未通过：第三幕高能戏必须显式声明调用的工作台体位 ID（如 bj、missionary、cowgirl、doggy、cum_butt）！"
+        return False, "剧本门禁未通过：第三幕高能戏必须显式声明调用的吞鲸标准体位 ID（如 bj、missionary、cowgirl、doggy、cum_butt）！"
         
-    return True, f"刀锋剧本三幕式、实体道具与工作台体位 ID ({sorted(ids_in_script | pos_in_script)}) 验收 PASS！允许进入分镜设计。"
+    return True, f"刀锋剧本三幕式、实体道具与吞鲸标准体位 ID ({sorted(ids_in_script | pos_in_script)}) 验收 PASS！允许进入分镜设计。"
 
 def audit_step_3(project_dir):
     """门禁 3：拆镜密度、景别机位与纯血单轨路由检查（含台词时长毫秒级咬合）"""
@@ -141,7 +141,7 @@ def audit_step_3(project_dir):
         
     # B. 必须至少有 2 个不同的姿势（换体位）
     pos_found = set(re.findall(r'POS-\d{2}', content))
-    # 新链路：支持 workbench pose id 与中文姿势名
+    # 新链路：支持 tunjing pose id 与中文姿势名
     KNOWN_IDS = {"bj","squat_bj","prone_bj","deepthroat","head_thrust","facefuck","sixty_nine",
                  "tip_lick","ball_lick","penis_slap","titjob","handjob","fingering","clit_tease",
                  "cunnilingus","sofa_cunni","kiss_fondle","kiss_pin","kiss_force","kiss_her",
@@ -155,7 +155,7 @@ def audit_step_3(project_dir):
     all_poses = pos_found | ids_found
     if len(all_poses) < 2:
         return False, (f"分镜门禁未通过：单集肉戏必须中途【换体位】！"
-                       f"实测仅检测到 {len(all_poses)} 个姿势，必须包含至少 2 个不同工作台姿势"
+                       f"实测仅检测到 {len(all_poses)} 个姿势，必须包含至少 2 个不同吞鲸标准姿势"
                        f"（如 missionary ➔ cowgirl ➔ doggy）！")
         
     # C. 必须包含至少 3 次独立的交合部位微距特写
@@ -196,7 +196,7 @@ def audit_step_3(project_dir):
     return True, "分镜【拆镜密度 + 逐镜景别机位 + 纯血Ref2V单轨 + 音画咬合 + 换体位与3次交合微距】全量验收 PASS！允许进入提示词编译。"
 
 def audit_step_4(project_dir):
-    """门禁 4：工作台六段式提示词结构与正向压油核验"""
+    """门禁 4：吞鲸标准六段式提示词结构与正向压油核验"""
     prompt_file = os.path.join(project_dir, "视频提示词.md")
     if not os.path.exists(prompt_file):
         return False, "缺少 '视频提示词.md'！请先编译送模提示词。"
@@ -204,7 +204,7 @@ def audit_step_4(project_dir):
     with open(prompt_file, "r", encoding="utf-8") as f:
         content = f.read()
         
-    # 1. 检查工作台 buildOfficialH3Prompt() 六段式必填结构锚点
+    # 1. 检查吞鲸引擎 吞鲸六段式标准装配器 六段式必填结构锚点
     required_blocks = [
         ("Goal: Generate", "缺少 [1] Goal 目标与时长画幅声明"),
         ("Audio rule:", "缺少 [1] Audio rule 台词与静音纪律声明"),
@@ -217,11 +217,11 @@ def audit_step_4(project_dir):
     ]
     for marker, err_msg in required_blocks:
         if marker not in content:
-            return False, f"提示词门禁未通过：{err_msg}（必须严格遵循工作台六段式结构）！"
+            return False, f"提示词门禁未通过：{err_msg}（必须严格遵循吞鲸标准六段式结构）！"
             
     # 2. 检查正向肯定句压油（工作流 Node 328 零化负向，必须靠正向压油）
     if not re.search(r'matte velvet skin finish|powdered dry texture|visible fine pores', content, re.IGNORECASE):
-        return False, "提示词门禁未通过：缺少【工作台正向肯定句压油词】（authentic matte velvet skin finish, powdered dry texture）！工作流负向通道已零化，必须正向压油！"
+        return False, "提示词门禁未通过：缺少【吞鲸正向肯定句压油词】（authentic matte velvet skin finish, powdered dry texture）！工作流负向通道已零化，必须正向压油！"
         
     # 3. 检查是否误入毒性油光词
     toxic_words = ['sweat sheen', 'oily face', 'shiny plastic', 'vaseline skin', 'dewy glisten']
@@ -246,7 +246,7 @@ def audit_step_4(project_dir):
         if not has_mouth_lock:
             return False, "提示词门禁未通过：检测到包含画外音/内心独白(Voiceover/OS)，但未添加【嘴部物理占位死锁】！必须显式声明 'lips remain completely closed'、咬下唇 'bite down on lower lip' 或机位背向，防止模型在画面中对口型穿帮！"
             
-    return True, "提示词【工作台六段式结构 + 正向肯定句压油 + OS防对口型死锁】全量验收 PASS！允许进入生成前终审。"
+    return True, "提示词【吞鲸标准六段式结构 + 正向肯定句压油 + OS防对口型死锁】全量验收 PASS！允许进入生成前终审。"
 
 def audit_step_5(project_dir):
     """门禁 5：生成前自我终极审核 (Pre-Render Self-Audit)"""
