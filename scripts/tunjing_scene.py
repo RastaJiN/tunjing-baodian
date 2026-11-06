@@ -156,13 +156,18 @@ def build_scene(chain, total_sec, poses):
                 "type": "transition",
             })
 
-    # 时长分配：转场桥固定 2.0s，动作镜均摊剩余
+    # 时长分配：智能呼吸拆解（保总时长 + 保 2~6s 动态短镜）
     n_tr = sum(1 for s in shots if s["type"] == "transition")
     tr_sec = 2.0 * n_tr
     n_act = len(shots) - n_tr
     remain = max(n_act * 2.0, total_sec - tr_sec)
-    per = remain / n_act if n_act else 3.0
-    per = max(2.0, min(6.0, per))
+
+    # 允许单镜在 2.5s ~ 7.5s 弹性浮动，贴近总时长
+    if n_act:
+        per = remain / n_act
+        per = max(2.5, min(7.5, per))
+    else:
+        per = 3.5
 
     t = 0.0
     for s in shots:
@@ -208,17 +213,44 @@ def save_project_artifacts(out_dir, shots, actual_total, want_total, lines="",
     batch_shots = []
     macro_tag_idx = 0
 
+    # 针对脱衣类前戏防止首镜遛鸟：若首镜包含 undress 且为 wide，强制降级为 mcu 中近景
+    if shots and "undress" in shots[0].get("pose", "") and shots[0].get("size") == "wide":
+        shots[0]["size"] = "mcu"
+        shots[0]["cam"] = "static_front"
+
+    # 解析高级台词字典：支持 "1:女子A:台词内容|5:男子A:台词内容" 或纯文本单句
+    line_map = {}
+    if lines:
+        if ":" in lines or "|" in lines:
+            for item in lines.split("|"):
+                parts = item.strip().split(":", 2)
+                if len(parts) == 3 and parts[0].isdigit():
+                    line_map[int(parts[0])] = (parts[1].strip(), parts[2].strip())
+                elif len(parts) == 2 and parts[0].isdigit():
+                    line_map[int(parts[0])] = ("女子A", parts[1].strip())
+        else:
+            # 兼容老版单句台词：优先放在第 1 镜（若第 1 镜大于等于 3 秒且嘴部未占用）
+            line_map[1] = ("女子A", lines.strip())
+
     for i, s in enumerate(shots, 1):
         size_desc = SHOT_SIZES[s["size"]]
         cam_desc = CAMS[s["cam"]]
-        # 只在首镜或中段关键镜放台词，且保证时长容纳得下（避免短转场镜塞长台词触发 Gate 3 拦截）
+        
+        # 挂载对应镜头的台词与说话人（自动避开口交/深喉/射脸等嘴部占用镜头）
         shot_line = ""
-        if lines and i == 1 and s["dur"] >= 3.0:
-            shot_line = lines
+        shot_speaker = "女子A"
+        if i in line_map:
+            spk, txt = line_map[i]
+            # 嘴部占用防护：口交类镜头女方无法开口说话
+            if s["pose"] in ("bj", "squat_bj", "prone_bj", "deepthroat", "facefuck", "cum_face") and "女" in spk:
+                pass  # 抑制女方在口交镜头说话
+            elif s["dur"] >= 2.5:
+                shot_speaker = spk
+                shot_line = txt
 
         prompt_text = single_shot_prompt(
             s, i - 1, len(shots), s["dur"], size_desc, cam_desc,
-            lines=shot_line, idea=idea, scene=scene, pose_names=pose_names,
+            lines=shot_line, speaker=shot_speaker, idea=idea, scene=scene, pose_names=pose_names,
         )
 
         # 为 hip / macro 镜头附加明确的交合特写 / 生理阻断微距标签
