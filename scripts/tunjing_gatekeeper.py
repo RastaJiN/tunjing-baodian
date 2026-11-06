@@ -10,12 +10,12 @@ import json
 import re
 
 STAGE_NAMES = {
-    1: "第 1 步：角色母版与资产建库 (Asset Foundation)",
-    2: "第 2 步：刀锋剧本创作 (Sharp Script)",
-    3: "第 3 步：弹跳分镜与双轨路由 (Bounce Storyboard)",
-    4: "第 4 步：提示词编译与硬规则门禁 (Prompt Audit)",
-    5: "第 5 步：生成前自我终极审核 (Pre-Render Self-Audit)",
-    6: "第 6 步：渲染提交与工程出片 (Render Dispatch)"
+1: "第 1 步：角色母版与资产建库 (Asset Foundation)",
+2: "第 2 步：刀锋剧本创作 (Sharp Script)",
+3: "第 3 步：弹跳分镜与节拍呼吸 (Bounce Storyboard)",
+4: "第 4 步：纯血Ref2V提示词编译 (Prompt Audit)",
+5: "第 5 步：生成前自我终极审核 (Pre-Render Self-Audit)",
+6: "第 6 步：渲染提交与工程出片 (Render Dispatch)"
 }
 
 def get_status_file(project_dir):
@@ -96,11 +96,9 @@ def audit_step_3(project_dir):
     if not re.search(r'1\.[0-9]s|微距|生理阻断|特写', content):
         return False, "分镜门禁未通过：核心交合动作前后必须插入至少一个 1.2s~2.0s 的生理阻断微距特写（指节抓白/足弓反弓/咬唇）！"
         
-    # 2. 必须显式标注双轨路由
-    has_ref2v = "Ref2V" in content
-    has_i2v = "I2V" in content
-    if not (has_ref2v or has_i2v):
-        return False, "分镜门禁未通过：每个镜头必须明确标注执行轨道 [Track: Ref2V] 或 [Track: I2V_Pose]！"
+    # 2. 检查纯血 Ref2V 轨道标注
+    if "Ref2V" not in content:
+        return False, "分镜门禁未通过：全片必须统一采用纯血 Ref2V 轨道 [Track: Ref2V]！"
         
     # 3. 严格核算：台词与分镜秒数物理咬合 (中文 3.0 字/s + 1.0s 气口)
     # 匹配格式示例: [SHOT-xx] ... 时长: 3.5s ... 台词: <d>...</d>
@@ -158,8 +156,8 @@ def audit_step_4(project_dir):
         return False, f"提示词门禁未通过：正向描述包含未翻译中文 ({len(chinese_chars)} 字)！送模正文必须为纯英文物理动量描述。"
         
     # 检查是否有 POS 动量
-    if not re.search(r'pressed flat|hyperextends|pelvic crest|kinetic|straddle', content, re.IGNORECASE):
-        return False, "提示词门禁未通过：肉戏提示词缺少生物力学物理动词（必须从 kinetic-positions.md 继承动量描述）！"
+    if not re.search(r'pressed flat|hyperextends|pelvic crest|kinetic|straddle|hip-height|matte velvet', content, re.IGNORECASE):
+        return False, "提示词门禁未通过：肉戏提示词缺少生物力学物理动词（必须从 kinetic-positions.md 继承动量描述并包含正向压油词）！"
         
     # 5. 画外音与内心独白 (OS/Voiceover) 绝对防对口型死锁检查
     if re.search(r'voiceover|monologue|\bOS\b', content, re.IGNORECASE):
@@ -198,7 +196,7 @@ def audit_step_5(project_dir):
     if "PASS" not in content or "REJECT" in content:
         return False, "终审门禁未通过：终审报告中存在未解决的 REJECT 项或未明确标注 PASS！必须全部达标！"
         
-    required_checks = ["资产实名与槽位", "音画台词咬合", "换体位与特写契约", "受控运镜规范", "提示词纯净度", "双轨准备度"]
+    required_checks = ["资产实名与槽位", "音画台词咬合", "换体位与特写契约", "受控运镜规范", "提示词纯净度", "纯血Ref2V单轨规范"]
     missing = [c for c in required_checks if c not in content]
     if missing:
         return False, f"终审门禁未通过：终审报告缺少以下维度的审核记录: {missing}！必须六项全检！"
