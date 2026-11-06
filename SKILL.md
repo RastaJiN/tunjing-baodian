@@ -1,6 +1,6 @@
 ---
 name: tunjing-baodian
-description: 吞鲸宝典·吞鲸工作室精品漫剧全流程极速生产引擎。内置50套体位矩阵与六段式装配内核，会话中说「吞鲸开始」即刻启动六大刚性门禁流水线。
+description: "Use when producing or auditing short dramas with Tunjing."
 version: 2.0.0
 author: 吞鲸工作室 (Swallowing Whale Studio)
 license: MIT
@@ -80,7 +80,8 @@ metadata:
 | `tunjing_resolver.py` | **自然语言动作速查器**：输入中文口语动作（如“女口交/扣女穴/女上位/射屁股”）秒查对应吞鲸引擎 ID 与动量 |
 | `tunjing_gatekeeper.py` | **六大刚性步进门禁状态机**：逐级核验项目产物并推进 `.tunjing_status.json` |
 | `tunjing_compiler.py` | **六段式提示词体检器**：校验必填结构锚点、正向压油词与毒性词拦截 |
-| `export_comfy_payload.py` | **渲染提交与批量任务核验器**：核验 5 大门禁状态与 `批量任务.json` 物理帧长 `(F-5)%17==0` |
+| `export_comfy_payload.py` | **渲染门禁核验与批量任务帧长校验器**：核验 5 大门禁状态与 `批量任务.json` 物理帧长 `(F-5)%17==0` |
+| `export_jianying_draft.py` | **剪映专业版草稿自动打包器**：读取分镜与成片，自动生成包含视频轨、音频轨与自动卡点字幕轨的剪映本地草稿 |
 | `dryrun_test.py` | **跨机端到端全链路自检器**：零人工干预跑通 Gate 1 ~ Gate 6 全流程，验证目标机 100% 可用 |
 
 ### 剧作节拍器模板 (`templates/`)
@@ -135,3 +136,5 @@ python scripts/tunjing_scene.py \
 8. **台词时长毫秒级咬合铁律**：中文台词按 `汉字数 / 3.0 + 省略号数 * 0.8 + 1.0s <= 镜头时长` 核算；严禁短镜头强塞长台词。台词必须用 `<d>[Chinese]...</d>` 包裹，且正文声明 `Audio rule` 严禁念出提示词标签。
 9. **画外音 (OS) 三重防对口型铁律**：凡含内心独白/OS 的镜头，必须附加嘴部物理占位死锁（如 `bite down on lower lip`、`lips remain completely closed`）或采用背向/局部微距机位逃逸。
 10. **物理帧长自动换算铁律**：所有送模镜头帧数严格遵循 `length = 5 + 17 * N`（`raw = round(sec * 24)` 后向上对齐），由脚本自动计算写入 `批量任务.json`。
+11. **自包含与零外部引用铁律（防跨机 Agent 幻觉）**：本技能包是 100% 闭环的唯一权威母版。严禁在文档、模板或提示词中引用任何不存在于本技能目录内的外部桌面目录、外部前端脚本或历史旧编号（如旧式 `POS-01`），防止其他机器或大模型产生路径搜寻幻觉。
+12. **派生文档单向生成与门禁同步铁律**：人类可读字典 `kinetic-positions.md` 必须由 `tunjing_poses_matrix.json` 单向生成，严禁手改脱节；任何提示词格式或体位 ID 规范的升级，必须同步更新 `tunjing_gatekeeper.py` 与 `dryrun_test.py`，确保自产产物 100% 通过自身门禁。
