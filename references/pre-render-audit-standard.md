@@ -17,7 +17,7 @@
 - [ ] **OS 防对口型物理死锁**：凡含画外音/内心独白的镜头，必须写明嘴部物理占位锁（`lips remain completely closed` / `bite down on lower lip`）或采用背向/微距机位逃逸。
 
 ### 维度三：换体位与特写契约 (Intimate Choreography Contract)
-- [ ] **中途换体位**：单集高能段至少调用 2 个不同的工作台交合体位 ID（如 `missionary` ➔ `cowgirl` ➔ `doggy`），并通过物理换位配方平滑衔接；
+- [ ] **中途换体位**：单集高能段至少调用 2 个不同的吞鲸引擎交合体位 ID（如 `missionary` ➔ `cowgirl` ➔ `doggy`），并通过物理换位配方平滑衔接；
 - [ ] **3 次结合部交合特写**：包含至少 3 处独立的腰胯/结合部特写（`hip` / `macro`），严禁用手部或面部充数；
 - [ ] **口交/深喉特写独立成镜**：包含至少 1 处 `bj` / `deepthroat` 等口爱近景或唇齿微距；
 - [ ] **1.5s 生理阻断微距**：核心冲撞前后嵌入指节抓紧承托沿、足弓绷直或咬唇的微观受力特写。
@@ -28,7 +28,7 @@
 - [ ] **零毒性运镜词**：全片无 `orbit, 360, fast zoom, chaotic reframing` 等诱发换脸与肢体崩塌的运镜。
 
 ### 维度五：提示词纯净度 (Six-Block Structure & Anti-Grease)
-- [ ] **工作台六段式完整**：每条提示词完整具备 `[1] Goal & Audio rule`、`[2] Reference map`、`[3] Consistency & Motion quality`、`[4] Pose focus chain`、`[5] integrated_multimodal_description`、`[6] overall_soundscape` 及独立成段的 `NEGATIVE` 列表；
+- [ ] **吞鲸标准六段式完整**：每条提示词完整具备 `[1] Goal & Audio rule`、`[2] Reference map`、`[3] Consistency & Motion quality`、`[4] Pose focus chain`、`[5] integrated_multimodal_description`、`[6] overall_soundscape` 及独立成段的 `NEGATIVE` 列表；
 - [ ] **正向肯定句压油内嵌**：包含 `authentic matte velvet skin finish, powdered dry texture, natural human skin with visible fine pores`，零 `sweat sheen, oily face, shiny plastic` 等毒性词；
 - [ ] **场地承托面动态一致**：动作描述与环境底噪已通过 `with_scene_surface` 适配当前 `--scene` 场地，无跨场地家具穿帮（如在书桌或浴室出现“床单/床板声”）。
 
@@ -51,6 +51,6 @@
 2. 音画台词咬合：[PASS / REJECT] (台词均满足 3.0字/s+1.0s 余量，OS 具备闭口物理锁)
 3. 换体位与特写契约：[PASS / REJECT] (多体位转换清晰，交合特写≥3次，口交特写与阻断微距齐全)
 4. 受控运镜规范：[PASS / REJECT] (2~6s 短镜拆解，逐镜标明景别与受控机位，wide 占比合规)
-5. 提示词纯净度：[PASS / REJECT] (工作台六段式完整，内嵌正向肯定句压油，场地承托面零穿帮)
+5. 提示词纯净度：[PASS / REJECT] (吞鲸标准六段式完整，内嵌正向肯定句压油，场地承托面零穿帮)
 6. 纯血Ref2V单轨规范：[PASS / REJECT] (全片 100% 纯血 Ref2V 单轨，批量任务帧长全部符合 5+17*N)
 ```
