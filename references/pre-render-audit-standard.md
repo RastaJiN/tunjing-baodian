@@ -34,7 +34,8 @@
 
 ### 维度六：纯血Ref2V单轨规范 (Pure Ref2V Pipeline Compliance)
 - [ ] **100% 纯血 Ref2V**：全片统一标定 `[Track: Ref2V]`，彻底杜绝单镜抽首帧 I2V 垫图；
-- [ ] **物理帧长合规**：导出的 `批量任务.json` 每一镜帧数严格满足 `(frames - 5) % 17 == 0`。
+- [ ] **物理帧长合规**：导出的 `批量任务.json` 每一镜帧数严格满足 `(frames - 5) % 17 == 0`；
+- [ ] **双轨构图死锁与反伪质检**：交合镜具备 `HEADS AND FACES STRICTLY OUT OF FRAME`，面部对白镜具备 `LOWER BODY STRICTLY OUT OF FRAME`，且首批渲染严格执行“首镜五联/三点切片（2%/50%/94%）肉眼核验放行制”，严禁仅凭文件大小或 PSNR 盲跑全集。
 
 ---
 
