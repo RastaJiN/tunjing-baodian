@@ -21,19 +21,20 @@ def lint_tunjing_prompt(text):
         if not sp.strip():
             errors.append("错误：检测到空的台词标签 <d></d>！")
             
-    # 2. 检查吞鲸标准六段式核心结构锚点
+    # 2. 检查吞鲸标准六段式核心结构锚点 (支持 v3.0 原厂 Full-Reference 与 v2.0)
     required_blocks = [
-        ("Goal: Generate", "缺少 [1] Goal 目标与时长画幅声明"),
-        ("Audio rule:", "缺少 [1] Audio rule 台词与静音纪律声明"),
-        ("Reference map", "缺少 [2] Reference map (<Picture N> 母版与场景槽位映射)"),
-        ("Consistency:", "缺少 [3] Consistency 身份与场景一致性死锁"),
-        ("Motion quality", "缺少 [3] Motion quality 防僵硬二次动作锁"),
-        ("integrated_multimodal_description:", "缺少 [5] integrated_multimodal_description 逐镜时间线主体"),
-        ("overall_soundscape:", "缺少 [6] overall_soundscape 环境底噪与动作声场"),
-        ("No subtitles, captions, watermarks", "缺少独立成段的 NEGATIVE 负面列表")
+        (["Goal & Audio Contract:", "Goal: Generate"], "缺少 [1] Goal 目标与时长画幅声明"),
+        (["Audio rule:", "Audio rule"], "缺少 [1] Audio rule 台词与静音纪律声明"),
+        (["subject_definitions:", "Reference map"], "缺少 [2] 实体与场景槽位映射 (subject_definitions 或 Reference map)"),
+        (["Consistency:", "Consistency"], "缺少 [3] Consistency 身份与场景一致性死锁"),
+        (["Motion quality", "Motion quality (Anti-Stiffness)"], "缺少 [3] Motion quality 防僵硬二次动作锁"),
+        (["integrated_multimodal_description:", "detailed_description:"], "缺少 [5] 逐镜时间线主体 (integrated_multimodal_description 或 detailed_description)"),
+        (["overall_soundscape:", "overall_soundscape"], "缺少 [6] overall_soundscape 环境底噪与动作声场"),
+        (["No subtitles, captions, watermarks", "No subtitles"], "缺少独立成段的 NEGATIVE 负面列表")
     ]
-    for marker, msg in required_blocks:
-        if marker not in text:
+    for markers, msg in required_blocks:
+        if isinstance(markers, str): markers = [markers]
+        if not any(m in text for m in markers):
             errors.append(f"结构错误：{msg}")
             
     # 3. 检查吞鲸正向肯定句压油词
