@@ -38,22 +38,25 @@ Audio rule: characters may only speak the exact words inside <d>...</d>; never r
 - **表情口型指令**：有性爱表情勾选时 → `按勾选的性爱表情时间线演出脸部；有浪叫或台词时张嘴，口型跟声音；不要回到平静自然脸。` 否则 → `表情自然；有浪叫或台词时张嘴，口型跟声音。`
 - **用户介绍（必须体现）**：`用户介绍（必须体现）：{idea}`（拼接抽根用户原文）。
 
-### [2] Reference map（槽位锁定是防崩核心）
+### [2] Reference map（槽位锁定是防崩核心 · 方案 A 五图拓扑唯一铁律）
 
-场景槽：
+统一遵循 **方案 A 五图空间拓扑规范**（严禁将 Picture 1 错定为场景）：
+
 ```text
-<Picture N> = {场景名}：场景环境参考，锁定空间结构、陈设、材质与环境光线；仅锁场景，不作人物身份或姿势参考。
+<Picture 1> = {女主名}：女主角 2x3 母版人物身份参考，锁定脸、发型、身材、肤色与服装状态；纯身份卡，严禁开场第一帧使用。
+<Picture 2> = {男主名}：男主角 2x3 母版人物身份参考，锁定脸、发型、体魄、肤色与服装状态；纯身份卡，严禁开场第一帧使用。
+<Picture 3> = {场景名}：母体空间与光影地标参考，锁定空间三维结构、主光入射角度、主要家具陈设与材质反光；不作人物姿态参考。
+<Picture 4> = {镜头起点分镜}：Shot 1 起势位移与构图锚点，规定角色从何种姿态起步及该机位下的局部场景特征。
+<Picture 5> = {镜头终点分镜}：Shot 2 交互落位与对戏终点锚点，锁定双人贴合对峙姿态及该机位下的微观环境背景。
 ```
-人物槽：
-```text
-<Picture N> = {角色名}：人物身份参考，锁定脸、发型、身材、肤色与服装状态。
-```
+
 随后必写：
 ```text
-角色与参考对应：{角色名}=<Picture N>，…
-场景与参考对应：{场景名}=<Picture N>，…
-For the target video, at 0.00 seconds into the target video, <Picture N> (character identity) is fully referenced for faces/bodies/clothing.
-Describe only the change that happens after 0.00s — do not re-describe still appearance already shown in character refs.
+角色与参考对应：{女主名}=<Picture 1>，{男主名}=<Picture 2>
+场景与参考对应：{场景名}=<Picture 3>
+起势与终点分镜对应：Shot 1 起势=<Picture 4>，Shot 2 终点=<Picture 5>
+For the target video, <Picture 1> and <Picture 2> supply identities, <Picture 3> supplies master room architecture and lighting, while <Picture 4> and <Picture 5> define the chronological shot anchors.
+Describe only the physical movement and emotional interaction that develop visibly across cuts — nobody changes posture or place instantaneously.
 ```
 
 ### [3] Consistency / Clothing / Motion quality
