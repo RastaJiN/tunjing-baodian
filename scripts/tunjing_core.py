@@ -1,11 +1,20 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-吞鲸宝典 · 提示词装配共享核心 (Tunjing Assembly Core)
+吞鲸宝典 v3.0 · 提示词装配共享核心 (Tunjing Assembly Core v3.0)
 
-唯一装配实现，供 tunjing_scene.py 与 tunjing_storyboard.py 共同调用，杜绝双份定义。
-1. 装配结构 1:1 对齐吞鲸宝典内置引擎吞鲸六段式标准装配器 六段式
-2. 完整移植吞鲸引擎 with_scene_surface() 与 build_soundscape_zh()，根据传入的 scene 自动把动作与声场里的“床/床单/床板”动态改写为目标场地（办公桌/沙发/浴室/车内/墙边/地面等），彻底根绝跨场景穿帮！
+唯一权威装配实现：
+1. 【原厂 Full-Reference 语法集成】:
+   - 彻底解耦 <Subject N> (动态可复用主体) 与 <Picture N> (物理参考图/锚点)
+   - 注入 retention_analysis: 区分 fully_preserved 与 partially_preserved (脱衣镜头服装可褪，身份死锁)
+   - 注入 原厂多说话人路由 <Subject N> (Sx) 与 (Sx, mouth occupied) 口交闭嘴标
+   - 注入 <scenetrans> 与 <cutoff> 动态受力打断标
+2. 【深渊之契 & 大人的工作台 独家护城河】:
+   - 双轨物理分流 (Composition Lock): 交合轨锁胯赶走人脸，面部轨锁脸赶走下半身
+   - 180度轴线死锁 (Axis Lock) 与 20% 硬质背景标桩
+   - 肢体减法法则: 一镜最多一只入画手
+   - 13 类场地承托面 (with_scene_surface) 与声学底噪动态改写
+   - Node 328 负向清零物理真相: 正向肯定句绝对压油词 (DE_OIL)
 """
 
 import json, os, re
@@ -40,61 +49,45 @@ No cartoon drift, messy background, or focus collapse
 No stiff, robotic, or frozen motion; bodies move with inertia, follow-through, and visible breathing
 No pose popping or teleporting limbs between beats; motion continues seamlessly through cuts"""
 
-# ── 1:1 移植自吞鲸引擎 tunjing_poses_matrix.json 的 13 类场景承托面与声学映射 ──
+# ── 13 类场景承托面与声学映射 ──
 SURFACE_PROFILES = {
-    "bed":     {"noun": "床", "on": "在床上", "brace": "撑床", "grab": "抓床单", "edge": "床沿", "sitEdge": "坐在床沿", "pad": "床单", "lie": "仰卧在床上", "kneel": "跪在床上", "sfx": "床板轻响"},
-    "hotel":   {"noun": "酒店床", "on": "在酒店床上", "brace": "撑酒店床", "grab": "抓酒店床单", "edge": "酒店床沿", "sitEdge": "坐在酒店床沿", "pad": "酒店床品", "lie": "仰卧在酒店床上", "kneel": "跪在酒店床上", "sfx": "床板轻响"},
-    "sofa":    {"noun": "沙发", "on": "在沙发上", "brace": "撑沙发", "grab": "抓沙发垫", "edge": "沙发沿", "sitEdge": "坐在沙发边缘", "pad": "沙发软垫", "lie": "仰卧在沙发上", "kneel": "跪在沙发上", "sfx": "沙发轻响"},
-    "chair":   {"noun": "椅子", "on": "在椅子上", "brace": "撑椅面或扶手", "grab": "抓椅背或扶手", "edge": "椅沿", "sitEdge": "坐在椅子上", "pad": "椅面", "lie": "坐靠在椅子上", "kneel": "跨跪在椅面上", "sfx": "椅子轻响"},
-    "kitchen": {"noun": "料理台", "on": "在料理台面上", "brace": "撑台面", "grab": "抓台沿", "edge": "台沿", "sitEdge": "坐在台沿边缘", "pad": "台面", "lie": "仰靠在台面上", "kneel": "趴在台面上", "sfx": "台面轻响"},
-    "bath":    {"noun": "浴室地面", "on": "在浴室里", "brace": "撑瓷砖墙或地面", "grab": "扶浴室墙面", "edge": "墙角", "sitEdge": "坐在浴室矮台边缘", "pad": "湿润瓷砖", "lie": "仰靠在浴室台边", "kneel": "跪在浴室地面上", "sfx": "水声与瓷砖回响"},
-    "desk":    {"noun": "长桌", "on": "在桌面上", "brace": "撑桌面", "grab": "抓桌沿", "edge": "桌沿", "sitEdge": "坐在桌沿边缘", "pad": "桌面", "lie": "仰靠在桌面上", "kneel": "趴在桌面上", "sfx": "桌面轻响"},
-    "wall":    {"noun": "墙边", "on": "靠墙", "brace": "双手撑墙", "grab": "扶墙面", "edge": "墙边", "sitEdge": "背靠墙", "pad": "墙面", "lie": "背贴墙面", "kneel": "靠墙跪立", "sfx": ""},
-    "window":  {"noun": "窗台", "on": "在落地窗前", "brace": "撑窗台或玻璃", "grab": "扶窗框", "edge": "窗台沿", "sitEdge": "坐在窗台边缘", "pad": "窗台", "lie": "靠在窗台边", "kneel": "跪在窗台前", "sfx": ""},
-    "rug":     {"noun": "地毯", "on": "在地毯上", "brace": "撑地毯", "grab": "抓地毯", "edge": "地毯边", "sitEdge": "坐在地毯上", "pad": "地毯", "lie": "仰卧在地毯上", "kneel": "跪在地毯上", "sfx": ""},
-    "floor":   {"noun": "地面", "on": "在地面上", "brace": "撑地面", "grab": "撑地面", "edge": "地面", "sitEdge": "坐在地面上", "pad": "地面", "lie": "仰卧在地面上", "kneel": "跪在地面上", "sfx": ""},
-    "car":     {"noun": "车内座椅", "on": "在车内座椅上", "brace": "撑座椅或扶手", "grab": "抓座椅靠背", "edge": "座椅沿", "sitEdge": "坐在车内座椅上", "pad": "真皮座椅", "lie": "仰靠在车座上", "kneel": "跪跨在车座上", "sfx": "座椅轻响"},
-    "balcony": {"noun": "露台栏杆", "on": "在露台上", "brace": "扶栏杆或撑地", "grab": "抓紧栏杆", "edge": "栏杆边", "sitEdge": "坐在露台矮沿上", "pad": "露台地面", "lie": "仰靠在露台上", "kneel": "跪在露台地面上", "sfx": ""},
+    "bed":     {"noun": "bed", "on": "on the bed", "brace": "bracing against the bed", "grab": "gripping the bedsheets", "edge": "edge of bed", "sitEdge": "sitting on the edge of the bed", "pad": "wrinkled bedsheets", "lie": "lying supine on the bed", "kneel": "kneeling on the bed", "sfx": "creaking bed frame resonance"},
+    "hotel":   {"noun": "hotel bed", "on": "on the hotel bed", "brace": "bracing on the hotel bed", "grab": "gripping crisp hotel sheets", "edge": "hotel bed edge", "sitEdge": "sitting on the hotel bed edge", "pad": "white hotel bedsheets", "lie": "lying on the hotel bed", "kneel": "kneeling on the hotel bed", "sfx": "muffled bedspring impact"},
+    "sofa":    {"noun": "leather sofa", "on": "on the sofa", "brace": "bracing against sofa armrest", "grab": "gripping sofa cushions", "edge": "sofa edge", "sitEdge": "perched on the sofa edge", "pad": "soft leather cushions", "lie": "reclined back against the sofa cushions", "kneel": "straddling and kneeling on the sofa", "sfx": "creaking leather upholstery"},
+    "chair":   {"noun": "heavy chair", "on": "on the chair", "brace": "gripping armrests", "grab": "holding the backrest", "edge": "seat edge", "sitEdge": "seated on the heavy chair", "pad": "chair seat", "lie": "leaning back into the chair", "kneel": "straddling the chair seat", "sfx": "strained wooden chair creaks"},
+    "kitchen": {"noun": "kitchen island counter", "on": "on the kitchen counter", "brace": "palms flat on cold granite counter", "grab": "gripping the counter edge", "edge": "counter edge", "sitEdge": "seated on the marble counter lip", "pad": "polished cold counter surface", "lie": "arched back over the counter", "kneel": "prone across the kitchen counter", "sfx": "dull hollow countertop thuds"},
+    "bath":    {"noun": "bathroom tiled floor", "on": "in the shower", "brace": "palms pressed against wet ceramic tiles", "grab": "holding tile wall ledge", "edge": "shower ledge", "sitEdge": "seated on the wet tile ledge", "pad": "slick wet bathroom tiles", "lie": "reclined against the tile wall", "kneel": "kneeling on the wet tile floor", "sfx": "splashing wet water echoes on cold tile"},
+    "desk":    {"noun": "industrial metal desk", "on": "on the desk", "brace": "palms pressed on cold scratched steel desktop", "grab": "white-knuckle grip on the metal desk lip", "edge": "table rim", "sitEdge": "seated back on the rusty desk edge", "pad": "cold dark-grey steel tabletop with rivets", "lie": "upper torso flattened over the desk", "kneel": "prone belly-down over the desk rim", "sfx": "heavy metallic desk frame groan"},
+    "wall":    {"noun": "solid concrete wall", "on": "against the wall", "brace": "both palms flat against the solid wall", "grab": "fingers clawing wall texture", "edge": "wall corner", "sitEdge": "back pinned flat to the wall", "pad": "solid textured wall surface", "lie": "spine flush against the cold wall", "kneel": "upright against the wall", "sfx": "heavy dull wall impacts"},
+    "window":  {"noun": "floor-to-ceiling glass window", "on": "against the glass window", "brace": "palms pressed against the cold glass pane", "grab": "gripping window frame", "edge": "window sill", "sitEdge": "perched against the window sill", "pad": "steamed reflective glass window", "lie": "pressed back into the glass", "kneel": "kneeling before the window", "sfx": "glass pane vibration resonance"},
+    "rug":     {"noun": "thick wool rug", "on": "on the floor rug", "brace": "palms digging into dense rug carpet", "grab": "clutching carpet fibers", "edge": "rug border", "sitEdge": "sitting on the rug", "pad": "textured thick rug", "lie": "supine across the soft rug", "kneel": "kneeling upright on the rug", "sfx": "muffled heavy floor impact"},
+    "floor":   {"noun": "hardwood floor", "on": "on the bare floor", "brace": "palms braced on bare floorboards", "grab": "scratching hardwood seams", "edge": "floor edge", "sitEdge": "sitting on the floor", "pad": "polished dark hardwood floor", "lie": "flat on the hardwood floor", "kneel": "kneeling on the floor", "sfx": "solid wood floorboard resonance"},
+    "car":     {"noun": "car leather seat", "on": "inside vehicle rear seat", "brace": "bracing on seat headrest or door handle", "grab": "gripping front seat back", "edge": "seat edge", "sitEdge": "cramped on the car leather seat", "pad": "contoured dark leather car seat", "lie": "tilted back in the car seat", "kneel": "straddling in the cramped car cabin", "sfx": "leather seat compression squeaks"},
+    "balcony": {"noun": "balcony railing", "on": "at the balcony terrace", "brace": "holding the cold metal balcony railing", "grab": "both hands locked on the railing bar", "edge": "railing bar", "sitEdge": "leaned against the balcony ledge", "pad": "stone terrace floor", "lie": "bent forward over the terrace railing", "kneel": "kneeling on the stone balcony floor", "sfx": "wind draft and distant ambient air"},
 }
 
 
 def detect_scene_id(scene_name):
-    """根据用户传入的场景名自动识别吞鲸引擎场地类型，彻底告别硬编码卧室/床"""
     s = (scene_name or "").lower()
-    if any(k in s for k in ("车", "座舱", "后座", "car")):
-        return "car"
-    if any(k in s for k in ("浴", "淋浴", "温泉", "汤池", "bath", "shower")):
-        return "bath"
-    if any(k in s for k in ("沙发", "茶几", "休息室", "客厅", "包厢", "sofa")):
-        return "sofa"
-    if any(k in s for k in ("椅", "王座", "宝座", "老板椅", "chair", "throne")):
-        return "chair"
-    if any(k in s for k in ("厨", "料理", "吧台", "kitchen", "bar")):
-        return "kitchen"
-    if any(k in s for k in ("窗", "落地窗", "window")):
-        return "window"
-    if any(k in s for k in ("阳台", "露台", "天台", "balcony")):
-        return "balcony"
-    if any(k in s for k in ("墙", "走廊", "巷", "电梯", "楼梯", "试衣间", "wall", "elevator")):
-        return "wall"
-    if any(k in s for k in ("地毯", "毯", "榻榻米", "rug")):
-        return "rug"
-    if any(k in s for k in ("地面", "地板", "地牢", "密室", "训练室", "祭坛", "floor")):
-        return "floor"
-    if any(k in s for k in ("办公", "书房", "桌", "案几", "讲台", "会议", "实验室", "诊室", "desk", "office")):
-        return "desk"
-    if any(k in s for k in ("酒店", "宾馆", "套房", "hotel")):
-        return "hotel"
+    if any(k in s for k in ("车", "座舱", "后座", "car")): return "car"
+    if any(k in s for k in ("浴", "淋浴", "温泉", "汤池", "bath", "shower")): return "bath"
+    if any(k in s for k in ("沙发", "茶几", "休息室", "客厅", "包厢", "sofa")): return "sofa"
+    if any(k in s for k in ("椅", "王座", "宝座", "老板椅", "chair", "throne")): return "chair"
+    if any(k in s for k in ("厨", "料理", "吧台", "kitchen", "bar")): return "kitchen"
+    if any(k in s for k in ("窗", "落地窗", "window")): return "window"
+    if any(k in s for k in ("阳台", "露台", "天台", "balcony")): return "balcony"
+    if any(k in s for k in ("墙", "走廊", "巷", "电梯", "楼梯", "试衣间", "wall", "elevator")): return "wall"
+    if any(k in s for k in ("地毯", "毯", "榻榻米", "rug")): return "rug"
+    if any(k in s for k in ("地面", "地板", "地牢", "密室", "训练室", "祭坛", "floor")): return "floor"
+    if any(k in s for k in ("办公", "书房", "桌", "案几", "讲台", "会议", "实验室", "诊室", "desk", "office", "铁桌")): return "desk"
+    if any(k in s for k in ("酒店", "宾馆", "套房", "hotel")): return "hotel"
     return "bed"
 
 
 def with_scene_surface(act_text, scene_name):
-    """复刻吞鲸引擎 with_scene_surface(act)：当场景不是床时，把动作里的床/床单/床沿全部替换为当前场景承托面"""
-    if not act_text:
-        return act_text
+    if not act_text: return act_text
     sc_id = detect_scene_id(scene_name)
-    if sc_id in ("bed", "hotel"):
-        return act_text
+    if sc_id in ("bed", "hotel"): return act_text
     loc = SURFACE_PROFILES.get(sc_id, SURFACE_PROFILES["desk"])
     out = str(act_text)
     reps = [
@@ -103,50 +96,41 @@ def with_scene_surface(act_text, scene_name):
         ("坐在床沿边缘", loc["sitEdge"]),
         ("坐在床沿", loc["sitEdge"]),
         ("坐床沿", loc["sitEdge"]),
-        ("双手撑床或抓床单", "双手" + loc["brace"] + "或" + loc["grab"]),
-        ("撑床或抓床单", loc["brace"] + "或" + loc["grab"]),
-        ("双手撑在床面上", "双手" + loc["brace"]),
-        ("双手撑床面上", "双手" + loc["brace"]),
-        ("双手撑床", "双手" + loc["brace"]),
-        ("手撑床", "手" + loc["brace"]),
+        ("双手撑床或抓床单", loc["brace"] + " or " + loc["grab"]),
+        ("撑床或抓床单", loc["brace"] + " or " + loc["grab"]),
+        ("双手撑在床面上", loc["brace"]),
+        ("双手撑床面上", loc["brace"]),
+        ("双手撑床", loc["brace"]),
+        ("手撑床", loc["brace"]),
         ("撑床面", loc["brace"]),
         ("撑床", loc["brace"]),
         ("抓紧床单", loc["grab"]),
         ("抓床单", loc["grab"]),
         ("抠床单", loc["grab"]),
         ("按床单", loc["grab"]),
-        ("床单枕头", loc["pad"]),
-        ("床单褶皱", loc["pad"]),
         ("床单", loc["pad"]),
-        ("枕头", loc["pad"]),
         ("床垫", loc["pad"]),
         ("床面", loc["pad"]),
         ("床沿", loc["edge"]),
-        ("床头", loc["edge"]),
         ("床板", loc["edge"]),
         ("仰卧在床上", loc["lie"]),
         ("躺在床上", loc["lie"]),
         ("跪在床上", loc["kneel"]),
-        ("趴跪床上", "趴跪在" + loc["pad"] + "上"),
-        ("趴在床上", loc["kneel"].replace("跪", "趴")),
         ("在床上", loc["on"]),
-        ("床上", loc["on"].replace("在", "")),
+        ("床上", loc["on"]),
     ]
     for old, new in reps:
         out = out.replace(old, new)
     return out
 
 
-def build_soundscape_zh(scene_name):
-    """复刻吞鲸引擎 build_soundscape_zh：根据当前场景动态生成底层环境声，杜绝在办公室/浴室里出现床板声"""
+def build_soundscape_en(scene_name):
     sc_id = detect_scene_id(scene_name)
     loc = SURFACE_PROFILES.get(sc_id, SURFACE_PROFILES["bed"])
     surf_sfx = loc.get("sfx", "")
-    if surf_sfx:
-        tail = f"皮肤拍击、湿润声与{surf_sfx}压在底层。"
-    else:
-        tail = "皮肤拍击与湿润水声压在底层。"
-    return f"室内安静底噪持续。湿润皮肤接触与节奏抽插声清晰可闻，皮肤拍击夹杂其中。{tail}"
+    return (f"Quiet room tone continues throughout. Rhythmic skin-on-skin collision slaps, "
+            f"viscous lubrication friction, heavy ragged breathing, and subtle {surf_sfx}. "
+            f"Strictly NO subtitles, NO text, NO captions, NO watermark.")
 
 
 def load_poses():
@@ -159,101 +143,148 @@ def load_recipes():
         return json.load(f)
 
 
-def header_block(dur, aspect, idea="", scene="当前场景", pose_names=""):
-    """六段式的头部：Goal / Audio rule / Reference map / Consistency / 压油 / 防僵硬"""
+def build_fullref_header(dur, aspect, scene="当前场景", idea="", is_undress=False):
+    """
+    100% 对齐 MiniMax 官方原厂 Ref2VA 指南六段式头部:
+    1. subject_definitions (<Subject N> 实体与 <Picture N> 物理锚点解耦)
+    2. summary (任务类型标定)
+    3. retention_analysis (fully_preserved vs partially_preserved 脱衣保留度)
+    4. consistency & motion locks
+    """
+    sc_id = detect_scene_id(scene)
+    surf = SURFACE_PROFILES.get(sc_id, SURFACE_PROFILES["bed"])
+
     parts = []
-    parts.append(f"Goal: Generate a {dur:.2f}-second {aspect} live-action adult video with "
-                 f"readable physical contact, stable identity, and native dialogue audio.")
-    parts.append("Audio rule: characters may only speak the exact words inside <d>...</d>; "
-                 "never read pose, intensity, camera, or negative instructions aloud. "
-                 "用户介绍、姿势名称、动作描述都不是台词，禁止念出；任何角色只能念 <d> 内的文字。")
-    parts.append("表情自然；有浪叫或台词时张嘴，口型跟声音。")
-    if idea:
-        parts.append(f"用户介绍（必须体现）：{idea}")
+    # 1. 目标与音频规则
+    parts.append(f"Goal & Audio Contract: {dur:.2f}s duration, {aspect} vertical, 24fps. "
+                 f"Live-action cinematic adult drama take with readable physical biomechanics and stable identity.")
+    parts.append("Audio rule: characters may ONLY speak the exact words inside <d>...</d>; "
+                 "never read directions, camera notes, or pose labels aloud. "
+                 "non_diegetic_music: N/A; diegetic foley and dialogue only.")
     parts.append("")
-    parts.append("Reference map (upload order = Picture number):")
-    parts.append(f"<Picture 1> = {scene}：场景环境参考，锁定空间结构、陈设、材质与环境光线；仅锁场景，不作人物身份或姿势参考。")
-    parts.append("<Picture 2> = 女子A：人物身份参考，锁定脸、发型、身材、肤色与服装状态。")
-    parts.append("<Picture 3> = 男子A：人物身份参考，锁定脸、发型、身材、肤色与服装状态。")
-    parts.append("角色与参考对应：女子A=<Picture 2>，男子A=<Picture 3>；场景与参考对应：" + scene + "=<Picture 1>")
-    parts.append("For the target video, at 0.00 seconds into the target video, <Picture 2> and "
-                 "<Picture 3> (character identity) are fully referenced for faces/bodies/clothing.")
-    parts.append("Describe only the change that happens after 0.00s — do not re-describe still "
-                 "appearance already shown in character refs; do not ignore scene refs.")
+
+    # 2. 官方原厂标准: subject_definitions
+    parts.append("subject_definitions:")
+    parts.append(f"<Subject 1> is the {scene} environment anchored in <Picture 1>, featuring {surf['noun']} and ambient noir lighting.")
+    if is_undress:
+        parts.append("<Subject 2> is the young woman in <Picture 2>, with pale skin, long dark hair; outfit is unfastened and peeled off in this take.")
+    else:
+        parts.append("<Subject 2> is the woman from <Picture 2>, with pale skin, long silky dark hair, and realistic anatomical proportions.")
+    parts.append("<Subject 3> is the mature man from <Picture 3>, with strong masculine physique, weathered tan skin, and defined musculature.")
     parts.append("")
-    parts.append("Consistency: Keep the same faces, body proportions, skin tone, hair, and clothing "
-                 "state across every shot (match <Picture 2> + <Picture 3>). Keep genital scale and "
-                 "junction proportions realistic and snug-fitting; contact stays close, not cavernous. "
-                 "Keep the same location and ambient lighting as <Picture 1>; no set redesign, no "
-                 "teleport to another place.")
+
+    # 3. 官方原厂标准: summary
+    parts.append("summary:")
+    parts.append(f"[reference generation + audio reference] The target video captures intimate kinetic physical drama between "
+                 f"<Subject 2> and <Subject 3> within <Subject 1>. All identities strictly reference <Picture 2> and <Picture 3>.")
+    parts.append("")
+
+    # 4. 官方原厂标准: retention_analysis (脱衣镜头安全锁)
+    parts.append("retention_analysis:")
+    parts.append("<Subject 1>: fully_preserved - space architecture, materials, and lighting are strictly locked to <Picture 1>.")
+    if is_undress:
+        parts.append("<Subject 2>: partially_preserved - facial features and body anatomy fully preserved; clothing state transitions dynamically as clothes slide down.")
+    else:
+        parts.append("<Subject 2>: fully_preserved - facial features, body anatomy, and skin texture are strictly locked to <Picture 2>.")
+    parts.append("<Subject 3>: fully_preserved - masculine facial identity, physique, and skin tone are strictly locked to <Picture 3>.")
+    parts.append("")
+
+    # 5. 一致性与材质压油死锁 (Consistency Lock)
+    parts.append("Consistency: Keep the same faces, body proportions, skin tone, hair, and anatomical scale throughout. "
+                 "Strictly TWO adults in frame. Keep genital scale realistic and snug-fitting; contact stays close. "
+                 "180-degree axis locked on a stationary tripod. NO set redesign, NO teleportation.")
     parts.append("Skin & Lighting: " + DE_OIL)
-    parts.append("Motion quality（防僵硬）: 全程动作流畅连贯，符合真实人体力学："
-                 "起落/抽送含预备—发力—跟随三阶段，体重转移有惯性，禁止整块平移；"
-                 "二次动作——乳房与臀肉随动作有真实延迟的波浪晃动，发丝滞后轻摆，肌肉挤压回弹；"
-                 "呼吸可见，肩膀与腹部随喘息起伏、节奏与动作同步；肌肉张弛交替，不锁死同一姿势；"
-                 "切镜时动作不停顿，beat 间无缝衔接；加速渐进如波浪推高，不突然切档。")
-    if pose_names:
-        parts.append(f"Pose focus chain: {pose_names}.")
+    parts.append("Motion quality (Anti-Stiffness): Smooth continuous human kinematics with visible inertia, follow-through, "
+                 "and natural breathing. Breasts and buttocks exhibit authentic delayed wave jiggle and recoil upon impact. "
+                 "Seamless kinetic momentum between cuts; NO sudden freeze or popping.")
     parts.append("")
     return parts
 
 
-def footer_block(scene="当前场景"):
-    return [
-        "overall_soundscape: " + build_soundscape_zh(scene),
-        "non_diegetic_music: N/A",
-        "",
-        "=== NEGATIVE ===",
-        NEG,
-    ]
+def build_shot_description(shot, index, total_shots, dur, size_desc, cam_desc,
+                           lines="", speaker="女子A", scene="当前场景"):
+    """
+    根据《深渊之契》双轨物理分流 (Composition Lock) 与官方原厂 detailed_description 规则编译单镜描述
+    """
+    pid = shot.get("pose", "")
+    first_p = pid.split("->")[0]
+    p_zh = shot.get("pose_zh", "")
 
+    # 判断轨道类型
+    is_oral = first_p in ORAL_ONLY or "口交" in p_zh or "深喉" in p_zh
+    is_penetration = (first_p not in FOREPLAY and first_p not in ORAL_ONLY and first_p not in FINISH_IDS and "->" not in pid)
+    is_climax = first_p in FINISH_IDS or "射" in p_zh or "内射" in p_zh
+    is_undress = "undress" in first_p
 
-def insert_hint(pose_id):
-    """只有插入类姿势才加阴道贴合要点；前戏、口交、转场位移与射精姿势一律不加"""
-    p = pose_id or ""
-    if "->" in p:
-        return ""
-    first = p.split("->")[0]
-    if first in FINISH_IDS or first in ORAL_ONLY or first in FOREPLAY:
-        return ""
-    return ("；画面要点：阴茎与阴道紧密贴合插入，短行程进出清晰可读，"
-            "交合处比例接近真人参考、阴唇自然包裹，不要占满画面")
+    # 景别与双轨构图死锁 (Composition Lock)
+    comp_lock = ""
+    if shot["size"] in ("hip", "macro") and is_penetration:
+        comp_lock = ("COMPOSITION LOCK: Camera locked low-angle at pelvic level, framed strictly from waist to mid-thigh. "
+                     "HEADS, FACES, AND UPPER TORSO ARE STRICTLY OUT OF FRAME. "
+                     "Only the rhythmic collision of pelvic bones and joined hips in view. ")
+    elif shot["size"] in ("face", "cu") and not is_oral:
+        comp_lock = ("COMPOSITION LOCK: Tight close-up locked on female side-profile and neck. "
+                     "LOWER BODY AND GENITALIA STRICTLY OUT OF FRAME. "
+                     "Intercourse is depicted ONLY through rhythmic shoulder trembling and hair shaking from unseen thrusts. ")
+    elif is_undress:
+        comp_lock = ("COMPOSITION LOCK: Medium-close framing strictly locked on shoulders, collarbone, and unbuttoning fingers. "
+                     "Male is fully dressed in background. LOWER BODY AND GENITALIA STRICTLY OUT OF FRAME to prevent exposure. ")
+
+    # 时间轴切分: [00.00s - XX.XXs] 三段式动量
+    at_str = "At 0.00s, actively in motion, inheriting momentum from previous shot with NO pause or freeze. " if index > 0 else "From 0.00s: "
+    adapted_action = with_scene_surface(shot.get("text", ""), scene)
+
+    # 肢体减法与防蛇信子/防插入要点
+    body_text = f"{comp_lock}{at_str}{adapted_action}."
+    if any(k in pid for k in ("kiss", "kiss_fondle", "kiss_pin", "kiss_force", "kiss_her")):
+        body_text += " (Anatomical constraint: lips gently parted with subtle contact; strictly NO exaggerated tongue protrusion; realistic lip anatomy)."
+    
+    # 只有纯结合交合镜且非微距排除人脸时才附加插入贴合
+    if is_penetration and shot["size"] not in ("face", "cu"):
+        body_text += " Snug anatomical junction between penis and vaginal entrance, rhythmic piston stroke clearly readable with elastic skin recoil."
+
+    # 原厂标准台词装配: <Subject N> (Sx) 与三段式气口
+    dialogue_block = ""
+    if lines:
+        spk_tag = "<Subject 2> (S1)" if "女" in speaker else "<Subject 3> (S2)"
+        # 嘴部占用检查
+        if is_oral and "女" in speaker:
+            dialogue_block = f" <Subject 2> (S1, mouth occupied) stays completely silent with lips sealed around shaft."
+        else:
+            t_mid_start = max(1.0, round(dur * 0.25, 2))
+            t_mid_end = min(dur - 0.5, round(dur * 0.75, 2))
+            dialogue_block = (f" From {t_mid_start:.2f}s to {t_mid_end:.2f}s, maintaining rhythmic kinetic motion, "
+                              f"{spk_tag} says: <d>[Chinese]{lines}</d>.")
+
+    # 镜头尾部稳定收束
+    tail = ""
+    if index == total_shots - 1:
+        tail = f" Final state: Unbroken anatomical continuity and stable composition held steady to {dur:.2f}s."
+
+    full_shot_desc = f"[Shot {index+1}] {size_desc}. {cam_desc}. {body_text}{dialogue_block}{tail}"
+    return full_shot_desc
 
 
 def single_shot_prompt(shot, index, total_shots, dur, size_desc, cam_desc,
                        lines="", speaker="女子A", idea="", scene="当前场景", pose_names=""):
     """
-    为「拆镜表」中的单个镜头生成完整可送模提示词（含自动承托面与声场适配）。
+    对外唯一装配接口: 生成包含原厂六段式 + 深渊之契双轨死锁的终极提示词
     """
-    parts = header_block(dur, "9:16", idea=idea, scene=scene, pose_names=pose_names)
+    is_undress = "undress" in shot.get("pose", "")
+    header = build_fullref_header(dur, "9:16", scene=scene, idea=idea, is_undress=is_undress)
+    
+    shot_body = build_shot_description(
+        shot, index, total_shots, dur, size_desc, cam_desc,
+        lines=lines, speaker=speaker, scene=scene
+    )
 
-    if index == 0:
-        head = "[Shot 1] Live-action cinematic."
-    else:
-        head = "[Shot 1] At 0.00s, this clip begins directly at this beat."
-
-    adapted_text = with_scene_surface(shot["text"], scene)
-    pose_raw = shot.get("pose", "")
-
-    # 针对接吻类体位增加防蛇信子约束
-    if any(k in pose_raw for k in ("kiss", "kiss_fondle", "kiss_pin", "kiss_force", "kiss_her")):
-        adapted_text += "（物理约束：唇齿轻启微碰，自然触碰，严禁舌头过度伸出，保持真人自然接吻生理形态）"
-
-    # 针对脱衣类前戏防止开场遛鸟约束
-    if "undress" in pose_raw:
-        adapted_text += "（画面锁定在肩颈与衣领扣子滑落，男方衣着完整，严禁下半身过度裸露与生殖器入画）"
-
-    body = f"景别：{size_desc}。机位：{cam_desc}。{adapted_text}"
-    body += insert_hint(pose_raw)
-
-    if lines:
-        body += f" {speaker} says: <d>[Chinese]{lines}</d>."
-
-    if index == total_shots - 1:
-        body += f" Final state: 人物身份不漂移，交合处仍紧密贴合、比例自然，构图稳定收住到 {dur:.2f}s。"
-
+    parts = list(header)
     parts.append("integrated_multimodal_description:")
-    parts.append(f"{head} {body}")
+    parts.append(shot_body)
     parts.append("")
-    parts.extend(footer_block(scene))
+    parts.append("overall_soundscape: " + build_soundscape_en(scene))
+    parts.append("non_diegetic_music: N/A")
+    parts.append("")
+    parts.append("=== NEGATIVE ===")
+    parts.append(NEG)
     return "\n".join(parts)
