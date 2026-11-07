@@ -1,7 +1,7 @@
 ---
 name: tunjing-baodian
 description: "Use when producing or auditing short dramas with Tunjing."
-version: 2.0.0
+version: 3.0.0
 author: 吞鲸工作室 (Swallowing Whale Studio)
 license: MIT
 metadata:
@@ -9,10 +9,10 @@ metadata:
     tags: [tunjing, baodian, drama, pure-ref2v, gatekeeper]
 ---
 
-# 🐳 吞鲸宝典 · 精品漫剧极速生产引擎 (Tunjing Baodian v2.0)
+# 🐳 吞鲸宝典 · 精品漫剧极速生产引擎 (Tunjing Baodian v3.0)
 
 > **吞鲸宗旨**：**文戏带刀有张力，动作带电有花样，步步门禁不跳步，纯血管线一次过。**
-> 吞鲸工作室 100% 自包含权威生产母版。内置 50 套体位动量矩阵、40 条物理换位配方与 13 类场地动态适配内核，零外部依赖、零脑补词汇、跨机器跨大模型 100% 无差别出片。
+> 吞鲸工作室 100% 自包含权威生产母版。内置 50 套体位动量矩阵、40 条物理换位配方、13 类场地动态适配内核与 v3.0 双轨物理分流构图死锁，零外部依赖、零脑补词汇、跨机器跨大模型 100% 无差别出片。
 
 ---
 
@@ -139,3 +139,6 @@ python scripts/tunjing_scene.py \
 10. **物理帧长自动换算铁律**：所有送模镜头帧数严格遵循 `length = 5 + 17 * N`（`raw = round(sec * 24)` 后向上对齐），由脚本自动计算写入 `批量任务.json`。
 11. **自包含与零外部引用铁律（防跨机 Agent 幻觉）**：本技能包是 100% 闭环的唯一权威母版。严禁在文档、模板或提示词中引用任何不存在于本技能目录内的外部桌面目录、外部前端脚本或历史旧编号（如旧式 `POS-01`），防止其他机器或大模型产生路径搜寻幻觉。
 12. **派生文档单向生成与门禁同步铁律**：人类可读字典 `kinetic-positions.md` 必须由 `tunjing_poses_matrix.json` 单向生成，严禁手改脱节；任何提示词格式或体位 ID 规范的升级，必须同步更新 `tunjing_gatekeeper.py` 与 `dryrun_test.py`，确保自产产物 100% 通过自身门禁。
+13. **双轨物理分流与构图排他死锁铁律（防浮空人脸与多手鬼影）**：严禁在同一镜头内“既要近景面部表情，又要下半身交合碰撞”（会导致 Cross-Attention 分裂产生浮空人脸或裁掉交合动作）。`hip`/`macro` 交合特写轨必须强制注入 `HEADS, FACES, AND UPPER TORSO ARE STRICTLY OUT OF FRAME`；`face`/`cu`/`mcu` 情绪对白轨必须强制注入 `LOWER BODY AND GENITALIA STRICTLY OUT OF FRAME`（交合仅靠肩颈震颤与发丝晃动体现），且特写框内严格执行肢体减法（最多 1 只手入画，其余手置于画外）。
+14. **正向纯英文视觉隔离与台词三段式气口铁律（防字幕烫印与身体僵死）**：`integrated_multimodal_description` 视觉动作描述 100% 采用专业物理英文（严禁裸露中文字符被视觉编码器当成海报字幕烫印在画面底部），正向末尾强制追加 `STRICTLY NO SUBTITLES, NO CHINESE CHARACTERS, NO TEXT, NO CAPTIONS, NO WATERMARKS`；中文台词仅允许置于 `<d>[Chinese]...</d>` 容器内，且必须采用“前 1.5s 纯动作呼吸 ➔ 中间 3.0s 念白 ➔ 尾 1.5s 动作收尾”三段式留白，防止语音合成全程压死身体去噪步进。
+15. **反发散模型越权与首镜五联切片真质检铁律**：针对 DeepSeek/GPT 等易发散模型，严禁让模型手写提示词，只允许其选定 `--chain`、`--total`、`--scene`、`--lines` 参数并调用 `tunjing_scene.py` 机械装配，随后运行 `tunjing_diff_audit.py` 出具真源偏离度审计报告；渲染阶段废除仅看文件大小与 PSNR 的伪质检，强制执行“首镜生成落盘 ➔ 抽取 2%/50%/94% 关键帧肉眼核验通过 ➔ 放行全集批跑”，且每镜后调用 `/free` 冷却 10 秒释放显存碎片。
