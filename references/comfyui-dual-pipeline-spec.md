@@ -68,3 +68,18 @@ Skin & Lighting: authentic matte velvet skin finish, powdered dry texture, natur
    - 严格遵循 MiniMax H3 官方模型特性，动作描述 100% 采用吞鲸矩阵内置的 `POSE_EN` 纯英文物理力学（`beatsEn` 与 `framingEn`），台词保留 `<d>[Chinese]...</d>`，彻底杜绝中文散文导致的动作漂移与纯灰影棚跑偏！
 5. **接吻防蛇信子形态锁**：
    - 接吻类镜头统一注入物理边界：`lips gently parted, subtle tongue contact, natural human lips anatomy, no exaggerated tongue protrusion`，防止舌头拉伸变形。
+6. **双轨物理分流构图死锁（Composition Lock）与肢体减法**：
+   - **交合特写轨 (`hip` / `macro`)**：强制注入 `COMPOSITION LOCK: Camera locked low-angle at pelvic level. Framed strictly from waist to mid-thigh. HEADS, FACES, AND UPPER TORSO ARE STRICTLY OUT OF FRAME.`，杜绝结合部上方出现浮空人脸。
+   - **面部情绪轨 (`face` / `cu` / `mcu`)**：强制注入 `COMPOSITION LOCK: LOWER BODY AND GENITALIA STRICTLY OUT OF FRAME. Intercourse is depicted ONLY through rhythmic shoulder trembling and hair shaking caused by unseen off-screen thrusts.`，杜绝因景别裁切导致正戏无交合感。
+   - **肢体减法**：特写框内最多允许 1 只手入画（`His left hand is the ONLY hand in frame`），其余肢体明文规定置于画框外，彻底消灭 4~5 只手的多肢鬼影。
+7. **空间坐标系、180 度轴线与防脑补床面死锁（014B / 014D 铁律）**：
+   - **防脑补床面**：在铁桌/办公台/墙边等非床场地做俯身或低姿动作时，正向必须排他性强化硬质承托面（如 `rigid industrial painted steel tabletop`），并显式声明 `STRICTLY NO BED, NO MATTRESS, NO BEDSHEET, NO FABRIC UNDER BODY, NO PILLOW`，同时剔除音效中 `mattress vibration` 等诱导词。
+   - **防特写背景棚拍化**：微距或特写必须强制保留 15%~20% 的浅景深硬质环境标桩（如 `Maintain 20% shallow depth-of-field background showing dim green phosphor CRT glow / dark mahogany headboard`）并声明 `STRICTLY NO PLAIN STUDIO BACKGROUND, NO GREY CYCLORAMA`。
+8. **黄金三 LoRA 权重组合与工作流静态资产断言**：
+   - **Node 53 (DMAD 骨骼动力学)**：锁定 `0.60`（保障骨盆冲撞力道且不撕裂关节）。
+   - **Node 400 (MysticXXX 生理特征)**：锁定 **`MysticXXX_MMH3-V1.safetensors` @ `0.50`**（禁用 V4，V1 在微距结合部物理形变最稳、不黏连融化）。
+   - **Node 404 (如梦似幻光影)**：拉满至 **`0.90`**（压死 Vaseline 塑料油光，强化胶片暗调颗粒）。
+   - **静态资产隔离断言**：新剧严禁直接复用残留旧剧默认图片名的工作流 JSON；提交前必须通过 `assert` 校验 Node 51/49/50 绑定的是当前剧集全 ASCII 命名的资产文件，且必须注入进 `ComfyUI-Installs/<User>/ComfyUI/input` 真实活动目录。
+9. **台词三段式气口与显存碎片治理**：
+   - **台词留白**：单镜台词切分至中段（`[0.00s-1.50s]` 闭唇纯动作呼吸 ➔ `[1.50s-4.50s]` 动作中念白 ➔ `[4.50s-end]` 念白结束深顶收尾），防止语音合成全程抢占导致身体僵死。
+   - **显存冷却与成片交付**：每镜落盘后必须调用 `POST /free` (`{"unload_models": False, "free_memory": True}`) 并 `sleep(10)` 释放 12GB 显卡碎片；成片交付优先采用 FFmpeg `concat demuxer` 无损缝合（规避新版剪映 5.x/6.x 草稿二进制加密拦截），配音节点在低配/异构环境下优先选用支持 CPU/CUDA 双模的轻量级 `ComfyUI-Qwen3-TTS (0.6B)`。
