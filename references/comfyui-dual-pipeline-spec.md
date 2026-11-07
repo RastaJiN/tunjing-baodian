@@ -1,80 +1,93 @@
-# 吞鲸 ComfyUI 双轨渲染工作流与节点规范 (Dual Pipeline Spec)
-> 任何机器 1:1 复现必须遵循的底层节点与环境契约。
+# 吞鲸纯血 Ref2V 生产管线规范 (Tunjing Pure Ref2V Pipeline Specification)
+> 继承自吞鲸工作室《纯血 Ref2V 核心生产宪章》
+> 唯一铁律：彻底摒弃单镜首帧依赖（I2V 禁令），全片 100% 采用全局母版 Ref2V 一采直出！
 
 ---
 
-## 一、双轨硬件与环境基准 (Hardware & Env Baseline)
-- **最低显卡配置**：NVIDIA RTX 3060 12GB / RTX 4070 Ti 12GB 或更高（支持单卡渲染）；
-- **宿主环境**：ComfyUI (原生或 Docker 版均可，监听端口默认 8188)；
-- **底层生图底模**：全线采用**越狱解禁版底模 (Uncensored Checkpoints / GGUF)**，彻底释放真实解剖与身体受力生成能力；
-- **底层视频模型**：MiniMax H3 (33B / INT8 近似) 或 同级开源影视级视频模型 (如 Wan2.1 / Seedance)。
+## 一、为什么彻底封杀单镜首帧垫图 (I2V)？
+1. **Cross-Attention 注意力竞争导致骨骼漂移与换脸**：
+   在视频扩散模型（MiniMax H3）中，若每镜单独抽一张首帧图喂入，首帧图的局部光影/姿态会与全局角色 2x3 母版发生剧烈的特征争夺，导致人物五官变形、身材比例坍塌甚至多肢畸变；
+2. **流程割裂摧毁批量自动化**：
+   单镜抽首帧迫使生产管线中断，需要人工切图、选图，无法跑通全自动队列；
+3. **纯血双锚定真理**：
+   全片每一镜统一遵循 **方案 A 五图空间拓扑标准**：
+   - **`<Picture 1>`**：女主角 2x3 定版母版（Female Identity，严禁开场第一帧用）
+   - **`<Picture 2>`**：男主角 2x3 定版母版（Male Identity，严禁开场第一帧用）
+   - **`<Picture 3>`**：母体空间与光源地标大景（Master Spatial Anchor，纯净场景底图）
+   - **`<Picture 4>`**：Shot 1 起势位移与构图锚点（Departure Anchor）
+   - **`<Picture 5>`**：Shot 2 交互落位与对戏终点分镜（Interaction Anchor）
+   由这五张参考图共同驱动，配合吞鲸标准六段式提示词直接生成视频，彻底消灭 Cross-Attention 竞争导致的骨骼漂移与瞬移。
 
 ---
 
-## 一之一、越狱版底模实战防翻车铁律 (Uncensored Pitfalls)
-1. **越狱底模出场景的“防发春脑补”断言**：
-   越狱模型对 `bed, hotel, sofa, bathroom` 等词极度敏感，容易自动脑补裸体假人或情趣内衣残留。
-   - **出纯场景时负向必须强拍死**：`human, person, woman, man, body, limbs, skin, nude, naked, clothes, underwear, lingerie, condom, sex toys, face`，确保场景 100% 纯净无人，防止进 I2V 裂殖出第三人！
-2. **越狱底模出姿态关键帧的“全解剖释放”**：
-   跑 POS-01 到 POS-12 姿态首帧时，直接调用 `kinetic-positions.md` 中的全套受力与解剖英文动量，越狱底模能直接出精准咬合与身体受力，彻底告别打码和融化。
+## 二、纯血 Ref2V 攻克高难度体位不融化的三大物理法则
+
+1. **核心交合强制收缩景别（算力独占）**：
+   - 严禁在大全景 (`wide`) 中让模型同时计算全身四肢 + 两张正脸 + 复杂交合（算力必然过载融化）；
+   - 核心冲撞镜头强制收紧为 **中近景 (`mcu`)、腰胯特写 (`hip`) 或结合部微距 (`macro`)**，将扩散算力 100% 集中于腰臀冲撞、软组织受力回弹与局部接触点。
+2. **面部微表情注意力交棒**：
+   - 激烈动作中的失神、咬唇、泪痕，交棒给相邻的 **1.5s~3.0s 独立面部/微距特写 (`face` / `macro`)**，通过弹跳剪辑组合出完整的视听高潮。
+3. **0.00s 空间接触死锁与防僵硬二次动作**：
+   - 每个动作镜头从 `0.00s` 起即处于接触/结合就位状态（1:1 调用吞鲸引擎 `tunjing_poses_matrix.json` 的 `beats` 原文），杜绝前戏漫游穿模；
+   - 全局挂载吞鲸引擎 `Motion quality（防僵硬）` 锁：包含预备—发力—跟随三阶段惯性、二次动作波浪晃动与呼吸起伏。
 
 ---
 
-## 二、轨道 A：【文戏与简单动作轨 · 纯血 Ref2V】
-适用于：00:00 ~ 01:30 的剧情对话、站立对峙、单人走位、面部神态。
+## 三、工作流负向清零真相与【正向肯定句绝对压油】
 
-### 1. 核心节点拓扑
+吞鲸宝典内置引擎底层工作流（`H3 标准工作流`）中，**Node 328 = `ConditioningZeroOut` 将负向条件通道直接清零**。
+因此，任何写在负向里的排油词在物理上均不参与采样计算，**压除 LoRA 高光油腻感必须且只能靠正向肯定句**（已固化于 `tunjing_core.py` 的 `DE_OIL` 常量中）：
+
+```text
+Skin & Lighting: authentic matte velvet skin finish, powdered dry texture, natural human skin with visible fine pores and subtle imperfections, soft subsurface scattering without surface reflection, non-greasy complexion, heavily diffused soft ambient light, zero hard directional light, 35mm film grain, photorealistic anatomy
 ```
-[角色 2x3 母版 PNG] ➔ LoadImage (Node A) ➔ \
-[纯净场景底图 PNG] ➔ LoadImage (Node B) ➔ ---> [MiniMax H3 Video DiT / Ref2V Sampler] ➔ VAE Decode ➔ SaveVideo
-[全英文物理动词文本] ➔ Text/Primitive (Node C) ➔ /
-```
-### 2. 关键运行参数 (死锁)
-- **CFG**：1.0（禁止使用高 CFG，防止过饱和彩噪）；
-- **Sampling Steps**：10 ~ 12 步；
-- **Scheduler**：beta / simple；
-- **画幅规格**：9:16 (864x1536 或 928x1664)；
-- **物理帧长**：`length = 5 + 17 * N` (如 107 帧 = 4.46s)。
 
 ---
 
-## 三、轨道 B：【高危复杂体位轨 · 姿态首帧 + I2V 启动】(绝不融化秘诀)
-适用于：02:45 ~ 04:30 的 POS-01 到 POS-11 复杂交合、悬空、折叠深顶、深喉等高难度动作。
+## 四、标准 Ref2V 节点拓扑与硬件参数基准
 
-### 1. 为什么不能纯靠文生视频？
-文生视频的 Cross-Attention 在计算两人多肢体复杂缠绕时会发生拓扑崩溃（出现三条腿、融化成橡皮泥）。因此必须在第一步把身体接触用高精度生图底模锁定！
-
-### 2. 两阶段作业拓扑（吸纳 qwen21-nsfw-pose 作者级工程配方）
-```
-【阶段 1：姿态关键帧锁定 (T2I / Edit / ControlNet Depth)】
-[男女素身母版] + [POSE-DB-02 纯灰度深度图 / 姿态骨架] 
-       ↓
-[Qwen-Image-2.1 (int8_convrot)] 
-挂载专用 LoRA:
-- 默认解剖强化: qwen2_1-femaledVaginus-nsfw-v1_3-fine_L22-31.safetensors @ 1.0
-- 换姿势脱衣保脸: qwen21-nsfw-image-edit.safetensors @ 1.0 (CFG 3.0 / 20步)
-       ↓ (作者级核心参数死锁)
-- 采样器: er_sde + beta (严禁用 euler/simple！)
-- CFG: 2.5 ~ 4.0 (严禁给 1.0，CFG 1.0 会饿死 LoRA 导致质感全无)
-- 步数: 50 步 (按摩拉伸类可 30 步)
-- 分辨率: 1152×1728 (2:3 竖版大画幅)
-       ↓
-[100% 完美的交合关键帧 PNG (解剖清晰、四肢无多余、皮肤汗水通透)]
-       ↓
-【阶段 2：动力学脉冲启动 (I2V)】
-[该交合关键帧 PNG] ➔ LoadImage (作为 Initial Frame) ➔ [H3 / 视频 I2V Sampler] ➔ 输出 2.5 ~ 4.0s 猛烈受力冲撞
+```text
+[<Picture 1> 女主 2x3 母版 PNG] ➔ \
+[<Picture 2> 男主 2x3 母版 PNG] ➔ \
+[<Picture 3> 场景母体与光源大景 PNG] ➔ ---> [MiniMax H3 / Wan 2.2 ReferenceToVideo] ➔ VAE Decode ➔ 成片 MP4
+[<Picture 4> Shot 1 起势位移分镜 PNG] ➔ /
+[<Picture 5> Shot 2 交互落位分镜 PNG] ➔ /
+[吞鲸标准六段式送模提示词文本]        ➔ /
 ```
 
-### 3. 提示词七支柱结构规范 (Prompt 7-Pillars for Keyframe)
-为确保关键帧具备电影质感与高张力，写生图词必须写满以下 7 要素（300~1500字符），严禁空洞形容词：
-1. **Camera**：机位与角度（`hyper-realistic photograph, low-angle shot, tight framing`，低机位直接 +1 级大胆度）；
-2. **Subject**：年龄、体脂轮廓、发丝湿润散乱状态；
-3. **Pose (Limb-by-limb)**：逐肢姿态（四肢具体着力点、哪个膝盖弯曲、双手抓在何处、脊柱反弓度）；
-4. **Setting & Lighting**：环境光态（水汽微雾、暗部冷青、局部高光溢出）；
-5. **Skin Texture**：皮肤真实微结构（`glistening, visible fine pores, natural skin texture, slick sheen`）；
-6. **Explicit Anatomy**：生理结合部位真实解剖词（结合部对齐、受力凹陷）；
-7. **Finish**：`8k resolution, cinematic lighting, candid caught-in-the-moment atmosphere, photorealistic anatomy`。
+- **CFG**：`1.0`
+- **Sampling Steps**：`10 ~ 12`
+- **Scheduler**：`beta` / `simple`
+- **画幅规格**：`9:16` (`864x1536` 或 `928x1664`)
+- **严格物理帧长公式**：`length = 5 + 17 * N`（由 `tunjing_scene.py` 按单镜秒数自动换算写入 `批量任务.json`）
 
-### 4. 视频 I2V 关键运行参数
-- **Motion Scale / Denoise**：0.65 ~ 0.80（既保持身体结合部不散架，又赋予肌肉与臀肉足够的撞击回弹）；
-- **英文动量提示词**：直接调用 `kinetic-positions.md` 中的对应 `Prompt Block`。
+---
+
+## 五、渲染出片入库与防踩坑物理铁律（2026一线实测定稿）
+
+1. **`VHS_VideoCombine` 取件真理（优先取 `-audio.mp4`）**：
+   - `VHS_VideoCombine` 在挂了音频渲染时，虽然本地磁盘会产出主视频（无声版）与 `-audio.mp4`（带音轨版）两个文件，但 ComfyUI `/history/<prompt_id>` 接口的 `outputs` **只返回 `-audio.mp4` 一个文件名**！
+   - 下游入库脚本必须**优先提取 `-audio.mp4`** 作为带声音的正式成片，严禁使用“跳过 audio”的筛选逻辑，否则会导致筛空丢片、白跑整轮任务！
+2. **严禁开场大全景脱衣（防遛鸟）**：
+   - 若第一镜为 `undress`（脱衣诱惑），景别强制收紧为 `mcu`（中近景）或 `cu`（特写），把画面锁定在肩颈与衣领扣子滑落，男方衣着完整，物理上严禁第 1 帧生殖器露出！
+3. **前戏严禁插入要点**：
+   - `undress`、`kiss_fondle`、`breast_rub`、`nipple_lick` 等前戏体位及转场桥镜，严禁带入任何“阴茎与阴道紧密贴合插入”语句，防止模型动作精神分裂与动作打架。
+4. **核心动作全英文物理力学驱动**：
+   - 严格遵循 MiniMax H3 官方模型特性，动作描述 100% 采用吞鲸矩阵内置的 `POSE_EN` 纯英文物理力学（`beatsEn` 与 `framingEn`），台词保留 `<d>[Chinese]...</d>`，彻底杜绝中文散文导致的动作漂移与纯灰影棚跑偏！
+5. **接吻防蛇信子形态锁**：
+   - 接吻类镜头统一注入物理边界：`lips gently parted, subtle tongue contact, natural human lips anatomy, no exaggerated tongue protrusion`，防止舌头拉伸变形。
+6. **双轨物理分流构图死锁（Composition Lock）与肢体减法**：
+   - **交合特写轨 (`hip` / `macro`)**：强制注入 `COMPOSITION LOCK: Camera locked low-angle at pelvic level. Framed strictly from waist to mid-thigh. HEADS, FACES, AND UPPER TORSO ARE STRICTLY OUT OF FRAME.`，杜绝结合部上方出现浮空人脸。
+   - **面部情绪轨 (`face` / `cu` / `mcu`)**：强制注入 `COMPOSITION LOCK: LOWER BODY AND GENITALIA STRICTLY OUT OF FRAME. Intercourse is depicted ONLY through rhythmic shoulder trembling and hair shaking caused by unseen off-screen thrusts.`，杜绝因景别裁切导致正戏无交合感。
+   - **肢体减法**：特写框内最多允许 1 只手入画（`His left hand is the ONLY hand in frame`），其余肢体明文规定置于画框外，彻底消灭 4~5 只手的多肢鬼影。
+7. **空间坐标系、180 度轴线与防脑补床面死锁（014B / 014D 铁律）**：
+   - **防脑补床面**：在铁桌/办公台/墙边等非床场地做俯身或低姿动作时，正向必须排他性强化硬质承托面（如 `rigid industrial painted steel tabletop`），并显式声明 `STRICTLY NO BED, NO MATTRESS, NO BEDSHEET, NO FABRIC UNDER BODY, NO PILLOW`，同时剔除音效中 `mattress vibration` 等诱导词。
+   - **防特写背景棚拍化**：微距或特写必须强制保留 15%~20% 的浅景深硬质环境标桩（如 `Maintain 20% shallow depth-of-field background showing dim green phosphor CRT glow / dark mahogany headboard`）并声明 `STRICTLY NO PLAIN STUDIO BACKGROUND, NO GREY CYCLORAMA`。
+8. **黄金三 LoRA 权重组合与工作流静态资产断言**：
+   - **Node 53 (DMAD 骨骼动力学)**：锁定 `0.60`（保障骨盆冲撞力道且不撕裂关节）。
+   - **Node 400 (MysticXXX 生理特征)**：锁定 **`MysticXXX_MMH3-V1.safetensors` @ `0.50`**（禁用 V4，V1 在微距结合部物理形变最稳、不黏连融化）。
+   - **Node 404 (如梦似幻光影)**：拉满至 **`0.90`**（压死 Vaseline 塑料油光，强化胶片暗调颗粒）。
+   - **静态资产隔离断言**：新剧严禁直接复用残留旧剧默认图片名的工作流 JSON；提交前必须通过 `assert` 校验 Node 51/49/50 绑定的是当前剧集全 ASCII 命名的资产文件，且必须注入进 `ComfyUI-Installs/<User>/ComfyUI/input` 真实活动目录。
+9. **台词三段式气口与显存碎片治理**：
+   - **台词留白**：单镜台词切分至中段（`[0.00s-1.50s]` 闭唇纯动作呼吸 ➔ `[1.50s-4.50s]` 动作中念白 ➔ `[4.50s-end]` 念白结束深顶收尾），防止语音合成全程抢占导致身体僵死。
+   - **显存冷却与成片交付**：每镜落盘后必须调用 `POST /free` (`{"unload_models": False, "free_memory": True}`) 并 `sleep(10)` 释放 12GB 显卡碎片；成片交付优先采用 FFmpeg `concat demuxer` 无损缝合（规避新版剪映 5.x/6.x 草稿二进制加密拦截），配音节点在低配/异构环境下优先选用支持 CPU/CUDA 双模的轻量级 `ComfyUI-Qwen3-TTS (0.6B)`。

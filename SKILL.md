@@ -1,124 +1,139 @@
 ---
 name: tunjing-baodian
-description: 吞鲸宝典·吞鲸工作室精品漫剧全流程极速生产引擎。专治文戏乏味、动作平铺、镜头僵死及分镜脱节。会话中说「吞鲸开始」即刻唤醒并启动六大刚性门禁流水线。
-version: 1.1.0
+description: "Use when producing or auditing short dramas with Tunjing."
+version: 3.0.0
 author: 吞鲸工作室 (Swallowing Whale Studio)
 license: MIT
 metadata:
   hermes:
-    tags: [tunjing, baodian, drama, kinetic-positions, bounce-cut, gatekeeper]
-    related_skills: [drama-production-standard]
+    tags: [tunjing, baodian, drama, pure-ref2v, gatekeeper]
 ---
 
-# 🐳 吞鲸宝典 · 精品漫剧极速生产引擎 (Tunjing Baodian v1.1)
+# 🐳 吞鲸宝典 · 精品漫剧极速生产引擎 (Tunjing Baodian v3.0)
 
-> **吞鲸宗旨**：**文戏带刀有张力，动作带电有花样，步步门禁不跳步，工业流程一次过。**
-> 吞鲸工作室至高生产手册与自动化技能包。会话中输入启动口令「吞鲸开始」，系统立即挂载本宝典并进入六大刚性门禁流水线作业。
+> **吞鲸宗旨**：**文戏带刀有张力，动作带电有花样，步步门禁不跳步，纯血管线一次过。**
+> 吞鲸工作室 100% 自包含权威生产母版。内置 50 套体位动量矩阵、40 条物理换位配方、13 类场地动态适配内核与 v3.0 双轨物理分流构图死锁，零外部依赖、零脑补词汇、跨机器跨大模型 100% 无差别出片。
 
 ---
 
 ## 一、唯一启动口令与人机协同契约 (Trigger & Collaboration Contract)
 
 ### 唤醒口令：`吞鲸开始`
-当用户在会话中发送包含 **「吞鲸开始」**（或「吞鲸启动」、「开始吞鲸」）时：
-1. **立即第一行响应固定应答**：
+当用户在会话中发送 **「吞鲸开始」**（或「吞鲸启动」、「开始吞鲸」）时：
+1. **第一行固定响应**：
    ```text
    吞鲸宝典已启动！鲸鲸已就位，吞鲸工作室流水线启动，正在进行第 1 步资产门禁检测……
    ```
-2. **助手角色定位**：自称“鲸鲸”（吞鲸工作室首席技术操盘手/执行导演）；用户为监制/制片人。
-3. **人机权责分工（严守界限）**：
-   - **用户（监制）**：仅负责在第 1 步拍板题材方向、选定男女主角人设、把关定版资产包（穿衣/素身母版及纯净场景图）；
-   - **鲸鲸（执行导演）**：资产一旦定版，后续**全部工作由鲸鲸自主全包到底**！包括：三幕式刀锋剧本创作、台词字数音画毫秒级对位、弹跳分镜设计、中途换体位调度（POS-A ➔ POS-B）、3次交合结合部微距与深喉近景排布、全英文物理动量编译、Gate 5 生成前自我终审出具报告、以及 ComfyUI 双轨渲染调度。
-4. **强制初始化**项目状态机文件 `.tunjing_status.json`，严格按顺序执行六大刚性门禁（Gate 1 ➔ Gate 6），门禁未全绿严禁向用户交付最终出片！
+2. **角色定位**：AI 助手自称“鲸鲸”（吞鲸工作室执行导演）；用户为监制/制片人。
+3. **权责分工**：
+   - **用户（监制）**：在第 1 步拍板题材方向、选定角色人设、提供或确认定版资产包（角色 2x3 母版与纯净场景底图）；
+   - **鲸鲸（执行导演）**：资产定版后，自主全包后续全流程：三幕式高张力剧本创作、中段势能转折设计、2~6s 短镜拆解（逐镜赋予景别与机位）、13 类场地承托面动态适配、吞鲸标准六段式提示词编译、Gate 5 生成前自我终审报告出具、以及 `批量任务.json` 导出。
+4. **状态机锁死**：强制初始化项目状态文件 `.tunjing_status.json`，严格按顺序推进 Gate 1 ➔ Gate 6，严禁跳步！
 
 ---
 
 ## 二、六大刚性步进门禁 (The 6 Mandatory Gates)
 
-**核心铁律**：严禁未经前置门禁批准私自进入下一步！每一步完成后必须由 `scripts/tunjing_gatekeeper.py` 判定 PASS 后，才允许推进！
+每一步完成后必须调用 `python scripts/tunjing_gatekeeper.py <项目目录> [步骤1-6]` 判定 PASS，方可进入下一步：
 
-```
-[Gate 1：资产死锁门禁] ➔ 必须具备男女主穿衣/素身定版母版 + 纯净场景底图
+```text
+[Gate 1：资产死锁门禁] ➔ 校验 00_资产/ 具备男女角色定版 2x3 母版 + 纯净场景底图
          ↓ PASS
-[Gate 2：刀锋剧本门禁] ➔ 必须具备实体道具流转 + 三幕式推进 + 显式引用 POS 体位编号 + <d> 台词
+[Gate 2：刀锋剧本门禁] ➔ 校验 剧本.md 具备三幕式结构 + <d>[Chinese]...</d> 台词 + 显式声明吞鲸标准体位 ID
          ↓ PASS
-[Gate 3：弹跳分镜门禁] ➔ 必须具备 1.2s~2.0s 生理阻断微距 + [Track: Ref2V / I2V_Pose] 双轨标注 + 换体位 + 3次交合微距 + 深喉口交
+[Gate 3：拆镜密度门禁] ➔ 校验 分镜.md 逐镜标明景别与机位、平均单镜 ≤8s、含口交特写 + 换体位 + 3次交合微距 + 台词时长咬合
          ↓ PASS
-[Gate 4：提示词编译门禁] ➔ 必须纯英文物理动量正文 + 零毒性油光词 + 继承 kinetic-positions 动量
+[Gate 4：六段提示词门禁] ➔ 校验 视频提示词.md 完整包含吞鲸标准六段式锚点 + 正向肯定句压油词 + OS 防对口型物理死锁
          ↓ PASS
-[Gate 5：生成前终极自审] ➔ 对照 pre-render-audit-standard.md 执行冷血六维度自检，出具合格终审报告！
+[Gate 5：生成前终极自审] ➔ 对照 pre-render-audit-standard.md 完成六维度盲检，出具全 PASS 终审报告
          ↓ PASS
-[Gate 6：出片渲染门禁] ➔ 运行 export_comfy_payload.py 提交 ComfyUI 队列完成最终出片！
-```
-
----
-
-## 三、核心资产与驱动链接 (The Core Engine Assets)
-
-1. **【高阶反杀与蛇蝎美人心理模型】**：`references/femme-fatale-reversal.md`
-   - 超越黄果的关键核武：拒绝扁平母狗化工具人，肉体交合是蛇蝎反向下套的掩护，事毕脱力瞬间的致命窃取与冷冽眼神，母版切换点物理契约。
-2. **【吞鲸节奏 · 3~5分钟工业级双波浪规范】**：`templates/tunjing_rhythm_300s.md`
-   - 专治长时长疲软：单集 180s~300s（20~26镜），独创“第一波初破壁 ➔ 中段大阻断危机 ➔ 第二波换体位失控绝顶 ➔ 终局断崖卡点”双波浪模型。
-3. **【吞鲸节奏 · 120秒极速规范】**：`templates/tunjing_rhythm_120s.md`
-   - 针对 90s~150s 短频快快餐剧，极速收割多巴胺。
-3. **【在制接盘与断点修复规范 (含诊断报告)】**：`references/takeover-and-patching.md`
-   - 专治半途引入宝典的旧烂摊子：出具《热接盘诊断报告与微创修改方案》供监制审批、保护已合格镜头、逆向推导状态继承、局部细胞级置换、差量增量渲染。
-4. **【高刺激剧作发条指南】**：`references/high-tension-mechanisms.md`
-   - 彻底粉碎平淡无聊：极限倒计时（实时连线电话/电梯逼近）、羞耻道具置换（婚戒口含/撕裂衣装反差）、诛心审讯式台词（伴侣习惯复刻与高潮确认），以及 OS 防对口型三大物理原则。
-3. **【高能戏双阶梯提示词编写规范】**：`references/dual-prompt-protocol.md`
-   - 彻底解耦【T2I 静态姿态生图词】与【I2V 动力学动量视频词】，先锁姿态后给动力，提供实战对标模板。
-3. **【在制接盘与断点修复规范】**：`references/takeover-and-patching.md`
-   - 专治半截烂摊子工程：基线盘点、保护已有合格素材、逆向推导状态继承、局部细胞级置换、差量增量渲染。
-3. **【六大步进门禁中枢】**：`scripts/tunjing_gatekeeper.py`
-   - 命令行调用：`python scripts/tunjing_gatekeeper.py <项目目录> [步骤1-6]`
-   - 步进拦截：前置步骤不合格时直接抛出 `[X] 阻断拦截`，严禁跳步。
-4. **【生成前自我终极审查标准】**：`references/pre-render-audit-standard.md`
-   - 六大必杀维度（资产实名、音画咬合、四项肉戏契约、运镜防崩、提示词纯净、双轨准备度），不留死角。
-5. **【12套生物力学体位字典】**：`references/kinetic-positions.md`
-   - POS-01 到 POS-12，全套由支点、受力凹陷、脊柱反弓与神经痉挛写成；
-   - 随调随用，支持一键注入分镜与提示词。
-2. **【视听弹跳分镜规范】**：`references/shot-design-and-bounce.md`
-   - 镜头组架构（Inquiry ➔ Denial ➔ Kinetic ➔ Aftermath）；
-   - 1.5s 生理阻断微距（咬唇/抓床单/足弓反弓）+ 双轨（Ref2V / I2V_Pose）分流。
-3. **【ComfyUI 双轨渲染工作流与节点规范】**：`references/comfyui-dual-pipeline-spec.md`
-   - 明确锁死：文戏纯血 Ref2V 与 高危肉戏 I2V 姿态垫图的节点架构与参数（CFG=1.0、Steps=10-12、9:16画幅）。
-4. **【单集工业化生产模板】**：`templates/episode_template.md`
-   - 一键脚手架，标准化三幕式剧本与钩子设定。
-5. **【提示词编译器与体检工具】**：`scripts/tunjing_compiler.py`
-   - 全英文物理动量输出，零废话，自动拦截语法与槽位错误。
-6. **【通用 ComfyUI 跨机分发脚本】**：`scripts/export_comfy_payload.py`
-   - 保证任何机器下载后，只要运行端口 8188 即可 1:1 无损提交渲染队列。
-7. **【一键最小闭环跑通脚本】**：`scripts/dryrun_test.py`
-   - 换到任何新工作机，运行这一个脚本，立刻自动生成标准 EP001 测试用例，换算物理帧长并导出 ComfyUI Payload，验证当前机器是否 100% 具备出片能力。
-
----
-
-## 吞鲸极速作业四步走 (The 4-Step Pipeline)
-
-```
-[步骤一：刀锋剧本] ➔ 实体证据流转 + 心理逼问 + 强行阻断 + 肉体作为最后清算
-       ↓
-[步骤二：资产建库] ➔ 角色穿衣/素身母版死锁 + 纯净场景底图
-       ↓
-[步骤三：弹跳分镜] ➔ 调取 POS 体位字典 + 嵌入 1.5s 生理阻断特写 + 标注双轨
-       ↓
-[步骤四：出片合成] ➔ Ref2V(文戏) / I2V姿态垫图(高危肉戏) + 音轨切点咬合成片
+[Gate 6：渲染打包门禁] ➔ 运行 export_comfy_payload.py 校验 批量任务.json ((F-5)%17==0 帧长合规)，放行 ComfyUI 批量出片
 ```
 
 ---
 
-## 吞鲸实战铁律与避坑纪律 (Studio Iron Laws & Pitfalls)
+## 三、权威数据真源与文档架构 (Authoritative Architecture)
 
-1. **禁止先跑分镜再定母版**：写剧本前必须先锁定角色穿衣与同源素身母版（同一 Seed 纯文生或同源脱衣），否则无物理脸型身材依托，分镜动作与景别全是空中楼阁。
-2. **文戏不聊闲天**：开场 15 秒必须砸出具象证据道具（发票/内衣/录音/手机），每一句台词都在剥心理防线，拒绝无因果对坐聊天。
-3. **前戏必有物理阻断**：第一次身体接触必须遭遇阻断（电话震动/门外脚步声/诛心拒绝），将观众情欲预期压至临界点。
-4. **做爱必带台词**：插入和深顶时，男方必须进行诛心逼问（复刻伴侣习惯/戳穿婚姻伪善），女方必须经历从道德抗拒到生理失控高潮的完整弧线。
-5. **体位必须带电**：严禁写“后入/抽送”等抽象词汇，必须从 `kinetic-positions.md` 提取物理动量（脊柱反弓、桌面抓白、大腿凹陷、水汽与神经痉挛）。
-6. **高难度动作坚决垫图 (双轨制)**：复杂多人缠绕体位（POS-01 ~ POS-11），在生图底模打出姿态关键帧走 I2V 启动动力学，严禁文生视频纯血 Ref2V 硬赌导致四肢融化。
-7. **禁止同余方程绑架剪辑呼吸感**：总帧数与帧长公式（`length = 5 + 17*N`）由脚本自动按单镜请求秒数就近换算，剪辑线通过 J/L-Cut 和微调吞吐多余帧，严禁用固定镜数强行平摊镜头时长摧毁节奏。
-8. **跨机 1:1 交付前先跑 Dry-Run**：在目标机器上正式出片前，必须先执行 `python scripts/dryrun_test.py` 验证帧长算力、Payload 导出与目录连通性，通过后再启动 ComfyUI 批量渲染。
-9. **状态机初始化健壮性防空键**：`.tunjing_status.json` 在由脚本或外部模板初始化时可能缺失 `current_step` 或 `passed_steps` 键，`load_status` 必须做默认补全防护，防止 gatekeeper 报 KeyError 阻断流水线。
-10. **台词与镜头时长物理咬合**：中文台词按每秒 3.0 字加气口停顿（省略号/破折号按 0.8s 计）进行物理时长核算。分镜秒数必须覆盖台词发音时长，严禁出现短镜头强塞超长台词导致下游 TTS 与唇形对位崩溃。
-11. **生图底模分工与越狱底模纪律**：人物母版采用 Krea2 Turbo 越狱版（8步/CFG 1.0），场景底图采用 Qwen-Image-2.1（25步/CFG 1.0，纯文生），高危姿态关键帧采用 Qwen 越狱版垫图。越狱底模出场景必须在负向强排死所有人物、衣物与生殖关键词，防止 Cross-Attention 脑补假人裂殖；出姿态关键帧时释放真实物理受力与解剖咬合。
-13. **画外音 (OS) 物理锁死与视点逃逸**：独白/画外音镜头严禁露出正面动嘴说话。必须包含嘴部物理占位锁（咬下唇 bite down on lower lip、咬床单 sealed around sheet、双唇压紧 lips pressed into thin line）或机位逃逸（后脑勺、锁骨起伏微距、手部抓白特写），并加 Audio Contract 隔离声明，彻底杜绝模型对口型穿帮。
-14. **在制项目热接盘（擦屁股）纪律**：接手半截工程严禁盲目开跑。必须先执行 Gate 0 盘点已有合格素材加保护锁；提取前镜终态作为断点补齐镜头的唯一始态；对平淡镜头原地进行 1.5s 阻断微距/交合微距细胞级置换；完成台词缩短，仅增量提交断点镜头。
+> **三大铁证数据真源（1:1 提取自吞鲸宝典内置引擎`tunjing_poses_matrix.json`，严禁任何大模型脱稿脑补）**：
+> 1. `references/tunjing_poses_matrix.json` — **50 套单体体位矩阵**（含 `framing` 机位景别、`beats` 三节拍物理动量、`sfx` 音效、`line` 喘息原文）
+> 2. `references/transition_recipes.json` — **40 条物理换位配方**（从抽离、重心转移、支点切换到重新对齐的连续物理路径）
+> 3. `references/oneshot_transitions.json` — **9 套一键组合转换模板**（仅作换位转场桥参考）
+
+### 核心规范文档 (`references/`)
+| 文件 | 核心职责 |
+|---|---|
+| `official-prompt-assembly-spec.md` | 吞鲸引擎 `吞鲸六段式标准装配器` **六段式提示词装配真源规格**（唯一合法的送模提示词结构） |
+| `kinetic-positions.md` | 50 套体位矩阵与换位配方的人类可读全集（由 JSON 真源自动生成） |
+| `comfyui-dual-pipeline-spec.md` | **纯血 Ref2V 单轨生产管线规范**（I2V 禁令、腰胯景别收缩防融化、Node 328 负向清零与正向肯定句压油） |
+| `shot-design-and-bounce.md` | **视听弹跳分镜规范**（1.5s 生理阻断微距、四类受控运镜、12~15s 硬件上限与短-中-长心电图呼吸） |
+| `high-tension-mechanisms.md` | **高张力戏剧引擎**（开场四大导火索 + 中段 M-01~M-06 六大转折原型轮换，相邻 3 集禁重样） |
+| `femme-fatale-reversal.md` | **四大高阶人物关系势能模型**（蛇蝎反杀 / 高岭之花崩塌 / 女本位绝对支配 / 绝境救赎） |
+| `pre-render-audit-standard.md` | **Gate 5 生成前自我终极审查标准**（六大维度一票否决盲检表） |
+| `takeover-and-patching.md` | **在制项目热接盘与微创修复规范**（已合格镜头保护锁、逆向状态继承、局部废镜置换） |
+
+### 自动化执行引擎 (`scripts/`)
+| 脚本 | 核心职责与调用方式 |
+|---|---|
+| `tunjing_core.py` | **装配与场地适配共享内核**（唯一实现六段式拼装 + `with_scene_surface` 13 类场地承托面与声场动态改写） |
+| `tunjing_scene.py` | **整段床戏自动拆镜主引擎**：将 120s~300s 姿势链拆为 20~30 个 2~6s 短镜，一键落盘 `分镜.md` + `视频提示词.md` + `批量任务.json` |
+| `tunjing_storyboard.py` | **单镜多节拍精修器**：针对单个镜头（3~6 个内部节拍）复刻吞鲸引擎时间轴切分与六段式输出 |
+| `tunjing_resolver.py` | **自然语言动作速查器**：输入中文口语动作（如“女口交/扣女穴/女上位/射屁股”）秒查对应吞鲸引擎 ID 与动量 |
+| `tunjing_gatekeeper.py` | **六大刚性步进门禁状态机**：逐级核验项目产物并推进 `.tunjing_status.json` |
+| `tunjing_compiler.py` | **六段式提示词体检器**：校验必填结构锚点、正向压油词与毒性词拦截 |
+| `export_comfy_payload.py` | **渲染门禁核验与批量任务帧长校验器**：核验 5 大门禁状态与 `批量任务.json` 物理帧长 `(F-5)%17==0` |
+| `export_jianying_draft.py` | **剪映专业版草稿自动打包器**：读取分镜与成片，自动生成包含视频轨、音频轨与自动卡点字幕轨的剪映本地草稿 |
+| `tunjing_diff_audit.py` | **真源偏离度与模型执行审计器**：专治发散型大模型（DeepSeek/GPT）夹带私货，一键输出六段式完整度、真源纯度与前戏冲突对比数据 |
+| `dryrun_test.py` | **跨机端到端全链路自检器**：零人工干预跑通 Gate 1 ~ Gate 6 全流程，验证目标机 100% 可用 |
+
+### 剧作节拍器模板 (`templates/`)
+- `episode_template.md` — 标准单集开放槽位生产模板（不绑死任何特定题材与场地）
+- `tunjing_rhythm_120s.md` — 120 秒极速节拍器规范（20~29 镜短镜拆解）
+- `tunjing_rhythm_300s.md` — 3~5 分钟（300 秒）双波浪节拍器规范（第一波初破壁 ➔ M-01~M-06 中段势能跃迁 ➔ 第二波换体位爆发）
+
+---
+
+## 四、核心生产机制：整段拆镜 vs 单镜精修 (The Production Engine)
+
+### 1. 严禁被“一键组合”迷惑（大模型第一铁律）
+硬件单次生成物理上限为几秒至十余秒。因此：
+- **2 分钟床戏严禁压进一个镜头！** 必须通过 `tunjing_scene.py` 拆解为 **20 ~ 30 个 2~6 秒的独立短镜**；
+- **逐镜必给景别 (`size`) 与机位 (`cam`)**，且 `wide`（中景）全集占比严格控制在 10% 以内，核心交合必须收紧至 `mcu` / `hip` / `cu` / `macro`。
+
+| 景别代号 | 视觉定义 | 机位代号 | 运镜定义（禁环绕/禁快变焦） |
+|---|---|---|---|
+| `wide` | 中景（腰以上到膝，仅用于建立与片尾收束） | `static_side` / `static_rear` / `static_front` | 固定侧 / 后侧 / 正面机位（三脚架死锁，仅允许撞击微震） |
+| `mcu` | 中近景（腰胯到胸口，主体受力清晰可读） | `low_hip` | 低机位贴腰固定（让肉体动，不让相机动） |
+| `hip` | 腰胯特写（大腿中段到肋下，专攻交合冲撞） | `ots` | 紧凑过肩固定（前景肩部压暗，制造压迫景深） |
+| `cu` | 近景（局部受力：手部/肩颈/侧胸/落点） | `high_angle` | 略高俯机位固定（适合指插/舔阴/仰卧反应） |
+| `macro` | 微距（结合部/指节抓白/足弓反弓/唇齿拉丝） | `slow_push` | 4~6 秒超慢匀速推轨（严禁中途变速） |
+| `face` | 面部特写（咬唇/泪痕/失神微表情） | `follow_soft` | 小幅度柔和跟随（用于抱起插入等位移） |
+
+### 2. 一键拆镜与项目文件落盘命令
+```bash
+python scripts/tunjing_scene.py \
+  --chain "kiss_fondle,bj,fingering,cunnilingus,missionary,cowgirl,doggy,cum_butt" \
+  --total 120 \
+  --scene "温泉浴室" \
+  --lines "别…求你…" \
+  --idea "水汽氤氲中的防线崩塌" \
+  --out-dir "./EP01_project"
+```
+执行后自动在 `./EP01_project` 下生成 100% 符合 Gate 3、Gate 4 与吞鲸引擎批处理规范的：
+1. `分镜.md`（带 `[Track: Ref2V]`、H3 物理帧数、景别机位、3 次交合微距与口交特写标记）
+2. `视频提示词.md`（全套吞鲸标准六段式送模提示词，已自动将动作与音效中的“床”改写为“温泉浴室/湿润瓷砖/水声”）
+3. `批量任务.json`（`schema: h3-drama-task`，可直接拖入吞鲸引擎或交由 `ComfyUI 批量队列` 批量渲染）
+
+---
+
+## 五、吞鲸十大工业铁律 (The 10 Studio Iron Laws)
+
+1. **纯血 Ref2V 五图空间拓扑铁律（汲取 Snail 电影级精髓）**：全片统一采用 `Picture 1/2 (男女主 2x3 纯身份卡) + Picture 3 (母体空间与光源地标) + Picture 4 (起势与位移源) + Picture 5 (交锋落位点)` 五图空间拓扑直通 MiniMax H3。彻底消灭 Cross-Attention 竞争导致的骨骼漂移与瞬移。
+2. **反瞬移显式动量链铁律**：严禁任何“上一秒站着/坐着，下一秒瞬间上床”的跳切！换体位、逼近、重心转移必须有明确的肉眼可见物理运动过程（如：手撑床面、膝盖顶入、重心下沉、布料挤压褶皱），正向强制注入 `nobody changes posture or place instantaneously; physical movement develops visibly across cuts`。
+3. **固定声学 DNA 死锁铁律**：角色的对白与喘息声线必须建立固定声学档案（如：男主低中音男中音带胸腔共鸣与干燥颗粒感；女主中高音带柔和圆润共鸣与断续吸气），强制注入 `Keep fixed vocal age, pitch center, resonance across every cut; only physical/emotional intensity changes`，严禁跨镜头声线突变。
+4. **剪辑师抽帧气口铁律 (Editor's Freeze Beat)**：在每个动作段落或情绪交锋的尾声（最后 1.2s~1.8s），强制让角色保持动作末端定格与自然胸腔呼吸（如 `close lips, chin lifts slightly, chest heaves with heavy breathing, preserve a nearly still reaction for the editor's freeze beat`），为后期剪辑、音效重音和反转卡点预留绝对安全的物理停顿。
+5. **景别收缩防融化铁律**：高难度双人交合严禁全身大全景硬算！取景强制收缩至腰胯中近景 (`mcu`) 或腰胯特写 (`hip`)，面部失神表情交棒给相邻的 1.5s 独立微距镜头 (`face` / `macro`)。
+6. **正向肯定句压油铁律**：工作流底层 Node 328 将负向通道清零（`ConditioningZeroOut`），负向写排油词无效。每条提示词正向必须内嵌：`authentic matte velvet skin finish, powdered dry texture, natural human skin with visible fine pores and subtle imperfections, soft subsurface scattering without surface reflection, non-greasy complexion, heavily diffused soft ambient light`。
+7. **1:1 真源溯源铁律**：所有动作描述必须取自 `tunjing_poses_matrix.json`（50 套姿势）与 `transition_recipes.json`（40 条换位配方），装配结构必须遵循 `official-prompt-assembly-spec.md` 六段式，零脱稿脑补。
+8. **13 类场地动态适配铁律**：传入 `--scene` 后，引擎自动调用 `with_scene_surface()` 将动作与声场中的默认“床/床单/床板轻响”改写为当前真实场地（书桌/沙发/浴室/车内/墙边/窗台/地毯/露台等），严禁跨场景穿帮。
+9. **双轨物理分流与构图排他死锁铁律（防浮空人脸与多手鬼影）**：严禁在同一镜头内“既要近景面部表情，又要下半身交合碰撞”。`hip`/`macro` 交合特写轨必须强制注入 `HEADS, FACES, AND UPPER TORSO ARE STRICTLY OUT OF FRAME`；`face`/`cu`/`mcu` 情绪对白轨必须强制注入 `LOWER BODY AND GENITALIA STRICTLY OUT OF FRAME`，且特写框内严格执行肢体减法（最多 1 只手入画）。
+10. **正向纯英文视觉隔离与台词三段式气口铁律（防字幕烫印与身体僵死）**：视觉动作描述 100% 采用专业物理英文，正向末尾强制追加 `STRICTLY NO SUBTITLES, NO CHINESE CHARACTERS, NO TEXT, NO CAPTIONS, NO WATERMARKS`；中文台词仅允许置于 `<d>[Chinese]...</d>` 容器内，且必须采用“前 1.5s 纯动作呼吸 ➔ 中间 3.0s 念白 ➔ 尾 1.5s 动作收尾”三段式留白，防止语音合成压死身体去噪步进。

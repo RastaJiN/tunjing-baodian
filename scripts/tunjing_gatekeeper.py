@@ -10,12 +10,12 @@ import json
 import re
 
 STAGE_NAMES = {
-    1: "第 1 步：角色母版与资产建库 (Asset Foundation)",
-    2: "第 2 步：刀锋剧本创作 (Sharp Script)",
-    3: "第 3 步：弹跳分镜与双轨路由 (Bounce Storyboard)",
-    4: "第 4 步：提示词编译与硬规则门禁 (Prompt Audit)",
-    5: "第 5 步：生成前自我终极审核 (Pre-Render Self-Audit)",
-    6: "第 6 步：渲染提交与工程出片 (Render Dispatch)"
+1: "第 1 步：角色母版与资产建库 (Asset Foundation)",
+2: "第 2 步：刀锋剧本创作 (Sharp Script)",
+3: "第 3 步：弹跳分镜与节拍呼吸 (Bounce Storyboard)",
+4: "第 4 步：纯血Ref2V提示词编译 (Prompt Audit)",
+5: "第 5 步：生成前自我终极审核 (Pre-Render Self-Audit)",
+6: "第 6 步：渲染提交与工程出片 (Render Dispatch)"
 }
 
 def get_status_file(project_dir):
@@ -77,14 +77,25 @@ def audit_step_2(project_dir):
     if "<d>" not in content or "</d>" not in content:
         return False, "剧本门禁未通过：台词必须严格使用 <d>[Chinese]...</d> 标签包裹！"
         
-    # 检查是否提及体位 POS
-    if not re.search(r'POS-\d{2}', content):
-        return False, "剧本门禁未通过：第三幕肉戏必须显式声明调用的生物力学体位编号（如 POS-01、POS-02）！"
+    # 检查是否提及体位（支持吞鲸引擎 50 个原生 pose id，兼容旧 POS-xx）
+    KNOWN_IDS = {"bj","squat_bj","prone_bj","deepthroat","head_thrust","facefuck","sixty_nine",
+                 "tip_lick","ball_lick","penis_slap","titjob","handjob","fingering","clit_tease",
+                 "cunnilingus","sofa_cunni","kiss_fondle","kiss_pin","kiss_force","kiss_her",
+                 "breast_rub","nipple_lick","undress","pov_insert","missionary","missionary_legup",
+                 "doggy","table_doggy","stand_doggy_wall","stand_bend_doggy","bedside_stand","anal",
+                 "cowgirl","cowgirl_upright","reverse_cowgirl","squat_cowgirl","lap_sit_back","lap_sit",
+                 "facesit","stand_face_hug","carry_insert","face_insert","side_face","side_spoon",
+                 "ass_rub","footjob","creampie","cum_face","cum_chest","cum_belly","cum_butt",
+                 "finger_masturbate"}
+    ids_in_script = set(re.findall(r'\b([a-z][a-z_]{1,24})\b', content)) & KNOWN_IDS
+    pos_in_script = set(re.findall(r'POS-\d{2}', content))
+    if not (ids_in_script or pos_in_script):
+        return False, "剧本门禁未通过：第三幕高能戏必须显式声明调用的吞鲸标准体位 ID（如 bj、missionary、cowgirl、doggy、cum_butt）！"
         
-    return True, "刀锋剧本三幕式、实体道具与体位编号验收 PASS！允许进入分镜设计。"
+    return True, f"刀锋剧本三幕式、实体道具与吞鲸标准体位 ID ({sorted(ids_in_script | pos_in_script)}) 验收 PASS！允许进入分镜设计。"
 
 def audit_step_3(project_dir):
-    """门禁 3：弹跳分镜与双轨路由检查（含台词时长毫秒级咬合）"""
+    """门禁 3：拆镜密度、景别机位与纯血单轨路由检查（含台词时长毫秒级咬合）"""
     sb_file = os.path.join(project_dir, "分镜.md")
     if not os.path.exists(sb_file):
         return False, "缺少 '分镜.md'！请先拆解分镜。"
@@ -96,11 +107,9 @@ def audit_step_3(project_dir):
     if not re.search(r'1\.[0-9]s|微距|生理阻断|特写', content):
         return False, "分镜门禁未通过：核心交合动作前后必须插入至少一个 1.2s~2.0s 的生理阻断微距特写（指节抓白/足弓反弓/咬唇）！"
         
-    # 2. 必须显式标注双轨路由
-    has_ref2v = "Ref2V" in content
-    has_i2v = "I2V" in content
-    if not (has_ref2v or has_i2v):
-        return False, "分镜门禁未通过：每个镜头必须明确标注执行轨道 [Track: Ref2V] 或 [Track: I2V_Pose]！"
+    # 2. 检查纯血 Ref2V 轨道标注
+    if "Ref2V" not in content:
+        return False, "分镜门禁未通过：全片必须统一采用纯血 Ref2V 轨道 [Track: Ref2V]！"
         
     # 3. 严格核算：台词与分镜秒数物理咬合 (中文 3.0 字/s + 1.0s 气口)
     # 匹配格式示例: [SHOT-xx] ... 时长: 3.5s ... 台词: <d>...</d>
@@ -130,20 +139,64 @@ def audit_step_3(project_dir):
     if not re.search(r'口交|深喉|oral|blowjob', content, re.IGNORECASE):
         return False, "分镜门禁未通过：缺少核心【口交/深喉近景或拉丝微距】！这是吞鲸高能戏的绝对支配项，必须单列镜头！"
         
-    # B. 必须至少有 2 个不同的 POS 体位编号（换体位）
+    # B. 必须至少有 2 个不同的姿势（换体位）
     pos_found = set(re.findall(r'POS-\d{2}', content))
-    if len(pos_found) < 2:
-        return False, f"分镜门禁未通过：单集肉戏必须中途【换体位】！实测仅检测到 {len(pos_found)} 个体位 ({list(pos_found)})，必须包含至少 2 个不同体位 (如 POS-01 ➔ POS-02)！"
+    # 新链路：支持 tunjing pose id 与中文姿势名
+    KNOWN_IDS = {"bj","squat_bj","prone_bj","deepthroat","head_thrust","facefuck","sixty_nine",
+                 "tip_lick","ball_lick","penis_slap","titjob","handjob","fingering","clit_tease",
+                 "cunnilingus","sofa_cunni","kiss_fondle","kiss_pin","kiss_force","kiss_her",
+                 "breast_rub","nipple_lick","undress","pov_insert","missionary","missionary_legup",
+                 "doggy","table_doggy","stand_doggy_wall","stand_bend_doggy","bedside_stand","anal",
+                 "cowgirl","cowgirl_upright","reverse_cowgirl","squat_cowgirl","lap_sit_back","lap_sit",
+                 "facesit","stand_face_hug","carry_insert","face_insert","side_face","side_spoon",
+                 "ass_rub","footjob","creampie","cum_face","cum_chest","cum_belly","cum_butt",
+                 "finger_masturbate"}
+    ids_found = set(re.findall(r'\b([a-z][a-z_]{2,24})\b', content)) & KNOWN_IDS
+    all_poses = pos_found | ids_found
+    if len(all_poses) < 2:
+        return False, (f"分镜门禁未通过：单集肉戏必须中途【换体位】！"
+                       f"实测仅检测到 {len(all_poses)} 个姿势，必须包含至少 2 个不同吞鲸标准姿势"
+                       f"（如 missionary ➔ cowgirl ➔ doggy）！")
         
     # C. 必须包含至少 3 次独立的交合部位微距特写
     macro_matches = re.findall(r'交合特写|结合部微距|结合特写|macro pelvic|macro penetration|macro interlocking', content, re.IGNORECASE)
     if len(macro_matches) < 3:
         return False, f"分镜门禁未通过：单集肉戏必须包含至少 3 次【独立的交合/结合部微距特写】（入口破壁/深层抽送咬合/绝顶死锁）！实测仅检测到 {len(macro_matches)} 次，严禁用手脸充数！"
+
+    # D. 【拆镜密度门禁】逐镜必须有景别 + 机位，且镜头密度符合硬件上限
+    shot_marks = re.findall(r'(?:^|\n)\s*(?:###?\s*)?\[?SHOT[\s\-]?\d+', content, re.IGNORECASE)
+    shot_count = len(shot_marks)
+    if shot_count == 0:
+        return False, ("分镜门禁未通过：未检测到任何 [SHOT-N / ### SHOT N] 镜头标记！"
+                       "必须逐镜拆解，每镜独立成条。")
+
+    # 景别必须逐镜出现（mcu/cu/macro/hip/face/wide 或中文景别词）
+    size_hits = len(re.findall(r'\b(?:wide|mcu|cu|macro|hip|face)\b|中景|中近景|近景|微距|腰胯特写|面部特写', content))
+    if size_hits < shot_count * 0.8:
+        return False, (f"分镜门禁未通过：【景别标注缺失】！检测到 {shot_count} 个镜头，"
+                       f"但仅 {size_hits} 处景别标注。逐镜必须标明景别"
+                       f"（wide/mcu/cu/macro/hip/face 或中景/中近景/近景/微距/腰胯特写/面部特写）！")
+
+    # 机位必须逐镜出现
+    cam_hits = len(re.findall(r'static_side|static_rear|static_front|low_hip|ots|high_angle|slow_push|follow_soft|固定机位|侧机位|后侧机位|低机位|过肩|俯机位|推轨|固定侧|固定后侧', content))
+    if cam_hits < shot_count * 0.8:
+        return False, (f"分镜门禁未通过：【机位标注缺失】！检测到 {shot_count} 个镜头，"
+                       f"但仅 {cam_hits} 处机位标注。逐镜必须标明机位"
+                       f"（static_side/static_rear/low_hip/ots/high_angle 等）！")
+
+    # 镜头密度：从时长反推，平均单镜不得超过 8 秒（硬件上限）
+    durations = [float(x) for x in re.findall(r'(\d+(?:\.\d+)?)\s*(?:秒|s)\b', content)]
+    if durations and shot_count:
+        avg = sum(d for d in durations if d <= 30) / max(1, len([d for d in durations if d <= 30]))
+        if avg > 8.0:
+            return False, (f"分镜门禁未通过：【镜头过长，违反硬件上限】！"
+                           f"平均单镜 {avg:.1f}s，超过 8s 上限。"
+                           f"2 分钟床戏应拆成 20~30 个 2~6s 短镜，严禁把多个体位压进一镜！")
         
-    return True, "分镜镜头组、弹跳微距、双轨路由、【音画咬合】及【换体位+3次交合微距+口交】全量验收 PASS！允许进入提示词编译。"
+    return True, "分镜【拆镜密度 + 逐镜景别机位 + 纯血Ref2V单轨 + 音画咬合 + 换体位与3次交合微距】全量验收 PASS！允许进入提示词编译。"
 
 def audit_step_4(project_dir):
-    """门禁 4：提示词编译与零中文正文检查"""
+    """门禁 4：吞鲸标准六段式提示词结构与正向压油核验"""
     prompt_file = os.path.join(project_dir, "视频提示词.md")
     if not os.path.exists(prompt_file):
         return False, "缺少 '视频提示词.md'！请先编译送模提示词。"
@@ -151,19 +204,34 @@ def audit_step_4(project_dir):
     with open(prompt_file, "r", encoding="utf-8") as f:
         content = f.read()
         
-    # 剔除台词内部后，正向不能大段中文
-    clean_text = re.sub(r'<d>.*?</d>', '', content, flags=re.DOTALL)
-    chinese_chars = re.findall(r'[\u4e00-\u9fa5]', clean_text)
-    if len(chinese_chars) > 50:
-        return False, f"提示词门禁未通过：正向描述包含未翻译中文 ({len(chinese_chars)} 字)！送模正文必须为纯英文物理动量描述。"
+    # 1. 检查吞鲸引擎 吞鲸六段式标准装配器 六段式必填结构锚点 (支持 v3.0 原厂 Full-Reference 与 v2.0)
+    required_blocks = [
+        (["Goal & Audio Contract:", "Goal: Generate"], "缺少 [1] Goal 目标与时长画幅声明"),
+        (["Audio rule:", "Audio rule"], "缺少 [1] Audio rule 台词与静音纪律声明"),
+        (["subject_definitions:", "Reference map"], "缺少 [2] 实体与场景槽位映射 (subject_definitions 或 Reference map)"),
+        (["Consistency:", "Consistency"], "缺少 [3] Consistency 身份与场景一致性死锁"),
+        (["Motion quality", "Motion quality (Anti-Stiffness)"], "缺少 [3] Motion quality 防僵硬二次动作锁"),
+        (["integrated_multimodal_description:", "detailed_description:"], "缺少 [5] 逐镜时间线主体 (integrated_multimodal_description 或 detailed_description)"),
+        (["overall_soundscape:", "overall_soundscape"], "缺少 [6] overall_soundscape 环境底噪与动作声场"),
+        (["No subtitles, captions, watermarks", "No subtitles"], "缺少独立成段的 NEGATIVE 负面列表")
+    ]
+    for markers, err_msg in required_blocks:
+        if isinstance(markers, str): markers = [markers]
+        if not any(m in content for m in markers):
+            return False, f"提示词门禁未通过：{err_msg}（必须严格遵循吞鲸标准六段式结构）！"
+            
+    # 2. 检查正向肯定句压油（工作流 Node 328 零化负向，必须靠正向压油）
+    if not re.search(r'matte velvet skin finish|powdered dry texture|visible fine pores', content, re.IGNORECASE):
+        return False, "提示词门禁未通过：缺少【吞鲸正向肯定句压油词】（authentic matte velvet skin finish, powdered dry texture）！工作流负向通道已零化，必须正向压油！"
         
-    # 检查是否有 POS 动量
-    if not re.search(r'pressed flat|hyperextends|pelvic crest|kinetic|straddle', content, re.IGNORECASE):
-        return False, "提示词门禁未通过：肉戏提示词缺少生物力学物理动词（必须从 kinetic-positions.md 继承动量描述）！"
+    # 3. 检查是否误入毒性油光词
+    toxic_words = ['sweat sheen', 'oily face', 'shiny plastic', 'vaseline skin', 'dewy glisten']
+    for tw in toxic_words:
+        if tw in content.lower():
+            return False, f"提示词门禁未通过：检测到诱发油光蜡感的毒性词 '{tw}'！请立即剔除。"
         
-    # 5. 画外音与内心独白 (OS/Voiceover) 绝对防对口型死锁检查
+    # 4. 画外音与内心独白 (OS/Voiceover) 绝对防对口型死锁检查
     if re.search(r'voiceover|monologue|\bOS\b', content, re.IGNORECASE):
-        # 必须显式包含物理闭口或嘴部占位描述
         mouth_lock_patterns = [
             r'lips remain completely closed',
             r'bite[s]? down on',
@@ -171,15 +239,15 @@ def audit_step_4(project_dir):
             r'lips are pressed into',
             r'sealed around',
             r'oral cavity is physically locked',
-            r'lips remain parted in breathless gasps', # 允许纯喘息微张，但严禁动嘴说话
-            r'back of her head', # 机位逃逸：背面
+            r'lips remain parted in breathless gasps',
+            r'back of her head',
             r'viewpoint is from behind'
         ]
         has_mouth_lock = any(re.search(p, content, re.IGNORECASE) for p in mouth_lock_patterns)
         if not has_mouth_lock:
             return False, "提示词门禁未通过：检测到包含画外音/内心独白(Voiceover/OS)，但未添加【嘴部物理占位死锁】！必须显式声明 'lips remain completely closed'、咬下唇 'bite down on lower lip' 或机位背向，防止模型在画面中对口型穿帮！"
             
-    return True, "提示词全英文动量描述、语法门禁与【OS防对口型物理死锁】验收 PASS！允许进入最终渲染提交。"
+    return True, "提示词【吞鲸标准六段式结构 + 正向肯定句压油 + OS防对口型死锁】全量验收 PASS！允许进入生成前终审。"
 
 def audit_step_5(project_dir):
     """门禁 5：生成前自我终极审核 (Pre-Render Self-Audit)"""
@@ -198,7 +266,7 @@ def audit_step_5(project_dir):
     if "PASS" not in content or "REJECT" in content:
         return False, "终审门禁未通过：终审报告中存在未解决的 REJECT 项或未明确标注 PASS！必须全部达标！"
         
-    required_checks = ["资产实名与槽位", "音画台词咬合", "换体位与特写契约", "受控运镜规范", "提示词纯净度", "双轨准备度"]
+    required_checks = ["资产实名与槽位", "音画台词咬合", "换体位与特写契约", "受控运镜规范", "提示词纯净度", "纯血Ref2V单轨规范"]
     missing = [c for c in required_checks if c not in content]
     if missing:
         return False, f"终审门禁未通过：终审报告缺少以下维度的审核记录: {missing}！必须六项全检！"
