@@ -55,8 +55,8 @@
 | `titjob` | 乳交 | Titjob |
 | `breast_rub` | 揉胸 | Breast rub |
 | `nipple_lick` | 舔乳头 | Nipple lick |
-| `solo_masturbate` | 女性独处工笔指脚自慰 | Solo delicate finger & toe curling masturbation |
-| `thigh_grind` | 腿裤水磨 | Thigh & fabric wet grinding |
+| `solo_masturbate` | 女性独处工笔指交自慰 | Solo delicate finger & toe curling masturbation |
+| `thigh_grind` | 隔裤揉蒂与腿间水磨 | Thigh & fabric wet grinding |
 
 
 ## 亲吻与剥离
@@ -621,7 +621,7 @@
 - **音效**：射精脉动与液体声、男声低吼、肉体拍击轻声、气声喘息
 - **参考台词**：嗯，啊，嗯，啊，
 
-### `solo_masturbate` — 女性独处工笔指脚自慰 (Solo delicate finger & toe curling masturbation)
+### `solo_masturbate` — 女性独处工笔指交自慰 (Solo delicate finger & toe curling masturbation)
 - **机位景别（中）**：近景至微距（阴部+纤细手指浅插+足弓反弓蜷缩，从0.00s已在自慰状态）
 - **机位景别（英）**：`Close-up to macro (vulva + slender fingers gently probing + arched curled toes; already in solo masturbation from 0.00s)`
 - **动量节拍（内置真源原文）**：
@@ -631,7 +631,7 @@
 - **音效**：细腻湿润水声、压抑气声轻喘、床单摩擦微响
 - **参考台词**：嗯…自己摸…怎么还是这么湿…
 
-### `thigh_grind` — 腿裤水磨 (Thigh & fabric wet grinding)
+### `thigh_grind` — 隔裤揉蒂与腿间水磨 (Thigh & fabric wet grinding)
 - **机位景别（中）**：中近景大腿根部与贴身衣物/腿肉紧贴厮磨（湿痕渗透可读，无直接插入）
 - **机位景别（英）**：`MCU of inner thighs and sheer damp fabric grinding tightly against thigh/pelvis (wetness seeping through, no penetration)`
 - **动量节拍（内置真源原文）**：

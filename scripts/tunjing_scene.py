@@ -218,16 +218,17 @@ def save_project_artifacts(out_dir, shots, actual_total, want_total, lines="",
         shots[0]["size"] = "mcu"
         shots[0]["cam"] = "static_front"
 
-    # 解析高级台词字典：支持 "1:女子A:台词内容|5:男子A:台词内容" 或纯文本单句
+    # 解析高级台词字典：支持 "1:女子A:台词内容|5:男子A:台词内容"、"镜2:女子A:台词内容" 或纯文本单句
     line_map = {}
     if lines:
         if ":" in lines or "|" in lines:
             for item in lines.split("|"):
                 parts = item.strip().split(":", 2)
-                if len(parts) == 3 and parts[0].isdigit():
-                    line_map[int(parts[0])] = (parts[1].strip(), parts[2].strip())
-                elif len(parts) == 2 and parts[0].isdigit():
-                    line_map[int(parts[0])] = ("女子A", parts[1].strip())
+                idx_m = re.search(r"\d+", parts[0]) if parts else None
+                if len(parts) == 3 and idx_m:
+                    line_map[int(idx_m.group(0))] = (parts[1].strip(), parts[2].strip())
+                elif len(parts) == 2 and idx_m:
+                    line_map[int(idx_m.group(0))] = ("女子A", parts[1].strip())
         else:
             # 兼容老版单句台词：优先放在第 1 镜（若第 1 镜大于等于 3 秒且嘴部未占用）
             line_map[1] = ("女子A", lines.strip())
@@ -293,8 +294,8 @@ def save_project_artifacts(out_dir, shots, actual_total, want_total, lines="",
             "camera_motion": s["cam"],
             "shot_size": s["size"],
             "pose": s["pose"],
-            "references": ["s1", "f1", "m1"],
-            "ref_images": ["scene_main.png", "female_master.png", "male_master.png"]
+            "references": ["f1", "m1", "s1"],
+            "ref_images": ["female_master.png", "male_master.png", "scene_main.png"]
         })
 
     # 若链条中 hip/macro 不足 3 处，在末尾补足结合部微距说明以提醒导演/门禁对齐
@@ -356,15 +357,38 @@ def print_table(shots, actual_total, want_total, lines="", idea="", scene="卧�
     if not emit_prompts:
         return
 
+    # 解析高级台词字典：支持 "1:女子A:台词内容|5:男子A:台词内容"、"镜2:女子A:台词内容" 或纯文本单句
+    line_map = {}
+    if lines:
+        if ":" in lines or "|" in lines:
+            for item in lines.split("|"):
+                parts = item.strip().split(":", 2)
+                idx_m = re.search(r"\d+", parts[0]) if parts else None
+                if len(parts) == 3 and idx_m:
+                    line_map[int(idx_m.group(0))] = (parts[1].strip(), parts[2].strip())
+                elif len(parts) == 2 and idx_m:
+                    line_map[int(idx_m.group(0))] = ("女子A", parts[1].strip())
+        else:
+            line_map[1] = ("女子A", lines.strip())
+
     print("=" * 96)
     print("=== 逐镜完整送模提示词（每镜独立一文件，可直接贴进 H3）===")
     print("=" * 96)
     for i, s in enumerate(shots, 1):
         size_desc = SHOT_SIZES[s["size"]]
         cam_desc = CAMS[s["cam"]]
+        shot_line = ""
+        shot_speaker = "女子A"
+        if i in line_map:
+            spk, txt = line_map[i]
+            if s["pose"] in ("bj", "squat_bj", "prone_bj", "deepthroat", "facefuck", "cum_face") and "女" in spk:
+                pass
+            elif s["dur"] >= 2.5:
+                shot_speaker = spk
+                shot_line = txt
         prompt = single_shot_prompt(
             s, i - 1, len(shots), s["dur"], size_desc, cam_desc,
-            lines=lines, idea=idea, scene=scene, pose_names=pose_names,
+            lines=shot_line, speaker=shot_speaker, idea=idea, scene=scene, pose_names=pose_names,
         )
         print(f"\n{'─' * 96}")
         print(f"### SHOT {i:02d}  {s['dur']}s  ({s['t0']}-{s['t1']}s)  "

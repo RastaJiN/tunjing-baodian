@@ -38,22 +38,31 @@ Audio rule: characters may only speak the exact words inside <d>...</d>; never r
 - **表情口型指令**：有性爱表情勾选时 → `按勾选的性爱表情时间线演出脸部；有浪叫或台词时张嘴，口型跟声音；不要回到平静自然脸。` 否则 → `表情自然；有浪叫或台词时张嘴，口型跟声音。`
 - **用户介绍（必须体现）**：`用户介绍（必须体现）：{idea}`（拼接抽根用户原文）。
 
-### [2] Reference map（槽位锁定是防崩核心）
+### [2] Reference map（槽位锁定是防崩核心：严格遵循「人先场景后」铁律）
 
-场景槽：
+**权威三槽映射标准（`<Picture 1>` = 女主、`<Picture 2>` = 男主、`<Picture 3>` = 场景）**：
+- `<Picture 1>`（对应 `ref_image_0`）= 女主角身份母版（锁定 `<Subject 1>`，台词路由 `S1`）
+- `<Picture 2>`（对应 `ref_image_1`）= 男主角身份母版（锁定 `<Subject 2>`，台词路由 `S2`）
+- `<Picture 3>`（对应 `ref_image_2`）= 纯净场景底图（锁定 `<Subject 3>` 空间环境与光线）
+
+人物槽（`<Picture 1>` / `<Picture 2>`）：
 ```text
-<Picture N> = {场景名}：场景环境参考，锁定空间结构、陈设、材质与环境光线；仅锁场景，不作人物身份或姿势参考。
+<Subject 1> is the woman from <Picture 1>, with pale skin, long silky dark hair, and realistic anatomical proportions.
+<Subject 2> is the mature man from <Picture 2>, with strong masculine physique, weathered tan skin, and defined musculature.
 ```
-人物槽：
+场景槽（`<Picture 3>`）：
 ```text
-<Picture N> = {角色名}：人物身份参考，锁定脸、发型、身材、肤色与服装状态。
+<Subject 3> is the {场景名} environment anchored in <Picture 3>, featuring {承托面} and ambient noir lighting.
 ```
-随后必写：
+随后在 `summary` 与 `retention_analysis` 中严格锁定：
 ```text
-角色与参考对应：{角色名}=<Picture N>，…
-场景与参考对应：{场景名}=<Picture N>，…
-For the target video, at 0.00 seconds into the target video, <Picture N> (character identity) is fully referenced for faces/bodies/clothing.
-Describe only the change that happens after 0.00s — do not re-describe still appearance already shown in character refs.
+summary:
+[reference generation + audio reference] The target video captures intimate kinetic physical drama between <Subject 1> and <Subject 2> within <Subject 3>. All identities strictly reference <Picture 1> and <Picture 2>.
+
+retention_analysis:
+<Subject 1>: fully_preserved - facial features, body anatomy, and skin texture are strictly locked to <Picture 1>.
+<Subject 2>: fully_preserved - masculine facial identity, physique, and skin tone are strictly locked to <Picture 2>.
+<Subject 3>: fully_preserved - space architecture, materials, and lighting are strictly locked to <Picture 3>.
 ```
 
 ### [3] Consistency / Clothing / Motion quality

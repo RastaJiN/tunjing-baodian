@@ -127,7 +127,7 @@ python scripts/tunjing_scene.py \
 
 ## 五、吞鲸十大工业铁律 (The 10 Studio Iron Laws)
 
-1. **纯血 Ref2V 单轨铁律**：全片 100% 采用 `Picture 1 (纯净场景底图) + Picture 2/3 (角色 2x3 母版)` 双锚定直通 MiniMax H3。**彻底封杀单镜抽首帧 I2V 垫图**，从根源消灭 Cross-Attention 注意力竞争导致的骨骼漂移与换脸。
+1. **纯血 Ref2V 单轨铁律**：全片 100% 采用 `Picture 1 (女主 2x3 母版) + Picture 2 (男主 2x3 母版) + Picture 3 (纯净场景底图)` 双锚定直通 MiniMax H3。**彻底封杀单镜抽首帧 I2V 垫图**，从根源消灭 Cross-Attention 注意力竞争导致的骨骼漂移与换脸。
 2. **景别收缩防融化铁律**：高难度双人交合严禁全身大全景硬算！取景强制收缩至腰胯中近景 (`mcu`) 或腰胯特写 (`hip`)，面部失神表情交棒给相邻的 1.5s 独立微距镜头 (`face` / `macro`)。
 3. **正向肯定句压油铁律**：工作流底层 Node 328 将负向通道清零（`ConditioningZeroOut`），负向写排油词无效。每条提示词正向必须内嵌：`authentic matte velvet skin finish, powdered dry texture, natural human skin with visible fine pores and subtle imperfections, soft subsurface scattering without surface reflection, non-greasy complexion, heavily diffused soft ambient light`。
 4. **1:1 真源溯源铁律**：所有动作描述必须取自 `tunjing_poses_matrix.json`（55 套姿势）与 `transition_recipes.json`（40 条换位配方），装配结构必须遵循 `official-prompt-assembly-spec.md` 六段式，零脱稿脑补。

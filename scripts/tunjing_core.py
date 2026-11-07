@@ -163,30 +163,30 @@ def build_fullref_header(dur, aspect, scene="当前场景", idea="", is_undress=
                  "non_diegetic_music: N/A; diegetic foley and dialogue only.")
     parts.append("")
 
-    # 2. 官方原厂标准: subject_definitions
+    # 2. 官方原厂标准: subject_definitions (铁律: <Picture 1>=女主, <Picture 2>=男主, <Picture 3>=场景)
     parts.append("subject_definitions:")
-    parts.append(f"<Subject 1> is the {scene} environment anchored in <Picture 1>, featuring {surf['noun']} and ambient noir lighting.")
     if is_undress:
-        parts.append("<Subject 2> is the young woman in <Picture 2>, with pale skin, long dark hair; outfit is unfastened and peeled off in this take.")
+        parts.append("<Subject 1> is the young woman in <Picture 1>, with pale skin, long dark hair; outfit is unfastened and peeled off in this take.")
     else:
-        parts.append("<Subject 2> is the woman from <Picture 2>, with pale skin, long silky dark hair, and realistic anatomical proportions.")
-    parts.append("<Subject 3> is the mature man from <Picture 3>, with strong masculine physique, weathered tan skin, and defined musculature.")
+        parts.append("<Subject 1> is the woman from <Picture 1>, with pale skin, long silky dark hair, and realistic anatomical proportions.")
+    parts.append("<Subject 2> is the mature man from <Picture 2>, with strong masculine physique, weathered tan skin, and defined musculature.")
+    parts.append(f"<Subject 3> is the {scene} environment anchored in <Picture 3>, featuring {surf['noun']} and ambient noir lighting.")
     parts.append("")
 
     # 3. 官方原厂标准: summary
     parts.append("summary:")
     parts.append(f"[reference generation + audio reference] The target video captures intimate kinetic physical drama between "
-                 f"<Subject 2> and <Subject 3> within <Subject 1>. All identities strictly reference <Picture 2> and <Picture 3>.")
+                 f"<Subject 1> and <Subject 2> within <Subject 3>. All identities strictly reference <Picture 1> and <Picture 2>.")
     parts.append("")
 
     # 4. 官方原厂标准: retention_analysis (脱衣镜头安全锁)
     parts.append("retention_analysis:")
-    parts.append("<Subject 1>: fully_preserved - space architecture, materials, and lighting are strictly locked to <Picture 1>.")
     if is_undress:
-        parts.append("<Subject 2>: partially_preserved - facial features and body anatomy fully preserved; clothing state transitions dynamically as clothes slide down.")
+        parts.append("<Subject 1>: partially_preserved - facial features and body anatomy fully preserved; clothing state transitions dynamically as clothes slide down.")
     else:
-        parts.append("<Subject 2>: fully_preserved - facial features, body anatomy, and skin texture are strictly locked to <Picture 2>.")
-    parts.append("<Subject 3>: fully_preserved - masculine facial identity, physique, and skin tone are strictly locked to <Picture 3>.")
+        parts.append("<Subject 1>: fully_preserved - facial features, body anatomy, and skin texture are strictly locked to <Picture 1>.")
+    parts.append("<Subject 2>: fully_preserved - masculine facial identity, physique, and skin tone are strictly locked to <Picture 2>.")
+    parts.append("<Subject 3>: fully_preserved - space architecture, materials, and lighting are strictly locked to <Picture 3>.")
     parts.append("")
 
     # 5. 一致性与材质压油死锁 (Consistency Lock)
@@ -243,13 +243,13 @@ def build_shot_description(shot, index, total_shots, dur, size_desc, cam_desc,
     if is_penetration and shot["size"] not in ("face", "cu"):
         body_text += " Snug anatomical junction between penis and vaginal entrance, rhythmic piston stroke clearly readable with elastic skin recoil."
 
-    # 原厂标准台词装配: <Subject N> (Sx) 与三段式气口
+    # 原厂标准台词装配: <Subject N> (Sx) 与三段式气口 (铁律: S1=Subject 1=女, S2=Subject 2=男)
     dialogue_block = ""
     if lines:
-        spk_tag = "<Subject 2> (S1)" if "女" in speaker else "<Subject 3> (S2)"
+        spk_tag = "<Subject 1> (S1)" if "女" in speaker else "<Subject 2> (S2)"
         # 嘴部占用检查
         if is_oral and "女" in speaker:
-            dialogue_block = f" <Subject 2> (S1, mouth occupied) stays completely silent with lips sealed around shaft."
+            dialogue_block = f" <Subject 1> (S1, mouth occupied) stays completely silent with lips sealed around shaft."
         else:
             t_mid_start = max(1.0, round(dur * 0.25, 2))
             t_mid_end = min(dur - 0.5, round(dur * 0.75, 2))

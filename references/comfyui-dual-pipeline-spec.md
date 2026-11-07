@@ -10,7 +10,7 @@
 2. **流程割裂摧毁批量自动化**：
    单镜抽首帧迫使生产管线中断，需要人工切图、选图，无法跑通全自动队列；
 3. **纯血双锚定真理**：
-   全片每一镜均由 **【1 张纯净场景底图 (`<Picture 1>`) + 男女角色 2x3 定版母版 (`<Picture 2>`, `<Picture 3>`)】** 共同驱动，配合吞鲸标准六段式提示词直接生成视频，一致性最高、批量稳定性最强。
+   全片每一镜均由 **【女主 2x3 定版母版 (`<Picture 1>`) + 男主 2x3 定版母版 (`<Picture 2>`) + 1 张纯净场景底图 (`<Picture 3>`)】** 共同驱动，配合吞鲸标准六段式提示词直接生成视频，一致性最高、批量稳定性最强。
 
 ---
 
@@ -41,10 +41,10 @@ Skin & Lighting: authentic matte velvet skin finish, powdered dry texture, natur
 ## 四、标准 Ref2V 节点拓扑与硬件参数基准
 
 ```text
-[<Picture 1> 纯净场景底图 PNG] ➔ \
-[<Picture 2> 女主 2x3 母版 PNG] ➔ ---> [MiniMax H3 ReferenceToVideo] ➔ VAE Decode ➔ 成片 MP4
-[<Picture 3> 男主 2x3 母版 PNG] ➔ /
-[吞鲸标准六段式送模提示词文本]    ➔ /
+[<Picture 1> 女主 2x3 母版 PNG (ref_image_0)] ➔ \
+[<Picture 2> 男主 2x3 母版 PNG (ref_image_1)] ➔ ---> [MiniMax H3 ReferenceToVideo] ➔ VAE Decode ➔ 成片 MP4
+[<Picture 3> 纯净场景底图 PNG (ref_image_2)] ➔ /
+[吞鲸标准六段式送模提示词文本]                ➔ /
 ```
 
 - **CFG**：`1.0`
