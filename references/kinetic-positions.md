@@ -1,7 +1,7 @@
 # 吞鲸 · 吞鲸标准姿势与物理动量全量字典
 
 > **本文件是 `tunjing_poses_matrix.json` 的人类可读视图**，由脚本从 JSON 真源生成，不再手工维护。
-> 当前收录 **50 套姿势 / 9 套一键组合 / 40 条换位配方**。
+> 当前收录 **55 套姿势 / 9 套一键组合 / 40 条换位配方**。
 
 ## ⚠️ 装配口径声明（与旧版不同，必须遵守）
 
@@ -55,6 +55,8 @@
 | `titjob` | 乳交 | Titjob |
 | `breast_rub` | 揉胸 | Breast rub |
 | `nipple_lick` | 舔乳头 | Nipple lick |
+| `solo_masturbate` | 女性独处工笔指脚自慰 | Solo delicate finger & toe curling masturbation |
+| `thigh_grind` | 腿裤水磨 | Thigh & fabric wet grinding |
 
 
 ## 亲吻与剥离
@@ -68,6 +70,7 @@
 | `cunnilingus` | 舔阴 | Cunnilingus |
 | `sofa_cunni` | 沙发舔阴 | Sofa cunnilingus |
 | `undress` | 脱衣诱惑 | Strip tease |
+| `mirror_ear_whisper` | 镜前擦拭与贴耳毒刺 | Mirror-front wiping & venomous ear whisper |
 | `pov_insert` | POV抽插 | POV thrusting |
 
 
@@ -102,6 +105,7 @@
 |---|---|---|
 | `missionary` | 传教士 | Missionary |
 | `missionary_legup` | 扛腿传教士 | Missionary legs up |
+| `floor_missionary` | 地板正面贯穿 | Hard floor full-weight missionary pinning |
 | `stand_face_hug` | 面对面抱着站立 | Standing embrace |
 | `carry_insert` | 抱起插入 | Standing carry insertion |
 | `face_insert` | 面对面抬腿插入 | Face-to-face leg-lift insertion |
@@ -120,6 +124,7 @@
 | `cum_chest` | 射在胸口 | Cum on chest |
 | `cum_belly` | 射在腹部 | Cum on belly |
 | `cum_butt` | 射在臀部 | Cum on butt |
+| `squirting_climax` | 女方绝顶喷水痉挛高潮 | Female squirting & convulsive climax spasm |
 
 
 ---
@@ -615,6 +620,56 @@
   - **Beat 3**：收尾：她双腿发抖，瘫软趴在床上，仍背对镜头保持趴姿；余精沿臀滑落；机位固定到结束
 - **音效**：射精脉动与液体声、男声低吼、肉体拍击轻声、气声喘息
 - **参考台词**：嗯，啊，嗯，啊，
+
+### `solo_masturbate` — 女性独处工笔指脚自慰 (Solo delicate finger & toe curling masturbation)
+- **机位景别（中）**：近景至微距（阴部+纤细手指浅插+足弓反弓蜷缩，从0.00s已在自慰状态）
+- **机位景别（英）**：`Close-up to macro (vulva + slender fingers gently probing + arched curled toes; already in solo masturbation from 0.00s)`
+- **动量节拍（内置真源原文）**：
+  - **Beat 1**：从0.00秒起女子A独自仰靠或半躺，双腿自然微张，一只手的中指与食指沿湿润阴唇缝隙浅浅探入抽送，指节带出细腻水光，另一手轻按小腹或揉捏自己乳尖
+  - **Beat 2**：指腹在小阴唇与阴蒂头之间打圈轻捻，节奏由慢渐快，小腹随呼吸高频起伏，足背绷紧、脚趾因酥麻本能向内抠紧反弓
+  - **Beat 3**：两指保持紧凑浅插抽动，湿润拉丝清晰可读，她偏头咬住下唇压抑喘息，画面严格只写女性独处自慰，绝无第二人入画
+- **音效**：细腻湿润水声、压抑气声轻喘、床单摩擦微响
+- **参考台词**：嗯…自己摸…怎么还是这么湿…
+
+### `thigh_grind` — 腿裤水磨 (Thigh & fabric wet grinding)
+- **机位景别（中）**：中近景大腿根部与贴身衣物/腿肉紧贴厮磨（湿痕渗透可读，无直接插入）
+- **机位景别（英）**：`MCU of inner thighs and sheer damp fabric grinding tightly against thigh/pelvis (wetness seeping through, no penetration)`
+- **动量节拍（内置真源原文）**：
+  - **Beat 1**：从0.00秒起女子A双腿夹紧或跨压在男子A结实大腿外侧，贴身薄透衣物或丝袜与敏感阴部紧贴大腿皮肉，水光已透过布料纤维渗出深色湿痕
+  - **Beat 2**：她主动扭动骨盆前后往复碾磨，软嫩阴唇隔着半透湿布与紧实腿肌剧烈挤压摩擦，大腿内侧软肉随水磨节律泛起肉浪
+  - **Beat 3**：摩擦幅度加深加快，湿滑粘液在腿根与织物间拉出微光，她腰肢轻颤、双膝死死夹紧不肯松开
+- **音效**：湿布厮磨水声、肌肤紧贴摩擦声、急促鼻音娇喘
+- **参考台词**：隔着裤子磨…哈啊…全都湿透了…
+
+### `floor_missionary` — 地板正面贯穿 (Hard floor full-weight missionary pinning)
+- **机位景别（中）**：中近景俯拍或侧低机位（冰冷硬质地板/地毯上双腿高折深压，阴茎整根没入，从0.00s已在深插状态）
+- **机位景别（英）**：`Low side or high-angle MCU on hard floor/rug (her legs folded high under his full weight, shaft buried deep from 0.00s)`
+- **动量节拍（内置真源原文）**：
+  - **Beat 1**：从0.00秒起女子A后背直接贴在冰冷硬质的地板/地毯上，双腿被男子A强行推高折向胸侧，阴茎已从0.00秒整根深埋入穴，交合处紧密贴合无退路
+  - **Beat 2**：男子A双臂撑在她耳侧地板上，利用全身重力自上而下垂直凶狠贯穿，每一次重顶都令她后背与硬地面发生沉闷撞击，臀肉与大腿根剧烈回弹
+  - **Beat 3**：她十指在地板上无处借力只能抓紧他小臂，小腹随深顶出现清晰凹陷，两人汗水滴落在地面反光
+- **音效**：沉重肉体撞击声、硬地闷响、失控短促惊喘
+- **参考台词**：地板好凉…啊…顶到底了…慢一点…
+
+### `mirror_ear_whisper` — 镜前擦拭与贴耳毒刺 (Mirror-front wiping & venomous ear whisper)
+- **机位景别（中）**：中近景90度侧面或过肩镜前构图（女子双掌撑镜面，男子自后贴背擦拭并贴耳低语，下半身排除画外）
+- **机位景别（英）**：`90-degree side or OTS MCU before mirror (her palms braced on glass, man flush behind wiping her skin and whispering into her ear)`
+- **动量节拍（内置真源原文）**：
+  - **Beat 1**：从0.00秒起女子A站在落地镜前，双掌平撑冰冷镜面，呼吸在玻璃上熏出白雾；男子A贴站在她身后，仅一只手入画，慢条斯理擦拭她锁骨或唇角水痕
+  - **Beat 2**：男子A胸膛完全压贴她后背，俯首至她耳廓旁不足一公分处，温热气息喷洒在她敏感耳垂上，她肩膀剧烈战栗、眼眶泛红却被迫看着镜中自己
+  - **Beat 3**：他手指顺着她下颌轻轻摩挲定格，两人眼神在镜面折射中形成心理压迫对峙，保持呼吸微动留出念白气口
+- **音效**：衣料摩擦微响、贴耳粗重呼吸、镜面指尖轻触
+- **参考台词**：看着镜子里的你自己…嘴上说不要，身体怎么在发抖？
+
+### `squirting_climax` — 女方绝顶喷水痉挛高潮 (Female squirting & convulsive climax spasm)
+- **机位景别（中）**：近景至腰胯特写（阴部剧烈收缩痉挛+透明爱液喷涌飞溅+大腿高频颤抖，头部排除画外）
+- **机位景别（英）**：`Pelvic close-up to macro (rhythmic vulvar contractions + clear female ejaculation gushing + violently trembling thighs; heads out of frame)`
+- **动量节拍（内置真源原文）**：
+  - **Beat 1**：从0.00秒起在密集刺激或抽插极点，女子A骨盆猛然向上高高挺起反弓，大腿内侧肌肉绷紧至极限并开始高频生理性痉挛颤抖
+  - **Beat 2**：阴部剧烈收缩张合，透明温热的爱液自穴口一股股激射喷涌而出，打湿下方床单与大腿根部，水花与拉丝在暗光下清晰可读
+  - **Beat 3**：喷涌余波中她腰臀阵阵抽搐，双腿无力向两侧滑开瘫软，小腹急促起伏平息，交合处满溢湿滑反光
+- **音效**：激烈液体喷溅水声、失控高亢哭喘、床单湿透摩擦
+- **参考台词**：啊——不行了…要去了…喷出来了…哈啊…
 
 
 ---

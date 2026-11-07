@@ -3,7 +3,7 @@
 > 本文档定义吞鲸宝典内置的 **六段式标准提示词装配结构**（代码实现位于 `scripts/tunjing_core.py`）。
 > **用途**：任何大模型或 Agent 在为吞鲸漫剧编写送模提示词时，必须严格按本规格逐段装配，**严禁脑补任何不在内置真源矩阵中的词汇与结构**。
 > 所有动作内容（Framing / Beats / 转换 / 台词）的来源只能有三个内置文件：
-> 1. `references/tunjing_poses_matrix.json`（50 套单体体位的 framing 与 beats 原文）
+> 1. `references/tunjing_poses_matrix.json`（55 套单体体位的 framing 与 beats 原文）
 > 2. `references/transition_recipes.json`（40 条物理换位配方的原文）
 > 3. `references/oneshot_transitions.json`（9 套转换模板的 beats 原文）
 

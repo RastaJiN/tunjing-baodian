@@ -9,7 +9,7 @@
    - 注入 retention_analysis: 区分 fully_preserved 与 partially_preserved (脱衣镜头服装可褪，身份死锁)
    - 注入 原厂多说话人路由 <Subject N> (Sx) 与 (Sx, mouth occupied) 口交闭嘴标
    - 注入 <scenetrans> 与 <cutoff> 动态受力打断标
-2. 【深渊之契 & 大人的工作台 独家护城河】:
+2. 【吞鲸工作室 v3.0 独家护城河】:
    - 双轨物理分流 (Composition Lock): 交合轨锁胯赶走人脸，面部轨锁脸赶走下半身
    - 180度轴线死锁 (Axis Lock) 与 20% 硬质背景标桩
    - 肢体减法法则: 一镜最多一只入画手
@@ -22,13 +22,13 @@ import json, os, re
 BASE = os.path.dirname(os.path.abspath(__file__))
 REF = os.path.join(BASE, "..", "references")
 
-FINISH_IDS = {"creampie", "cum_face", "cum_chest", "cum_belly", "cum_butt"}
+FINISH_IDS = {"creampie", "cum_face", "cum_chest", "cum_belly", "cum_butt", "squirting_climax"}
 ORAL_ONLY = {"bj", "squat_bj", "prone_bj", "deepthroat", "head_thrust", "facefuck",
              "sixty_nine", "cunnilingus", "sofa_cunni", "fingering", "clit_tease",
              "tip_lick", "ball_lick", "penis_slap", "handjob", "titjob"}
 FOREPLAY = {"undress", "kiss_fondle", "breast_rub", "nipple_lick",
             "kiss_pin", "kiss_force", "kiss_her", "ass_rub", "masturbation",
-            "finger_masturbate", "strip_tease"}
+            "finger_masturbate", "solo_masturbate", "thigh_grind", "mirror_ear_whisper", "strip_tease"}
 
 DE_OIL = ("authentic matte velvet skin finish, powdered dry texture, natural human skin with "
           "visible fine pores and subtle imperfections, soft subsurface scattering without "

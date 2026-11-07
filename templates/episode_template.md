@@ -10,7 +10,7 @@
 - **目标总时长**：`{{ TOTAL_SEC }}` 秒 (如 120s 或 300s；按 2~6s/镜自动拆解为独立短镜)
 - **当前场景 (`--scene`)**：`{{ SCENE_NAME }}` *(传入真实场地名，如：温泉汤池 / 游艇座舱 / 落地窗书房 / 客厅沙发 / 暴雨车内 / 卧室大床；引擎将自动适配承托面与环境底噪)*
 - **本集转折原型**：`{{ MIDPOINT_ARCHETYPE }}` *(从 6 大转折原型中择一：M-01权力倒置 / M-02情感破防 / M-03筹码加码 / M-04空间感官迁移 / M-05禁忌崩塌 / M-06外部危机；相邻 3 集禁重样！)*
-- **选定吞鲸标准姿势链 (`--chain`)**：`{{ POSE_CHAIN }}` *(从吞鲸引擎 50 套原生 ID 中按本集剧情自由组合，如：`kiss_fondle,bj,fingering,cunnilingus,missionary,cowgirl,doggy,cum_butt`)*
+- **选定吞鲸标准姿势链 (`--chain`)**：`{{ POSE_CHAIN }}` *(从吞鲸引擎 55 套原生 ID 中按本集剧情自由组合，如：`kiss_fondle,bj,fingering,cunnilingus,missionary,cowgirl,doggy,cum_butt`)*
 
 ---
 

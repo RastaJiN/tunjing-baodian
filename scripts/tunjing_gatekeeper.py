@@ -77,7 +77,7 @@ def audit_step_2(project_dir):
     if "<d>" not in content or "</d>" not in content:
         return False, "剧本门禁未通过：台词必须严格使用 <d>[Chinese]...</d> 标签包裹！"
         
-    # 检查是否提及体位（支持吞鲸引擎 50 个原生 pose id，兼容旧 POS-xx）
+    # 检查是否提及体位（吞鲸 v3.0 标准 55 套原生 pose id）
     KNOWN_IDS = {"bj","squat_bj","prone_bj","deepthroat","head_thrust","facefuck","sixty_nine",
                  "tip_lick","ball_lick","penis_slap","titjob","handjob","fingering","clit_tease",
                  "cunnilingus","sofa_cunni","kiss_fondle","kiss_pin","kiss_force","kiss_her",
@@ -86,13 +86,12 @@ def audit_step_2(project_dir):
                  "cowgirl","cowgirl_upright","reverse_cowgirl","squat_cowgirl","lap_sit_back","lap_sit",
                  "facesit","stand_face_hug","carry_insert","face_insert","side_face","side_spoon",
                  "ass_rub","footjob","creampie","cum_face","cum_chest","cum_belly","cum_butt",
-                 "finger_masturbate"}
+                 "solo_masturbate","thigh_grind","floor_missionary","mirror_ear_whisper","squirting_climax"}
     ids_in_script = set(re.findall(r'\b([a-z][a-z_]{1,24})\b', content)) & KNOWN_IDS
-    pos_in_script = set(re.findall(r'POS-\d{2}', content))
-    if not (ids_in_script or pos_in_script):
+    if not ids_in_script:
         return False, "剧本门禁未通过：第三幕高能戏必须显式声明调用的吞鲸标准体位 ID（如 bj、missionary、cowgirl、doggy、cum_butt）！"
         
-    return True, f"刀锋剧本三幕式、实体道具与吞鲸标准体位 ID ({sorted(ids_in_script | pos_in_script)}) 验收 PASS！允许进入分镜设计。"
+    return True, f"刀锋剧本三幕式、实体道具与吞鲸标准体位 ID ({sorted(ids_in_script)}) 验收 PASS！允许进入分镜设计。"
 
 def audit_step_3(project_dir):
     """门禁 3：拆镜密度、景别机位与纯血单轨路由检查（含台词时长毫秒级咬合）"""
@@ -140,8 +139,6 @@ def audit_step_3(project_dir):
         return False, "分镜门禁未通过：缺少核心【口交/深喉近景或拉丝微距】！这是吞鲸高能戏的绝对支配项，必须单列镜头！"
         
     # B. 必须至少有 2 个不同的姿势（换体位）
-    pos_found = set(re.findall(r'POS-\d{2}', content))
-    # 新链路：支持 tunjing pose id 与中文姿势名
     KNOWN_IDS = {"bj","squat_bj","prone_bj","deepthroat","head_thrust","facefuck","sixty_nine",
                  "tip_lick","ball_lick","penis_slap","titjob","handjob","fingering","clit_tease",
                  "cunnilingus","sofa_cunni","kiss_fondle","kiss_pin","kiss_force","kiss_her",
@@ -150,9 +147,8 @@ def audit_step_3(project_dir):
                  "cowgirl","cowgirl_upright","reverse_cowgirl","squat_cowgirl","lap_sit_back","lap_sit",
                  "facesit","stand_face_hug","carry_insert","face_insert","side_face","side_spoon",
                  "ass_rub","footjob","creampie","cum_face","cum_chest","cum_belly","cum_butt",
-                 "finger_masturbate"}
-    ids_found = set(re.findall(r'\b([a-z][a-z_]{2,24})\b', content)) & KNOWN_IDS
-    all_poses = pos_found | ids_found
+                 "solo_masturbate","thigh_grind","floor_missionary","mirror_ear_whisper","squirting_climax"}
+    all_poses = set(re.findall(r'\b([a-z][a-z_]{1,24})\b', content)) & KNOWN_IDS
     if len(all_poses) < 2:
         return False, (f"分镜门禁未通过：单集肉戏必须中途【换体位】！"
                        f"实测仅检测到 {len(all_poses)} 个姿势，必须包含至少 2 个不同吞鲸标准姿势"
@@ -204,7 +200,7 @@ def audit_step_4(project_dir):
     with open(prompt_file, "r", encoding="utf-8") as f:
         content = f.read()
         
-    # 1. 检查吞鲸引擎 吞鲸六段式标准装配器 六段式必填结构锚点 (支持 v3.0 原厂 Full-Reference 与 v2.0)
+    # 1. 检查吞鲸引擎 吞鲸六段式标准装配器 六段式必填结构锚点 (v3.0 原厂 Full-Reference 规范)
     required_blocks = [
         (["Goal & Audio Contract:", "Goal: Generate"], "缺少 [1] Goal 目标与时长画幅声明"),
         (["Audio rule:", "Audio rule"], "缺少 [1] Audio rule 台词与静音纪律声明"),

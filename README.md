@@ -80,7 +80,7 @@ python scripts/tunjing_diff_audit.py <项目目录>
 
 | 文件 | 内容 | 条数 |
 |---|---|---|
-| `references/tunjing_poses_matrix.json` | 单体姿势（framing + beats 中英原文） | 50 套 |
+| `references/tunjing_poses_matrix.json` | 单体姿势（framing + beats 中英原文） | 55 套 |
 | `references/oneshot_transitions.json` | 一键组合模板（仅作转场桥参考） | 9 套 |
 | `references/transition_recipes.json` | 物理换位配方 | 40 条 |
 | `references/kinetic-positions.md` | 上表的人类可读视图（由 JSON 生成） | — |

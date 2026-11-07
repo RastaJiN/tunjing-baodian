@@ -10,7 +10,7 @@
     python tunjing_resolver.py "女口交"          # 单个动作
     python tunjing_resolver.py "扣女穴"          # 指插
     python tunjing_resolver.py "女上位"          # 骑乘
-    python tunjing_resolver.py --list            # 列出全部 50 套可用动作
+    python tunjing_resolver.py --list            # 列出全部 55 套可用动作
     python tunjing_resolver.py --scene "..."     # 整段床戏剧本自动拆解生成全部提示词
 """
 

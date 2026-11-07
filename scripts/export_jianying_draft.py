@@ -107,11 +107,11 @@ def export_to_jianying(project_dir, draft_name=None, video_dir=None, draft_root=
     print("=" * 65)
 
     # 竖屏漫剧标准画幅 9:16 (1080x1920)
-    # 预先显式初始化视频轨、音频轨与文本字幕轨
+    # 预先显式初始化视频轨、音频轨与文本字幕轨并保存轨道引用 (TrackRef)
     script = folder.create_draft(draft_name, 1080, 1920)
-    script.append_track(draft.TrackSpec(draft.TrackType.video))
-    script.append_track(draft.TrackSpec(draft.TrackType.audio))
-    script.append_track(draft.TrackSpec(draft.TrackType.text))
+    v_track_ref = script.append_track(draft.TrackSpec(draft.TrackType.video, name="视频轨"))
+    a_track_ref = script.append_track(draft.TrackSpec(draft.TrackType.audio, name="音频轨"))
+    t_track_ref = script.append_track(draft.TrackSpec(draft.TrackType.text, name="字幕轨"))
 
     # 1. 扫描渲染视频文件
     # 优先匹配 video_dir，次选 project_dir 下的 mp4，最后尝试 ComfyUI 默认输出
@@ -146,7 +146,7 @@ def export_to_jianying(project_dir, draft_name=None, video_dir=None, draft_root=
                 v_mat,
                 target_timerange=draft.Timerange(current_us, dur_us)
             )
-            script.add_segment(v_seg)
+            script.add_segment(v_seg, track=v_track_ref)
             print(f"  [+] {shot_tag} 视频已对位: {os.path.basename(matched_mp4)} ({s['duration']}s)")
         else:
             # 尚未渲染出片时的占位标注
@@ -161,7 +161,7 @@ def export_to_jianying(project_dir, draft_name=None, video_dir=None, draft_root=
                 border=draft.TextBorder(color=(0.0, 0.0, 0.0), width=0.15),
                 clip_settings=draft.ClipSettings(transform_y=-0.75)
             )
-            script.add_segment(txt_seg)
+            script.add_segment(txt_seg, track=t_track_ref)
             print(f"  [+] {shot_tag} 字幕已卡点: 「{s['speech']}」")
 
         current_us += dur_us

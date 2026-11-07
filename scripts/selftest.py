@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-吞鲸宝典 v2.0 · 跨机权威完整性自检器 (Tunjing Master Self-Test)
+吞鲸宝典 v3.0 · 跨机权威完整性自检器 (Tunjing Master Self-Test)
 全部采用相对路径（可移植到任何机器、任何目录），一次性核验：
-1. 全部 25 个核心文件存在且非空
-2. 3 个吞鲸内置真源 JSON 结构合法（50 套姿势 / 40 条换位配方 / 9 套转换模板）
-3. 全部 8 个 Python 脚本 AST 语法 100% 通过
+1. 全部 28 个核心文件存在且非空
+2. 3 个吞鲸内置真源 JSON 结构合法（55 套姿势 / 40 条换位配方 / 9 套转换模板）
+3. 全部 11 个 Python 脚本 AST 语法 100% 通过
 4. 13 类场地承托面动态适配 (with_scene_surface) 功能正常
 """
 
@@ -52,7 +52,7 @@ REQUIRED_FILES = [
 
 def main():
     print("=" * 65)
-    print("🐳 吞鲸宝典 v2.0 · 跨机权威母版完整性自检")
+    print("🐳 吞鲸宝典 v3.0 · 跨机权威母版完整性自检")
     print(f"当前挂载路径: {SKILL_DIR}")
     print("=" * 65)
 
@@ -71,7 +71,7 @@ def main():
         recipes = json.load(f)
     with open(os.path.join(SKILL_DIR, "references/oneshot_transitions.json"), encoding="utf-8") as f:
         oneshots = json.load(f)
-    assert len(poses) >= 50, f"姿势数不足 50: {len(poses)}"
+    assert len(poses) >= 55, f"姿势数不足 55: {len(poses)}"
     assert len(recipes) >= 40, f"换位配方不足 40: {len(recipes)}"
     assert len(oneshots) >= 9, f"转换模板不足 9: {len(oneshots)}"
     print(f"[✓] 2/4 吞鲸内置真源数据 PASS ({len(poses)} 套姿势 / {len(recipes)} 条换位配方 / {len(oneshots)} 套模板)")
@@ -91,7 +91,7 @@ def main():
     print("[✓] 4/4 13类场地承托面与声场动态适配 (with_scene_surface) PASS")
 
     print("=" * 65)
-    print("🎉 吞鲸宝典 v2.0 权威母版自检 100% 通过！跨机跨模型随时可投产！")
+    print("🎉 吞鲸宝典 v3.0 权威母版自检 100% 通过！跨机跨模型随时可投产！")
     print("=" * 65)
 
 

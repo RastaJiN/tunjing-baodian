@@ -21,7 +21,7 @@ def lint_tunjing_prompt(text):
         if not sp.strip():
             errors.append("错误：检测到空的台词标签 <d></d>！")
             
-    # 2. 检查吞鲸标准六段式核心结构锚点 (支持 v3.0 原厂 Full-Reference 与 v2.0)
+    # 2. 检查吞鲸标准六段式核心结构锚点 (v3.0 原厂 Full-Reference 规范)
     required_blocks = [
         (["Goal & Audio Contract:", "Goal: Generate"], "缺少 [1] Goal 目标与时长画幅声明"),
         (["Audio rule:", "Audio rule"], "缺少 [1] Audio rule 台词与静音纪律声明"),
