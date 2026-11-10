@@ -33,7 +33,7 @@
 因此，任何写在负向里的排油词在物理上均不参与采样计算，**压除 LoRA 高光油腻感必须且只能靠正向肯定句**（已固化于 `tunjing_core.py` 的 `DE_OIL` 常量中）：
 
 ```text
-Skin & Lighting: authentic matte velvet skin finish, powdered dry texture, natural human skin with visible fine pores and subtle imperfections, soft subsurface scattering without surface reflection, non-greasy complexion, heavily diffused soft ambient light, zero hard directional light, 35mm film grain, photorealistic anatomy
+Skin & Lighting: authentic matte velvet skin finish, powdered dry complexion texture, natural human skin with visible fine pores and subtle dermal grain, soft subsurface scattering with gentle matte light absorption, heavily diffused soft ambient illumination, organic 35mm cinema film grain, photorealistic human anatomy
 ```
 
 ---
@@ -44,9 +44,20 @@ Skin & Lighting: authentic matte velvet skin finish, powdered dry texture, natur
 [<Picture 1> 女主 2x3 母版 PNG (ref_image_0)] ➔ \
 [<Picture 2> 男主 2x3 母版 PNG (ref_image_1)] ➔ ---> [MiniMax H3 ReferenceToVideo] ➔ VAE Decode ➔ 成片 MP4
 [<Picture 3> 纯净场景底图 PNG (ref_image_2)] ➔ /
-[吞鲸标准六段式送模提示词文本]                ➔ /
+[<Picture 4~9> 近景承托面/道具母版 (ref_image_3~8, 按需通电)] ➔ /
+[<Audio 1~3> 男女主定版干声 WAV (ref_audio_0~2, 锁死音色)]   ➔ /
+[吞鲸标准六段式送模提示词文本]                               ➔ /
 ```
 
+- **核心底模与 LoRA 黄金挂载**：
+  - **Node 192 (`UNETLoader`)**：`minimax_h3_hybrid_fl2va_ref2va_b25-49-int8.safetensors`
+  - **Node 38 (`CLIPLoader`)**：优先挂载满血 8-bit 旋转量化版 `qwen3vl_32b_minimax_h3_ultra_uncensored_heretic_int8_convrot.safetensors`（大内存机器下替代 4-bit `nvfp4`，根治多参考图注意力丢失与复杂空间调度听不懂的问题；仅编码瞬间过显存，不影响采样耗时）
+  - **Node 53 (`LoraLoaderModelOnly`)**：`minimax_h3_dmad_full_dareties_v4_step600_comfy_fro.safetensors` @ `0.80`
+  - **Node 400 (`LoraLoaderModelOnly`)**：`MysticXXX_MMH3-V5-ref2va.safetensors`（Ref2VA 专用版；文戏/穿衣/空镜强制置 `0.0`，肉戏置 `0.45 ~ 0.50`）
+  - **Node 404 (`LoraLoaderModelOnly`)**：`H3_RuMengSiHuan_1536-e8.safetensors` @ `0.80`
+- **12GB 显卡低显存削峰四护法链（严禁断开或穿插 Node 333 SigmaShift）**：
+  - `Node 331 (ModelAttentionBackend = comfy kitchen attention)` ➔ `Node 332 (BlockSparseAttention = sol-attn, tau=1.3, min_tokens=12288)` ➔ `Node 403 (MiniMaxLowVRAMAttention, head_chunks=2)` ➔ `Node 401 (MiniMaxChunkFeedForward, chunks=2, seq_threshold=4096)` ➔ `Node 397 (SelfLiftH3Sampler, lowres_scale=0.6, highres_tiling=True, upscaler_unload=True)`
+  - **排雷铁律**：彻底从文/肉主工作流中物理移除悬空的 `Node 333 (MiniMaxH3SigmaShift, shift_video=12.0)` 以及 `Node 342~345/366` 武打加速 LoRA 组（武戏单独存为独立工作流备用），防止脚本误连导致人物橡皮泥拉扯或 3 倍速抽搐。
 - **CFG**：`1.0`
 - **Sampling Steps**：`10 ~ 12`
 - **Scheduler**：`beta` / `simple`
@@ -72,14 +83,15 @@ Skin & Lighting: authentic matte velvet skin finish, powdered dry texture, natur
    - **交合特写轨 (`hip` / `macro`)**：强制注入 `COMPOSITION LOCK: Camera locked low-angle at pelvic level. Framed strictly from waist to mid-thigh. HEADS, FACES, AND UPPER TORSO ARE STRICTLY OUT OF FRAME.`，杜绝结合部上方出现浮空人脸。
    - **面部情绪轨 (`face` / `cu` / `mcu`)**：强制注入 `COMPOSITION LOCK: LOWER BODY AND GENITALIA STRICTLY OUT OF FRAME. Intercourse is depicted ONLY through rhythmic shoulder trembling and hair shaking caused by unseen off-screen thrusts.`，杜绝因景别裁切导致正戏无交合感。
    - **肢体减法**：特写框内最多允许 1 只手入画（`His left hand is the ONLY hand in frame`），其余肢体明文规定置于画框外，彻底消灭 4~5 只手的多肢鬼影。
-7. **空间坐标系、180 度轴线与防脑补床面死锁（014B / 014D 铁律）**：
-   - **防脑补床面**：在铁桌/办公台/墙边等非床场地做俯身或低姿动作时，正向必须排他性强化硬质承托面（如 `rigid industrial painted steel tabletop`），并显式声明 `STRICTLY NO BED, NO MATTRESS, NO BEDSHEET, NO FABRIC UNDER BODY, NO PILLOW`，同时剔除音效中 `mattress vibration` 等诱导词。
-   - **防特写背景棚拍化**：微距或特写必须强制保留 15%~20% 的浅景深硬质环境标桩（如 `Maintain 20% shallow depth-of-field background showing dim green phosphor CRT glow / dark mahogany headboard`）并声明 `STRICTLY NO PLAIN STUDIO BACKGROUND, NO GREY CYCLORAMA`。
-8. **黄金三 LoRA 权重组合与工作流静态资产断言**：
-   - **Node 53 (DMAD 骨骼动力学)**：锁定 `0.60`（保障骨盆冲撞力道且不撕裂关节）。
-   - **Node 400 (MysticXXX 生理特征)**：锁定 **`MysticXXX_MMH3-V1.safetensors` @ `0.50`**（禁用 V4，V1 在微距结合部物理形变最稳、不黏连融化）。
-   - **Node 404 (如梦似幻光影)**：拉满至 **`0.90`**（压死 Vaseline 塑料油光，强化胶片暗调颗粒）。
-   - **静态资产隔离断言**：新剧严禁直接复用残留旧剧默认图片名的工作流 JSON；提交前必须通过 `assert` 校验 Node 51/49/50 绑定的是当前剧集全 ASCII 命名的资产文件，且必须注入进 `ComfyUI-Installs/<User>/ComfyUI/input` 真实活动目录。
-9. **台词三段式气口与显存碎片治理**：
-   - **台词留白**：单镜台词切分至中段（`[0.00s-1.50s]` 闭唇纯动作呼吸 ➔ `[1.50s-4.50s]` 动作中念白 ➔ `[4.50s-end]` 念白结束深顶收尾），防止语音合成全程抢占导致身体僵死。
-   - **显存冷却与成片交付**：每镜落盘后必须调用 `POST /free` (`{"unload_models": False, "free_memory": True}`) 并 `sleep(10)` 释放 12GB 显卡碎片；成片交付优先采用 FFmpeg `concat demuxer` 无损缝合（规避新版剪映 5.x/6.x 草稿二进制加密拦截），配音节点在低配/异构环境下优先选用支持 CPU/CUDA 双模的轻量级 `ComfyUI-Qwen3-TTS (0.6B)`。
+5. **肢体减法与正向空间不变式（Positive Invariant）**：
+   - **肢体减法**：特写框内最多允许 1 只手入画（`His left hand is the ONLY hand in frame`），其余肢体明文规定置于画框外，彻底消灭 4~5 只手的多肢鬼影。
+   - **正向空间不变式（防画红线）**：严禁在画面段出现 `axis / line / lines / 越轴 / 轴线` 等具象构图线词，统一采用 `The camera stays on the same side of them throughout; <Subject 1> is on the left, <Subject 2> is on the right.`。
+   - **硬质承托面排他强化与特写景深标桩**：在铁桌/办公台/墙边等非床场地做俯身或低姿动作时，正向必须强化硬质承托面材质，并保留 15%~20% 的浅景深硬质环境标桩（如 `Maintain 20% shallow depth-of-field background showing dark mahogany headboard`）。
+6. **A/B/C 三档槽位物理隔离、单调服装状态机与空镜三不铁律**：
+   - **单人镜/空镜槽位物理隔离**：单人特写镜必须将未出场角色的槽位替换为纯净场景底图占位（防背景裂殖第二张人脸鬼影）；纯环境空镜三槽全挂场景底图；`retention_analysis` 中 `<Subject 3>` 声明 `weak_reference for exact camera framing` 防广角透视拉扯。
+   - **空镜三不铁律**：零胶片特效词（禁 `flashback / overexposed / halation / light flare` 防门框五金融化）、闭门底图禁写动态推门大位移、100% 锚定底图真实陈设白名单（单次动作禁跨时段写两遍）。
+7. **黄金 LoRA 分级隔离、ComfyUI 启动参数与单实例防 OOM 锁**：
+   - **ComfyUI 必加启动参数**：Windows 下运行 20GB+ H3 模型与 Qwen3-VL 32B 编码器，启动命令必须包含 `--lowvram --disable-smart-memory`（防大文件内存映射闪退与显存打满）。
+   - **LoRA 文肉动态分级**：文戏/穿衣镜成人特征 LoRA 权重强制置 `0.0`（防正装长出器官），肉戏恢复 `0.45~0.50`；Node 53 (DMAD) 锁定 `0.60~0.80`；Node 250/252/265 保持动态帧长计算连线。
+   - **真实目录动态寻址与单实例锁**：提交前通过 `/system_stats` 核验 `--input-directory` 真实挂载目录，使用全 ASCII 文件名；批跑启动前清理残留孤儿进程、清空 `/queue` 并调用 `POST /free` 冷却 10 秒，严禁双进程并发抢占显存引发 Node 397 (SelfLift) OOM。
+   - **潜变量续写与母带合成**：超长连续镜头优先采用 `ComfyUI-H3-Continuum` 透传音视频潜变量上下文（4 chunks × 5s）；成片交付优先采用 FFmpeg `concat demuxer`（`-c copy`）无损缝合全长母带。

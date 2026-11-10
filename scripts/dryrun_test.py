@@ -45,17 +45,17 @@ def run_dryrun(target_dir):
     assert gate_mod.check_gate(target_dir, 1), "Gate 1 资产门禁未通过！"
 
     # ── 2. 准备 Gate 2 刀锋剧本（显式使用吞鲸内置 pose id）──
-    script_content = """# 深渊交锋 · EP01 刀锋剧本
+    script_content = """# 吞鲸标准测试剧集 · EP01 刀锋剧本
 
 ## 第一幕：秘密撕扯与极限阻断
-男主将偷拍的酒店发票重重拍在红木办公桌上，步步紧逼。
-男主：<d>[Chinese] 你以为你丈夫能保得住你？他拿来抵押的第一张契约，就是你的名字。</d>
-女主：<d>[Chinese] 疯子……把东西还我！</d>
+男主将文件拍在办公桌上，步步紧逼。
+男主：<d>[Chinese] 你以为你能全身而退？这上面签着你的名字。</d>
+女主：<d>[Chinese] 把东西还我！</d>
 男主单手将她按在墙边（kiss_pin），门外突发脚步声停驻，两人瞬间屏息凝固。
 
 ## 第二幕：防线失守与羞耻前戏
 危机暂退，男主展开凌厉前戏：调用吞鲸引擎 kiss_fondle（揉胸舌吻）➔ bj（跪姿口交）➔ fingering（手指扣插女穴）➔ cunnilingus（舔阴）。
-男主：<d>[Chinese] 叫啊，让他进来看看李太太现在的样子。</d>
+男主：<d>[Chinese] 别出声，门外还没走远。</d>
 
 ## 第三幕：多体位清战与绝顶收网
 进入主力冲撞：先以 missionary（传教士）破壁贯入，中途强制换体位至 cowgirl（女上位骑乘）与 doggy（后入趴跪），最后以 cum_butt（射在臀部）完成绝顶清算。
@@ -73,8 +73,8 @@ def run_dryrun(target_dir):
     pose_names = "→".join(poses.get(p, {}).get("nameZh", p) for p in chain)
     _, pr_path, bj_path = scene_mod.save_project_artifacts(
         target_dir, shots, actual, 120.0,
-        lines="嗯…啊…不要…", idea="女秘书被按在办公桌上清算",
-        scene="顶奢办公室", pose_names=pose_names
+        lines="嗯…啊…不要…", idea="executive office confrontation",
+        scene="executive office", pose_names=pose_names
     )
 
     assert gate_mod.check_gate(target_dir, 3), "Gate 3 拆镜门禁未通过！"
@@ -90,7 +90,7 @@ def run_dryrun(target_dir):
     audit_dir = os.path.join(target_dir, "审查")
     os.makedirs(audit_dir, exist_ok=True)
     report_content = """# 吞鲸工作室 · 渲染放行终审报告 (Clearance Report)
-- 剧集：深渊交锋 · EP01
+- 剧集：吞鲸标准测试剧集 · EP01
 - 自审执行人：鲸鲸 (执行导演)
 - 审查结论：[PASS 放行]
 

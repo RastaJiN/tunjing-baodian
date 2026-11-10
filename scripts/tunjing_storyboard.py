@@ -66,26 +66,25 @@ def expand_poses(seq, poses, recipes):
         p = poses.get(pid)
         if not p:
             continue
-        name = p.get("nameZh") or pid
-        beats = p.get("beatsZh") or []
+        name = p.get("nameEn") or pid
+        beats = p.get("beatsEn") or []
         b0 = beats[0] if len(beats) > 0 else name
         b1 = beats[1] if len(beats) > 1 else None
         b2 = beats[2] if len(beats) > 2 else None
 
-        actions.append({"kind": "establish", "pose": pid, "text": f"（{name}·建立）{b0}"})
+        actions.append({"kind": "establish", "pose": pid, "text": b0})
         if b1:
-            actions.append({"kind": "push", "pose": pid, "text": f"（{name}·推进）{b1}。手腿腰同前。"})
+            actions.append({"kind": "push", "pose": pid, "text": b1})
         if i < len(seq) - 1:
-            tr, key = find_transition(recipes, pid, seq[i + 1])
-            if tr:
-                actions.append({"kind": "transition", "pose": f"{pid}->{seq[i+1]}",
-                                "recipe": key, "text": f"（衔接转场）{tr}"})
-            else:
-                nxt = poses.get(seq[i + 1], {}).get("nameZh", seq[i + 1])
-                actions.append({"kind": "transition", "pose": f"{pid}->{seq[i+1]}",
-                                "recipe": None, "text": f"（衔接转场）从「{name}」物理过渡到「{nxt}」"})
+            nxt = poses.get(seq[i + 1], {}).get("nameEn", seq[i + 1])
+            actions.append({
+                "kind": "transition",
+                "pose": f"{pid}->{seq[i+1]}",
+                "recipe": f"{pid}->{seq[i+1]}",
+                "text": f"Continuous physical transition from {name} into {nxt}, shifting center of gravity smoothly over two seconds"
+            })
         elif b2:
-            actions.append({"kind": "finish", "pose": pid, "text": f"（{name}·收束）{b2}。手腿腰同前。"})
+            actions.append({"kind": "finish", "pose": pid, "text": b2})
     return actions
 
 
@@ -150,15 +149,15 @@ def build_prompt(seq, dur=10.0, aspect="9:16", lines="", idea="", scene="当前�
 
     spoken = False
     for i, (act, bd) in enumerate(zip(actions, bounds)):
-        head = "[Shot 1] Live-action cinematic." if i == 0 else f"[Shot {i+1}] At {bd['t0']:.2f}s, the shot continues without cutting."
+        head = "[Shot 1] Live-action cinematic, medium close-up, camera locked static on a heavy tripod;" if i == 0 else f"[Shot {i+1}] At {bd['t0']:.2f}s, the shot transitions to medium close-up, camera locked static on a heavy tripod;"
         body = with_scene_surface(act["text"], scene)
         if i == 0:
-            body = "镜头保持固定机位。" + body + insert_hint(act.get("pose", ""))
+            body = body + insert_hint(act.get("pose", ""))
         if lines and not spoken and i in (0, n // 2, n - 1):
-            body += f" 女子A says: <d>[Chinese]{lines}</d>."
+            body += f" <Subject 1> (S1) says: <d>[Chinese]{lines}</d> while <Subject 2> (S2) keeps his lips completely closed."
             spoken = True
         if i == n - 1:
-            body += f" Final state: 人物身份不漂移，交合处仍紧密贴合、比例自然，构图稳定收住到 {dur:.2f}s。"
+            body += f" Final state: Unbroken anatomical continuity and stable composition held steady to {dur:.2f}s."
         parts.append(f"{head} {body}")
         parts.append("")
 

@@ -87,14 +87,14 @@ def audit_project(project_dir):
                 "tip_lick", "ball_lick", "penis_slap", "handjob", "titjob"}
 
     required_anchors = [
-        "Goal:",
-        "Audio rule:",
-        "Reference map",
-        "Consistency:",
-        "Motion quality",
-        "integrated_multimodal_description:",
-        "overall_soundscape:",
-        "=== NEGATIVE ==="
+        ("Goal & Audio Contract:", "Goal:"),
+        ("Audio rule:",),
+        ("subject_definitions:", "Reference map"),
+        ("Consistency:",),
+        ("Motion quality",),
+        ("integrated_multimodal_description:", "detailed_description:"),
+        ("overall_soundscape:",),
+        ("=== NEGATIVE ===",)
     ]
 
     for idx, s in enumerate(shots, 1):
@@ -103,7 +103,7 @@ def audit_project(project_dir):
         size = s.get("shot_size", "")
         
         # 结构检查
-        anchors_present = sum(1 for a in required_anchors if a in prompt)
+        anchors_present = sum(1 for grp in required_anchors if any(a in prompt for a in grp))
         if anchors_present >= 7:
             struct_pass += 1
         else:
@@ -123,21 +123,29 @@ def audit_project(project_dir):
                 report["violations"].append(f"镜头 {s.get('id')} ({pose}) 属于前戏/口交/转场，但被注入了插入要点！")
 
         # 检查台词（排除说明文字中的 <d>...</d> 规则）
-        prompt_without_rule = prompt.replace("Audio rule: characters may only speak the exact words inside <d>...</d>;", "")
+        prompt_without_rule = re.sub(r"Audio rule:.*?aloud\.", "", prompt)
         d_match = re.search(r"<d>(?:\[Chinese\])?(.*?)</d>", prompt_without_rule)
         if d_match:
             line_text = d_match.group(1).strip()
-            # 嘴部占用检查
             if first_p in ("bj", "deepthroat", "facefuck", "cum_face") and "女子" in prompt:
                 report["violations"].append(f"镜头 {s.get('id')} ({pose}) 女方嘴部被占用，但排了女方对白！")
+            if "HEADS, FACES, AND UPPER TORSO ARE STRICTLY OUT OF FRAME" in prompt and "off-screen voiceover" not in prompt:
+                report["violations"].append(f"镜头 {s.get('id')} 存在画内对白但误锁了 HEADS OUT OF FRAME（无头讲话冲突）！")
             spoken_dialogues.append((s.get("id"), line_text))
+
+        if "->" in pose and "LOWER BODY AND GENITALIA STRICTLY OUT OF FRAME" in prompt:
+            report["violations"].append(f"镜头 {s.get('id')} ({pose}) 属于换体位转场镜，但误锁了 LOWER BODY OUT OF FRAME！")
 
         # 动作纯度检查：比对是否脱稿自编
         p_info = poses_db.get(first_p)
         if p_info:
             beats_en = p_info.get("beatsEn", [])
             beats_zh = p_info.get("beatsZh", [])
-            has_truth = any(b[:20].lower() in prompt.lower() for b in beats_en) or any(b[:6] in prompt for b in beats_zh)
+            has_truth = (
+                "->" in pose
+                or any(b[:18].lower() in prompt.lower() for b in beats_en if b)
+                or any(b[:6] in prompt for b in beats_zh if b)
+            )
             if has_truth:
                 pure_truth_pass += 1
             else:

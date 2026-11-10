@@ -1,7 +1,7 @@
 ---
 name: tunjing-baodian
 description: "Use when producing or auditing short dramas with Tunjing."
-version: 3.0.0
+version: 4.0.0
 author: 吞鲸工作室 (Swallowing Whale Studio)
 license: MIT
 metadata:
@@ -9,10 +9,10 @@ metadata:
     tags: [tunjing, baodian, drama, pure-ref2v, gatekeeper]
 ---
 
-# 🐳 吞鲸宝典 · 精品漫剧极速生产引擎 (Tunjing Baodian v3.0)
+# 🐳 吞鲸宝典 · 全剧集视听导演调度生产引擎 (Tunjing Baodian v4.0)
 
 > **吞鲸宗旨**：**文戏带刀有张力，动作带电有花样，步步门禁不跳步，纯血管线一次过。**
-> 吞鲸工作室 100% 自包含权威生产母版。内置 55 套体位动量矩阵、40 条物理换位配方、13 类场地动态适配内核与 v3.0 双轨物理分流构图死锁，零外部依赖、零脑补词汇、跨机器跨大模型 100% 无差别出片。
+> 吞鲸工作室 100% 自包含权威生产母版。内置 55 套纯英文体位动量矩阵 + 8 大非肉戏导演调度原语（正反打/环境空镜/信物微距/生理阻断/空间转移/尾声收束）、40 条物理换位配方、13 类场地中英双轨动态适配内核、分号 (`;`) 黄金分割律与双轨物理分流构图死锁，零外部依赖、零脑补词汇、跨机器跨大模型 100% 无差别出片。
 
 ---
 
@@ -137,8 +137,28 @@ python scripts/tunjing_scene.py \
 8. **台词时长毫秒级咬合铁律**：中文台词按 `汉字数 / 3.0 + 省略号数 * 0.8 + 1.0s <= 镜头时长` 核算；严禁短镜头强塞长台词。台词必须用 `<d>[Chinese]...</d>` 包裹，且正文声明 `Audio rule` 严禁念出提示词标签。
 9. **画外音 (OS) 三重防对口型铁律**：凡含内心独白/OS 的镜头，必须附加嘴部物理占位死锁（如 `bite down on lower lip`、`lips remain completely closed`）或采用背向/局部微距机位逃逸。
 10. **物理帧长自动换算铁律**：所有送模镜头帧数严格遵循 `length = 5 + 17 * N`（`raw = round(sec * 24)` 后向上对齐），由脚本自动计算写入 `批量任务.json`。
-11. **自包含与零外部引用铁律（防跨机 Agent 幻觉）**：本技能包是 100% 闭环的唯一权威母版。严禁在文档、模板或提示词中引用任何不存在于本技能目录内的外部桌面目录、外部前端脚本或历史已废弃编号，防止其他机器或大模型产生路径搜寻幻觉。
+11. **自包含与零外部引用铁律（防跨机 Agent 幻觉与来源污染）**：本技能包是 100% 闭环的唯一权威母版。严禁在文档、模板、代码注释或提示词中引用任何不存在于本技能目录内的外部桌面目录、外部前端脚本、特定项目剧名/角色名、外部博主/教程来源或历史事故编号，所有经验一律内化为通用工业标准术语。
 12. **派生文档单向生成与门禁同步铁律**：人类可读字典 `kinetic-positions.md` 必须由 `tunjing_poses_matrix.json` 单向生成，严禁手改脱节；任何提示词格式或体位 ID 规范的升级，必须同步更新 `tunjing_gatekeeper.py` 与 `dryrun_test.py`，确保自产产物 100% 通过自身门禁。
-13. **双轨物理分流与构图排他死锁铁律（防浮空人脸与多手鬼影）**：严禁在同一镜头内“既要近景面部表情，又要下半身交合碰撞”（会导致 Cross-Attention 分裂产生浮空人脸或裁掉交合动作）。`hip`/`macro` 交合特写轨必须强制注入 `HEADS, FACES, AND UPPER TORSO ARE STRICTLY OUT OF FRAME`；`face`/`cu`/`mcu` 情绪对白轨必须强制注入 `LOWER BODY AND GENITALIA STRICTLY OUT OF FRAME`（交合仅靠肩颈震颤与发丝晃动体现），且特写框内严格执行肢体减法（最多 1 只手入画，其余手置于画外）。
-14. **正向纯英文视觉隔离与台词三段式气口铁律（防字幕烫印与身体僵死）**：`integrated_multimodal_description` 视觉动作描述 100% 采用专业物理英文（严禁裸露中文字符被视觉编码器当成海报字幕烫印在画面底部），正向末尾强制追加 `STRICTLY NO SUBTITLES, NO CHINESE CHARACTERS, NO TEXT, NO CAPTIONS, NO WATERMARKS`；中文台词仅允许置于 `<d>[Chinese]...</d>` 容器内，且必须采用“前 1.5s 纯动作呼吸 ➔ 中间 3.0s 念白 ➔ 尾 1.5s 动作收尾”三段式留白，防止语音合成全程压死身体去噪步进。
-15. **反发散模型越权与首镜五联切片真质检铁律**：针对 DeepSeek/GPT 等易发散模型，严禁让模型手写提示词，只允许其选定 `--chain`、`--total`、`--scene`、`--lines` 参数并调用 `tunjing_scene.py` 机械装配，随后运行 `tunjing_diff_audit.py` 出具真源偏离度审计报告；渲染阶段废除仅看文件大小与 PSNR 的伪质检，强制执行“首镜生成落盘 ➔ 抽取 2%/50%/94% 关键帧肉眼核验通过 ➔ 放行全集批跑”，且每镜后调用 `/free` 冷却 10 秒释放显存碎片。
+13. **双轨物理分流与构图排他死锁铁律（防浮空人脸与多手鬼影）**：严禁在同一镜头内“既要近景面部表情，又要下半身交合碰撞”（会导致 Cross-Attention 分裂产生浮空人脸或裁掉交合动作）。`hip`/`macro` 交合特写轨必须强制注入 R4 全肯定物理切边（`The frame is tightly cropped from waist to mid-thigh, containing exclusively the lower torso, hips, and pelvic contact junction`）；`face`/`cu`/`mcu` 情绪对白轨必须注入 `The frame is tightly cropped from chest and collarbones up to the head, containing exclusively the upper torso, neck, and face`（严禁在正向文本混入 `OUT OF FRAME` 否定词根，已由 `tunjing_core.py` 的 `sanitize_positive_only()` 自动净化）（交合仅靠肩颈震颤与发丝晃动体现），且特写框内严格执行肢体减法（最多 1 只手入画，其余手置于画外）。
+14. **正向纯英文视觉隔离与台词三段式气口铁律（防字幕烫印与身体僵死）**：`integrated_multimodal_description` 视觉动作描述 100% 采用专业物理英文（严禁裸露中文字符被视觉编码器当成海报字幕烫印在画面底部），画面描述与音效严格分栏（严禁在画面段写入 `sound / echoes / music / bgm / 传来 / 回荡` 等声音词汇诱发画面凭空找人张嘴）；中文台词仅允许置于 `<d>[Chinese]...</d>` 容器内，且必须采用“前 25% 纯动作呼吸 ➔ 中间 50% 念白 ➔ 尾 25% 动作收尾”三段式留白，防止语音合成全程压死身体去噪步进。
+15. **反发散模型越权与首镜五联切片真质检铁律**：针对发散型大模型，严禁让模型手写提示词，只允许其选定 `--chain`、`--total`、`--scene`、`--lines` 参数并调用 `tunjing_scene.py` 机械装配，随后运行 `tunjing_diff_audit.py` 出具真源偏离度审计报告；渲染阶段废除仅看文件大小与 PSNR 的伪质检，强制执行“首镜生成落盘 ➔ 抽取 2%/50%/94% 关键帧肉眼核验通过 ➔ 放行全集批跑”，且每镜后调用 `/free` 冷却 10 秒释放显存碎片。
+16. **分号 (`;`) 黄金分割律、量化运镜与正向空间不变式铁律（防画红线与运镜失控）**：
+    - 每条 `[Shot N]` 镜行必须以分号 `;` 一分为二：分号前仅写摄像机指令（`景别, 机位角度, 运动类型+幅度+速度量化值`，如 `sliding forward 12 cm over three seconds`），分号后只写人与物的可见物理动作，严禁将运镜词混入分号之后；
+    - 严禁在画面段出现 `axis`、`line`、`lines`、`越轴`、`轴线`、`分界线` 等具象构图名词（会被视觉编码器直接画成实体线条），统一采用**正向空间不变式（Positive Invariant）**：`The camera stays on the same side of them throughout; <Subject 1> is on the left, <Subject 2> is on the right.`；
+    - 严禁使用 `very slowly`、`extremely`、`slightly`、`suddenly` 等模糊程度副词，一律替换为厘米与秒数的确定性物理量；多镜切换仅允许使用官方 5 大英文切镜绑定短语（`the camera cuts to` / `the shot cuts to` / `the shot transitions to` / `the shot changes to` / `the shot switches to`），严禁使用 `fade / dissolve / wipe` 或中文“镜头切至”。
+17. **A/B/C 三档槽位物理隔离、单调服装状态机与弱构图引用铁律（防单人镜鬼影与透视畸变）**：
+    - **三档槽位隔离与 9 图 3 音扩展挂载**：双人同框镜（Tier A）挂载 `[女母版, 男母版, 场景底图]`；单人正反打特写镜（Tier B，`srs_female` / `srs_male`）必须将未入画角色的槽位强制替换为纯净场景底图占位，从硬件输入端根除背景暗部裂殖出第二张人脸鬼影；纯环境/道具空镜（Tier C，`env_cut` / `prop_macro`）三槽全挂场景底图；工作流完整保留 9 个图像参考槽（`ref_image_0~8`：槽 0~2 为女/男/全景，槽 3~8 按需挂载近景承托面空间图与核心道具母版）与 3 个音频参考槽（`ref_audio_0~2`，挂载男女主定版干声 `<Audio 1>` / `<Audio 2>` 锁死全集音色），未用到的扩展槽在当前镜自动静音绕过；
+    - **单调不可逆服装状态机**：全片服装按 `穿衣 (dressed) ➔ 半脱 (partially_undressed) ➔ 全裸 (nude)` 单向演进，一旦完成脱衣，后续镜头永久锁死素身母版，严禁回跳穿衣；
+    - **场景弱构图引用**：`retention_analysis` 中 `<Subject 3>` 必须声明 `weak_reference for exact camera framing`，防止切近景/特写时被广角场景底图的远景透视拉扯导致家具畸变。
+18. **空镜/闪回三不铁律与场景陈设白名单铁律（防门框拉丝与假家具脑补）**：
+    - **零胶片特效词**：严禁使用 `flashback, overexposed, halation, dreamy glow, light flare` 等特效词破坏建筑五金几何边缘；
+    - **闭门不写推门**：底图为闭合门板时，严禁强写推门进出大位移，必须保持门体与五金静态定格；
+    - **陈设 100% 取自底图白名单**：家具与道具描述必须严格锚定 `<Picture 3>` 真实存在的元素，严禁脑补底图不存在的陈设，且单次线性动作严禁在多时间段重复描写两遍。
+19. **对话回合制（C27c/C27d）、肌肉神态同句绑定与官方画外音死公式铁律（破除 3 秒静止假人）**：
+    - **按回合切镜**：15 秒对话段开口交互 ≥ 6 次，严禁同一角色连续独占 2 个镜头发声，单次发言 ≤ 15 字（超长台词必须拆镜插入听者反应或转局部特写画外音）；
+    - **肌肉神态与听者同句绑定**：严禁角色静止超过 3 秒；每句台词必须在同一 Shot 的同一句话内绑定具体面部肌肉与手部重心微动作（如 `jaw clenched tight, throat bobbing once`），且同时声明未说话听者的闭口微反应（`while <Subject M> keeps lips completely closed`）；
+    - **画外音三要素死公式**：凡内嵌画外音/内心独白，必须严格采用 `<Subject N> (Sx) says in an off-screen voiceover: <d>[Chinese]...</d> while her/his lips remain completely closed.`；交合微距镜（`hip/macro`）若有台词，必须自动转为该画外音公式，且对话镜严禁误锁 `HEADS OUT OF FRAME`，换体位转场镜严禁误锁 `LOWER BODY OUT OF FRAME`。
+20. **剧本原义死锁（00b）、三级戏份门禁与工作流黄金拓扑铁律**：
+    - **原义死锁與全剧集视听导演调度**：严禁自发温吞慢热降级篡改剧本开篇强冲突动作，严禁私加事后温存躺床戏或剧本外体位；全集拆镜必须具备完整的“开场环境建立 (`env_cut`) ➔ 双人封堵对峙 (`confront_2s`) ➔ 单人正反打交锋 (`srs_male` ⇄ `srs_female`) ➔ 场间物象转场 (`prop_macro`) ➔ 多体位冲撞与正反打交替 ➔ 尾声收束”导演调度，严禁全片仅排双人连体中景；
+    - **三级戏份门禁**：Gate 3 自动按「含口交戏 / 独处自慰戏 / 纯插入交合戏」三级分档核验，不强迫无口交剧本硬塞口交；
+    - **工作流黄金拓扑与满血底模锁**：Node 38 优先挂载 `qwen3vl_32b_minimax_h3_ultra_uncensored_heretic_int8_convrot.safetensors`（大内存下替代 4-bit `nvfp4` 以保多图跨模态对齐精度），Node 400 挂载 `MysticXXX_MMH3-V5-ref2va.safetensors`（文戏/穿衣/空镜权重强制归 `0.0`，肉戏恢复 `0.45~0.50`），Node 53 (DMAD) 与 Node 404 (如梦似幻) 锁定 `0.80`；物理切除悬空的 `Node 333 (MiniMaxH3SigmaShift)` 与武打倍速 LoRA 组（342~345），锁死 12GB 低显存四护法链（`Node 331 -> 332 -> 403 -> 401`）；所有资产文件名必须为纯 ASCII 英文/数字/下划线，启动前动态校验 ComfyUI `--input-directory` 真实挂载目录，确保单实例进程运行防 OOM；跨镜接缝两边必须换视角或换景别，需要定格抽尾帧时追加 `The movement stops and the picture holds still for the last second.`。
