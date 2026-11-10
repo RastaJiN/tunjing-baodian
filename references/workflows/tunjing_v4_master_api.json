@@ -404,5 +404,86 @@
     "_meta": {
       "title": "LoRA加载器（仅模型）- 如梦似幻"
     }
+  },
+  "43": {
+    "inputs": {
+      "image": "scene_main.png"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "加载图像_槽4_道具或局部参考 (<Picture 4>)"
+    }
+  },
+  "19": {
+    "inputs": {
+      "image": "scene_main.png"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "加载图像_槽5_扩展参考 (<Picture 5>)"
+    }
+  },
+  "23": {
+    "inputs": {
+      "image": "scene_main.png"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "加载图像_槽6_扩展参考 (<Picture 6>)"
+    }
+  },
+  "199": {
+    "inputs": {
+      "image": "scene_main.png"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "加载图像_槽7_扩展参考 (<Picture 7>)"
+    }
+  },
+  "200": {
+    "inputs": {
+      "image": "scene_main.png"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "加载图像_槽8_扩展参考 (<Picture 8>)"
+    }
+  },
+  "201": {
+    "inputs": {
+      "image": "scene_main.png"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "加载图像_槽9_扩展参考 (<Picture 9>)"
+    }
+  },
+  "14": {
+    "inputs": {
+      "audio": "female_voice.wav"
+    },
+    "class_type": "LoadAudio",
+    "_meta": {
+      "title": "加载音频_槽1_女主声线 (<Audio 1>)"
+    }
+  },
+  "15": {
+    "inputs": {
+      "audio": "female_voice.wav"
+    },
+    "class_type": "LoadAudio",
+    "_meta": {
+      "title": "加载音频_槽2_男主声线 (<Audio 2>)"
+    }
+  },
+  "48": {
+    "inputs": {
+      "audio": "female_voice.wav"
+    },
+    "class_type": "LoadAudio",
+    "_meta": {
+      "title": "加载音频_槽3_配角或环境声 (<Audio 3>)"
+    }
   }
 }

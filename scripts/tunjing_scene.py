@@ -412,6 +412,18 @@ def resolve_slot_refs(shot_size, pose_id, is_nude_state=True, asset_dir=""):
     else:
         lora_weight = 0.45
 
+    # 自动探测 00_资产/ 下的道具参考图（如 daoju_*.png / prop_*.png / *keycard*.png / *ring*.png）
+    # 当镜头为 prop_insert 或 present_item 时，自动追加到第 4 槽位 (<Picture 4> -> Node 43)，绝不挤占前 3 槽！
+    prop_img = ""
+    if first_p in ("prop_insert", "present_item") and asset_dir and os.path.isdir(asset_dir):
+        prop_cands = sorted(
+            f for f in os.listdir(asset_dir)
+            if f.lower().endswith((".png", ".jpg", ".jpeg", ".webp"))
+            and any(k in f.lower() for k in ("daoju", "prop", "item", "card", "ring", "contract", "phone"))
+        )
+        if prop_cands:
+            prop_img = prop_cands[0]
+
     if first_p in ("env_establish", "empty_cut", "corridor_cut"):
         return "C_empty_cut", ["s1", "s1", "s1"], [s_img, s_img, s_img], lora_weight, spatial_zone
     if first_p in ("srs_male", "loosen_tie", "rub_temple"):
@@ -420,6 +432,9 @@ def resolve_slot_refs(shot_size, pose_id, is_nude_state=True, asset_dir=""):
         shot_size == "face" and first_p not in ("bj", "squat_bj", "prone_bj", "deepthroat", "head_thrust", "facefuck")
     ):
         return "B_solo_female", ["f1", "s1", "s1"], [f_img, s_img, s_img], lora_weight, spatial_zone
+
+    if prop_img:
+        return "A_two_shot_with_prop", ["f1", "m1", "s1", "p1"], [f_img, m_img, s_img, prop_img], lora_weight, spatial_zone
 
     return "A_two_shot", ["f1", "m1", "s1"], [f_img, m_img, s_img], lora_weight, spatial_zone
 
@@ -517,6 +532,8 @@ def save_project_artifacts(out_dir, shots, actual_total, want_total, lines="",
         tier_label, ref_keys, ref_imgs, lora_w, spatial_zone = resolve_slot_refs(
             s["size"], s["pose"], is_nude_state=is_nude_state, asset_dir=asset_dir
         )
+        if len(ref_imgs) >= 4 and ref_imgs[3]:
+            s["prop_ref"] = ref_imgs[3]
 
         # 优先采用台词括号显式指定的情绪（如 生气/委屈/忧伤/冷笑），否则按台词语义与剧集推进阶段自动感知
         prog = i / max(1, len(shots))

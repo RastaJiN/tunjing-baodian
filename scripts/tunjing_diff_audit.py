@@ -317,8 +317,9 @@ def write_producer_receipt(project_dir, report):
         elif pose in ("srs_male", "srs_female"):
             tag = "👁️【单人正反打】 "
 
+        prop_note = f"🎁道具槽4:`{refs[3]}` " if len(refs) >= 4 and refs[3] else ""
         lines.append(
-            f"| **{sid}** | {dur:.2f}s ({frames}f) | `{sz}` / `{cam}` | `{pose}` | `{refs[0]}` | `{refs[1]}` | `{refs[2]}` | {tag}{line_str} |"
+            f"| **{sid}** | {dur:.2f}s ({frames}f) | `{sz}` / `{cam}` | `{pose}` | `{refs[0]}` | `{refs[1]}` | `{refs[2]}` | {prop_note}{tag}{line_str} |"
         )
 
     lines.extend([

@@ -155,14 +155,18 @@ def build_shot_workflow(base_wf, shot, custom_seed=None, prefix_override=None):
         wf["49"]["inputs"]["image"] = ref_imgs[1]
     if "50" in wf:
         wf["50"]["inputs"]["image"] = ref_imgs[2]
-    # 支持第 4 槽位道具参考图 (<Picture 4> -> Node 43 -> ref_images.ref_image_3)，严禁拔掉 Node 50 场景槽顶替！
-    if len(ref_imgs) >= 4 and ref_imgs[3]:
-        if "43" in wf:
-            wf["43"]["inputs"]["image"] = ref_imgs[3]
-        if "265" in wf:
-            wf["265"]["inputs"]["ref_images.ref_image_3"] = ["43", 0]
-    elif "265" in wf and "ref_images.ref_image_3" in wf["265"]["inputs"]:
-        del wf["265"]["inputs"]["ref_images.ref_image_3"]
+    # 动态挂载第 4~9 扩展参考图槽位 (<Picture 4>~<Picture 9> -> Nodes 43, 19, 23, 199, 200, 201)
+    # 有道具/扩展图时自动连上 Node 265，无道具镜自动断开 ref_image_3..8（绝不拔掉 Node 50 场景槽顶替！）
+    extra_slot_nodes = [(3, "43"), (4, "19"), (5, "23"), (6, "199"), (7, "200"), (8, "201")]
+    for slot_idx, node_id in extra_slot_nodes:
+        port_key = f"ref_images.ref_image_{slot_idx}"
+        if len(ref_imgs) > slot_idx and ref_imgs[slot_idx]:
+            if node_id in wf:
+                wf[node_id]["inputs"]["image"] = ref_imgs[slot_idx]
+            if "265" in wf:
+                wf["265"]["inputs"][port_key] = [node_id, 0]
+        elif "265" in wf and port_key in wf["265"]["inputs"]:
+            del wf["265"]["inputs"][port_key]
 
     if "400" in wf:
         wf["400"]["inputs"]["lora_name"] = shot.get("lora_mystic_name", "MysticXXX_MMH3-V5-ref2va.safetensors")

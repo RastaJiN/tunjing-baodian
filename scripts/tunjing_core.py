@@ -341,6 +341,8 @@ def build_fullref_header(
     female_desc="young woman anchored in <Picture 1>, preserving her exact facial structure, hairstyle, skin tone, and anatomical proportions",
     male_desc="mature man anchored in <Picture 2>, preserving his exact masculine facial identity, hairstyle, skin tone, and muscular build",
     scene_props="",
+    prop_ref="",
+    prop_desc="key physical item anchored in <Picture 4>, preserving its exact printed markings, shape, and surface texture",
     has_audio_refs=True,
 ):
     """
@@ -396,6 +398,8 @@ def build_fullref_header(
         parts.append(f"<Subject 2> is the {male_desc}.")
         parts.append(f"<Subject 3> is the {scene_en} environment anchored in <Picture 3>{props_clause} and ambient lighting.")
 
+    if prop_ref:
+        parts.append(f"<Subject 4> is the {prop_desc}.")
     if has_audio_refs and tier != "C_empty_cut":
         parts.append("Audio timbre anchors: <Audio 1> locks the vocal timbre of <Subject 1> (S1); <Audio 2> locks the vocal timbre of <Subject 2> (S2).")
     parts.append("")
@@ -421,6 +425,8 @@ def build_fullref_header(
             parts.append("<Subject 1>: fully_preserved - facial identity, exact hairstyle, body anatomy, and skin texture are strictly locked to <Picture 1>.")
         parts.append("<Subject 2>: fully_preserved - masculine facial identity, physique, and skin tone are strictly locked to <Picture 2>.")
     parts.append(f"<Subject 3>: fully_preserved for surface texture and lighting direction from <Picture 3>; weak_reference for exact camera framing.")
+    if prop_ref:
+        parts.append("<Subject 4>: fully_preserved - exact object geometry, surface markings, and material texture are strictly locked to <Picture 4>.")
     parts.append("")
 
     # 5. Consistency, Skin & Lighting, MOTION FLOOR
@@ -509,7 +515,8 @@ def build_shot_description(shot, index, total_shots, dur, size_desc, cam_desc,
         comp_lock = ("COMPOSITION LOCK: Pure architectural environment framing anchored in <Picture 3>, "
                      "focusing exclusively on spatial geometry, lighting, and existing interior furnishings. ")
     elif first_p in ("prop_insert", "cut_insert"):
-        comp_lock = ("COMPOSITION LOCK: Extreme macro framing cropped tightly on the hand and surface contact area, "
+        prop_anchor_clause = " holding <Subject 4> anchored in <Picture 4>," if shot.get("prop_ref") else ""
+        comp_lock = (f"COMPOSITION LOCK: Extreme macro framing cropped tightly on the hand and surface contact area,{prop_anchor_clause} "
                      "with 20% shallow depth-of-field background anchored in <Picture 3>. ")
     elif first_p == "srs_male":
         comp_lock = ("COMPOSITION LOCK: Tight single-subject focus cropped from chest to head on <Subject 2> positioned on the left side of the frame, "
@@ -597,7 +604,8 @@ def single_shot_prompt(shot, index, total_shots, dur, size_desc, cam_desc,
                        lines="", speaker="女子A", idea="", scene="hotel suite", pose_names="",
                        female_desc="young woman anchored in <Picture 1>, preserving her exact facial structure, hairstyle, skin tone, and anatomical proportions",
                        male_desc="mature man anchored in <Picture 2>, preserving his exact masculine facial identity, hairstyle, skin tone, and muscular build",
-                       scene_props="", emotion="default", voiceover=False, hold_last_second=False,
+                       scene_props="", prop_ref="", prop_desc="key physical item anchored in <Picture 4>, preserving its exact printed markings, shape, and surface texture",
+                       emotion="default", voiceover=False, hold_last_second=False,
                        tier="A_two_shot", has_audio_refs=True):
     """
     吞鲸 v4.0 对外唯一装配接口：
@@ -610,10 +618,12 @@ def single_shot_prompt(shot, index, total_shots, dur, size_desc, cam_desc,
     is_staging = first_p in STAGING_IDS
     shot_size = shot.get("size", "mcu")
 
+    eff_prop = prop_ref or shot.get("prop_ref", "")
     header = build_fullref_header(
         dur, "9:16", scene=scene, idea=idea, is_undress=is_undress,
         is_staging=is_staging, tier=tier, shot_size=shot_size,
         female_desc=female_desc, male_desc=male_desc, scene_props=scene_props,
+        prop_ref=eff_prop, prop_desc=prop_desc,
         has_audio_refs=has_audio_refs
     )
 
