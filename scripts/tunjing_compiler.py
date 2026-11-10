@@ -64,8 +64,23 @@ def lint_tunjing_prompt(text):
         blocks = [text]
 
     for idx_b, blk in enumerate(blocks, 1):
+        if "=== NEGATIVE ===" in blk:
+            errors.append(f"镜头块 {idx_b} [正向混入NEGATIVE致命错误]：送入 Node 263 的正向提示词严禁包含 '=== NEGATIVE ===' 段落（CFG=1.0 下必触发反向注意力画字幕/灰墙）！")
         pos_part = blk.split("=== NEGATIVE ===")[0]
         pos_no_d = re.sub(r'<d>.*?</d>', '', pos_part, flags=re.DOTALL)
+
+        # R4 字幕反向注意力词根拦截（严禁在正向写 NO SUBTITLES / CAPTIONS / ON-SCREEN TEXT）
+        sub_triggers = re.findall(r'\b(subtitles?|captions?|on-screen text|burn-in text|text ban)\b', pos_no_d, re.IGNORECASE)
+        if sub_triggers:
+            errors.append(f"镜头块 {idx_b} [字幕反向诱导词致命错误]：正向文本检测到 {sorted(set(sub_triggers))}！严禁在正向写 NO SUBTITLES/CAPTIONS，该词根会直接诱导 Qwen3-VL 在画面腰腹部烫印白色字幕！")
+
+        # 拦截 says: 与 <d> 断行（SRT 字幕块格式诱导）
+        if re.search(r'says:\s*\n\s*<d>', pos_part, re.IGNORECASE):
+            errors.append(f"镜头块 {idx_b} [台词断行字幕诱导错误]：检测到 'says:\n<d>' 断行写法！必须同行紧接写成 'says: <d>[Chinese]...</d>'，严禁拆成两行剧本字幕块！")
+
+        # 拦截 At 0.00s, mcu, static_side; 工程代码复读
+        if re.search(r'At 0\.00s,\s*(?:wide|mcu|cu|macro|hip|face)\s*,', pos_no_d, re.IGNORECASE):
+            errors.append(f"镜头块 {idx_b} [工程代码复读错误]：检测到 'At 0.00s, mcu, static_side;' 机械代号复读，破坏相机与动作分区！")
 
         # R1/H9: 剥离 <d> 后零汉字扫描
         zh_left = re.findall(r'[\u4e00-\u9fff]+', pos_no_d)

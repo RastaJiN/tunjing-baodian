@@ -233,6 +233,13 @@ def audit_step_4(project_dir):
     # 3c. 送模代码块全文本 0 汉字盲检（剥离 <d>...</d> 后，正向 Prompt 严禁残留任何汉字防字幕烫印）
     code_blocks = re.findall(r'```(?:text)?\s*(.*?)```', content, re.DOTALL)
     for idx_cb, cb in enumerate(code_blocks, 1):
+        if "=== NEGATIVE ===" in cb:
+            return False, f"提示词门禁未通过：第 {idx_cb} 镜送模代码块内混入了 '=== NEGATIVE ===' 段落！Node 263 正向提示词必须 100% 剥离负面清单（防反向注意力画字幕）！"
+        sub_trig = re.findall(r'\b(subtitles?|captions?|on-screen text|burn-in text|text ban)\b', cb, re.IGNORECASE)
+        if sub_trig:
+            return False, f"提示词门禁未通过：第 {idx_cb} 镜正向文本含有字幕反向诱导词 {sorted(set(sub_trig))}！严禁在正向写 NO SUBTITLES/CAPTIONS！"
+        if re.search(r'says:\s*\n\s*<d>', cb, re.IGNORECASE):
+            return False, f"提示词门禁未通过：第 {idx_cb} 镜将 'says:' 与 '<d>' 拆成了两行（SRT字幕格式诱导）！必须同行写为 'says: <d>[Chinese]...</d>'！"
         pos_part = cb.split("=== NEGATIVE ===")[0]
         pos_no_d = re.sub(r'<d>.*?</d>', '', pos_part, flags=re.DOTALL)
         zh_chars = re.findall(r'[\u4e00-\u9fff]+', pos_no_d)
