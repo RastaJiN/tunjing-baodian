@@ -119,6 +119,15 @@ def audit_project(project_dir):
         if re.findall(r"(?:,\s*,+|,\s*\.|;\s*,)", pos_no_d):
             report["violations"].append(f"镜头 {s.get('id')} [正则阉割残骸]：检测到 ', ,' 或 ', .' 破碎标点语法！")
 
+        # 反作弊检查 C：拦截手部/道具特写被机械套用“腰胯交合(pelvic contact junction)”切边锁！
+        if any(w in prompt.lower() for w in ("keycard", "tight close-up on hands", "palm")) and "pelvic contact junction" in prompt.lower():
+            report["violations"].append(f"镜头 {s.get('id')} [手部道具镜误锁下体交合]：明明是手部/房卡特写，却被机械套用了 'pelvic contact junction' 腰胯下体切边锁！")
+
+        # 反作弊检查 D：拦截单人正反打镜头未物理隔离缺席异性槽位！
+        if any(w in prompt.lower() for w in ("single reverse shot", "tight single-subject")) and len(ref_imgs) >= 3:
+            if ref_imgs[0] != ref_imgs[2] and ref_imgs[1] != ref_imgs[2]:
+                report["violations"].append(f"镜头 {s.get('id')} [单人正反打未隔离异性槽]：正文声明为单人正反打，但 ref_images {ref_imgs[:3]} 同时挂了男女双人母版（未将缺席方替换为场景图）！")
+
         # 结构检查
         anchors_present = sum(1 for grp in required_anchors if any(a in prompt for a in grp))
         if anchors_present >= 7:

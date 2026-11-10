@@ -457,6 +457,8 @@ def sanitize_positive_only(text):
         (r"\bno hard cuts\b", "continuous unbroken motion"),
         (r"\bwithout surface reflection\b", "with gentle matte light absorption"),
         (r"\bnon-greasy complexion\b", "dry velvet complexion"),
+        (r"\blight sweat\b", "dry matte skin texture"),
+        (r"\bsweaty skin\b", "matte velvet skin"),
         (r"\bzero hard directional light\b", "even ambient illumination"),
         (r"\bunobstructed\b", "clean"),
     ]

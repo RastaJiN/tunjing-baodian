@@ -163,7 +163,7 @@ def parse_storyboard_md(sb_file):
     with open(sb_file, "r", encoding="utf-8") as f:
         content = f.read()
 
-    blocks = re.split(r"(?:^|\n)###?\s*SHOT[-_\s]*", content, flags=re.IGNORECASE)
+    blocks = re.split(r"(?:^|\n)###?\s*\[?SHOT[-_\s]*", content, flags=re.IGNORECASE)
     shots = []
     missing = []
 
@@ -229,7 +229,7 @@ def parse_storyboard_md(sb_file):
 
         # ── 体位双格式提取（行内 + 表格 + 标题括号）──
         pose_id, pose_zh = "", ""
-        pose_raw = _cell(b, "体位", "姿势", "pose")
+        pose_raw = _cell(b, "体位", "姿势", "姿势代号", "姿势类别", "pose", "pose_id")
         if pose_raw:
             m_id = re.search(r"`?([a-z][a-z_0-9->]{1,40})`?", pose_raw)
             if m_id:

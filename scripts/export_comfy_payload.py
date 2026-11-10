@@ -69,8 +69,8 @@ def verify_batch_json(project_dir):
         total_frames += frames
 
         ref_imgs = s.get("ref_images", [])
-        if len(ref_imgs) != 3:
-            return False, f"镜头 {i} ref_images 必须严格为 3 槽 [Picture 1, Picture 2, Picture 3]（空间图池单槽轮换仍在槽位 2 完成）！"
+        if len(ref_imgs) not in (3, 4):
+            return False, f"镜头 {i} ref_images 必须为 3 槽 [女, 男, 场] 或 4 槽 [女, 男, 场, 道具]（实测 {len(ref_imgs)} 槽）！"
         # 校验核心空间锚点：槽位 2（<Picture 3>）必须非空
         if not ref_imgs[2]:
             return False, f"镜头 {i} 缺失 <Picture 3> 场景空间锚点！背景底图严禁断开！"

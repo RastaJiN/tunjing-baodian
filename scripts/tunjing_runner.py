@@ -154,6 +154,14 @@ def build_shot_workflow(base_wf, shot, custom_seed=None, prefix_override=None):
         wf["49"]["inputs"]["image"] = ref_imgs[1]
     if "50" in wf:
         wf["50"]["inputs"]["image"] = ref_imgs[2]
+    # 支持第 4 槽位道具参考图 (<Picture 4> -> Node 43 -> ref_images.ref_image_3)，严禁拔掉 Node 50 场景槽顶替！
+    if len(ref_imgs) >= 4 and ref_imgs[3]:
+        if "43" in wf:
+            wf["43"]["inputs"]["image"] = ref_imgs[3]
+        if "265" in wf:
+            wf["265"]["inputs"]["ref_images.ref_image_3"] = ["43", 0]
+    elif "265" in wf and "ref_images.ref_image_3" in wf["265"]["inputs"]:
+        del wf["265"]["inputs"]["ref_images.ref_image_3"]
 
     if "400" in wf:
         wf["400"]["inputs"]["lora_name"] = shot.get("lora_mystic_name", "MysticXXX_MMH3-V5-ref2va.safetensors")
