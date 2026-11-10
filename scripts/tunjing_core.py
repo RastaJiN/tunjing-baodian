@@ -459,6 +459,7 @@ def sanitize_positive_only(text):
         (r"\bnon-greasy complexion\b", "dry velvet complexion"),
         (r"\blight sweat\b", "dry matte skin texture"),
         (r"\bsweaty skin\b", "matte velvet skin"),
+        (r"\bthe\s+the\b", "the"),
         (r"\bzero hard directional light\b", "even ambient illumination"),
         (r"\bunobstructed\b", "clean"),
     ]
@@ -557,7 +558,7 @@ def build_shot_description(shot, index, total_shots, dur, size_desc, cam_desc,
         body_text += " (Anatomical lock: lips gently parted 5 mm with subtle contact and natural lip geometry; his left hand is the single hand in frame)."
 
     if is_penetration and shot.get("size") not in ("face", "cu"):
-        body_text += " Snug anatomical junction between penis and vaginal entrance, rhythmic piston strokes of 10 cm clearly readable with elastic skin recoil."
+        body_text += " Snug anatomical junction between penis and vaginal entrance, male anatomy complete and seated inside the female body with distinct anatomical boundaries, rhythmic piston strokes of 10 cm clearly readable with elastic skin recoil."
 
     tail = ""
     if hold_last_second or first_p == "outro_solo":

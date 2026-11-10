@@ -174,6 +174,8 @@ def build_shot_workflow(base_wf, shot, custom_seed=None, prefix_override=None):
         wf["259"]["inputs"]["value"] = float(shot.get("duration", 5.0))
     if "263" in wf:
         wf["263"]["inputs"]["text"] = shot.get("prompt", "")
+    if "265" in wf:
+        wf["265"]["inputs"]["ref_image_size"] = "match"
     if "364" in wf:
         wf["364"]["inputs"]["filename_prefix"] = prefix_override or f"TunjingV4_{shot.get('shot_id', 'shot')}_"
 
@@ -355,7 +357,7 @@ def main():
                     break
 
             try:
-                http_json(f"{COMFY_URL}/free", method="POST", payload={"unload_models": False, "free_memory": True})
+                urllib.request.urlopen(urllib.request.Request(f"{COMFY_URL}/free", data=json.dumps({"unload_models": False, "free_memory": True}).encode("utf-8"), headers={"Content-Type": "application/json"}, method="POST"), timeout=10).read()
             except Exception:
                 pass
             time.sleep(10)

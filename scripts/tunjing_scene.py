@@ -209,33 +209,54 @@ def allocate_exact_h3_frames(shots, want_total_sec):
     # 计算总阶数 K_total，使 5 * n_shots + 17 * K_total 最接近 target_raw_frames
     k_total = max(n_shots * 2, round((target_raw_frames - 5 * n_shots) / 17.0))
 
-    # 为每个镜头分配初始权重：转场/微距阻断偏短（权重 0.65），正戏/对话偏长（权重 1.15）
+    # 心电图呼吸节拍权重（短 1.63s/k=2 标点微距 ⇄ 中 3.75s~4.46s 反应/过渡 ⇄ 长 5.17s~6.58s 主力发力/长台词）
+    ecg_wave = [0.82, 1.15, 0.95, 1.32, 0.72, 1.22, 1.05]
     weights = []
-    for s in shots:
+    for idx_s, s in enumerate(shots):
         pid = s.get("pose", "")
-        if s.get("type") == "transition" or pid in ("cut_insert", "prop_insert"):
-            weights.append(0.65)
-        elif pid in ("env_establish", "outro_solo"):
-            weights.append(0.85)
+        sz = s.get("size", "")
+        if pid in ("cut_insert", "prop_insert") or (sz == "macro" and pid in STAGING_IDS):
+            weights.append(0.38)  # 1.625s (39f) 生理阻断短促标点
+        elif s.get("type") == "transition":
+            weights.append(0.68)  # ~3.75s (90f) 换体位过渡
+        elif sz in ("face", "cu") or pid in ("srs_male", "srs_female"):
+            weights.append(ecg_wave[idx_s % len(ecg_wave)])
         else:
-            weights.append(1.15)
+            weights.append(ecg_wave[(idx_s + 1) % len(ecg_wave)] * 1.12)
 
     w_sum = sum(weights)
     ks = [max(2, min(10, round(k_total * (w / w_sum)))) for w in weights]
+
+    # 打破连续 3 镜同帧长（严禁平铺一刀切 175f/7.29s）
+    for i in range(2, n_shots):
+        if ks[i] == ks[i - 1] == ks[i - 2]:
+            if ks[i - 1] > 2 and ks[i] < 10:
+                ks[i - 1] -= 1
+                ks[i] += 1
+            elif ks[i] > 3:
+                ks[i] -= 1
+                ks[i - 2] = min(10, ks[i - 2] + 1)
 
     # 精确配平差值到 K_total
     diff = k_total - sum(ks)
     idx = 0
     guard = 0
-    while diff != 0 and guard < 1000:
+    while diff != 0 and guard < 2000:
         guard += 1
         i = idx % n_shots
         idx += 1
         if diff > 0 and ks[i] < 10:
-            ks[i] += 1
+            # 避免制造三连同长
+            nxt_k = ks[i] + 1
+            if i >= 2 and ks[i - 1] == nxt_k and ks[i - 2] == nxt_k and guard < 1500:
+                continue
+            ks[i] = nxt_k
             diff -= 1
         elif diff < 0 and ks[i] > 2:
-            ks[i] -= 1
+            nxt_k = ks[i] - 1
+            if i >= 2 and ks[i - 1] == nxt_k and ks[i - 2] == nxt_k and guard < 1500:
+                continue
+            ks[i] = nxt_k
             diff += 1
 
     t_frames = 0

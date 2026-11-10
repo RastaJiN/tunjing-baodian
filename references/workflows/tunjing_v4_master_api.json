@@ -204,7 +204,7 @@
         "250",
         1
       ],
-      "ref_image_size": "max",
+      "ref_image_size": "match",
       "clip": [
         "38",
         0
