@@ -437,13 +437,18 @@ def save_project_artifacts(out_dir, shots, actual_total, want_total, lines="",
         if first_p not in ("env_establish", "blocking_2s", "undress") and first_p not in ("srs_male", "srs_female", "prop_insert"):
             is_nude_state = True
 
-        # 挂载对应镜头的台词与说话人
+        # 挂载对应镜头的台词、说话人与显式表演情绪（支持 "4:男子A(生气):台词" 语法）
         shot_line = ""
         shot_speaker = "女子A"
+        explicit_emo = ""
         if first_p == "srs_male":
             shot_speaker = "男子A"
         if i in line_map:
             spk, txt = line_map[i]
+            emo_m = re.search(r"[（(](.*?)[）)]", spk)
+            if emo_m:
+                explicit_emo = emo_m.group(1).strip()
+                spk = re.sub(r"[（(].*?[）)]", "", spk).strip()
             if first_p in ("bj", "squat_bj", "prone_bj", "deepthroat", "facefuck", "cum_face") and "女" in spk:
                 pass
             elif s["dur"] >= 2.0:
@@ -454,9 +459,11 @@ def save_project_artifacts(out_dir, shots, actual_total, want_total, lines="",
             s["size"], s["pose"], is_nude_state=is_nude_state, asset_dir=asset_dir
         )
 
-        # 自动按剧集推进阶段匹配【文戏/情绪状态失控谱】：前段防御掩饰(inhibition) -> 中段爆发失控(surge) -> 尾段余波消散(aftermath)
+        # 优先采用台词括号显式指定的情绪（如 生气/委屈/忧伤/冷笑），否则按台词语义与剧集推进阶段自动感知
         prog = i / max(1, len(shots))
-        if first_p == "outro_solo" or first_p in FINISH_IDS or prog > 0.82:
+        if explicit_emo:
+            auto_emotion = explicit_emo
+        elif first_p == "outro_solo" or first_p in FINISH_IDS or prog > 0.82:
             auto_emotion = "aftermath"
         elif first_p in ("env_establish", "blocking_2s", "undress") or prog < 0.30:
             auto_emotion = "inhibition"

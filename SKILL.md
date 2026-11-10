@@ -158,7 +158,7 @@ python scripts/tunjing_scene.py \
     - **陈设 100% 取自底图白名单**：家具与道具描述必须严格锚定 `<Picture 3>` 真实存在的元素，严禁脑补底图不存在的陈设，且单次线性动作严禁在多时间段重复描写两遍。
 19. **对话回合制（C27c/C27d）、肌肉神态同句绑定与官方画外音死公式铁律（破除 3 秒静止假人）**：
     - **按回合切镜**：15 秒对话段开口交互 ≥ 6 次，严禁同一角色连续独占 2 个镜头发声，单次发言 ≤ 15 字（超长台词必须拆镜插入听者反应或转局部特写画外音）；
-    - **肌肉神态与听者同句绑定**：严禁角色静止超过 3 秒；每句台词必须在同一 Shot 的同一句话内绑定具体面部肌肉与手部重心微动作（如 `jaw clenched tight, throat bobbing once`），且同时声明未说话听者的闭口微反应（`while <Subject M> keeps lips completely closed`）；
+    - **12 大主动表演情绪光谱 + 3 阶心理阈值状态谱与听者同句绑定**：严禁角色静止超过 3 秒；内置 12 种主动表演情绪底色（`生气/anger_rage`、`冷怒/cold_wrath`、`忧伤/grief_sorrow`、`委屈/humiliated_tears`、`得意冷笑/triumph_smirk`、`欣喜温柔/warm_joy`、`恐惧惊慌/fear_panic`、`嫉妒怨恨/jealousy_spite`、`嘲讽/mockery`、`挑衅/provocation`、`隐忍/forbearance`、`迷离失神/ecstasy`）与 3 大反应阶段（`inhibition/surge/aftermath`），全部拆解为【眉弓+眼眸+鼻翼呼吸+下颌唇角】四维解剖指令，支持 `--lines "4:男子A(生气):台词|5:女子A(委屈):台词"` 显式标注或根据台词字面自动感知，且同时声明未说话听者的闭口微反应（`while <Subject M> keeps lips completely closed`）；
     - **画外音三要素死公式**：凡内嵌画外音/内心独白，必须严格采用 `<Subject N> (Sx) says in an off-screen voiceover: <d>[Chinese]...</d> while her/his lips remain completely closed.`；交合微距镜（`hip/macro`）若有台词，必须自动转为该画外音公式，且对话镜严禁误锁 `HEADS OUT OF FRAME`，换体位转场镜严禁误锁 `LOWER BODY OUT OF FRAME`。
 20. **剧本原义死锁（00b）、三级戏份门禁与工作流黄金拓扑铁律**：
     - **原义死锁与全剧集视听导演调度**：严禁自发温吞慢热降级篡改剧本开篇强冲突动作，严禁私加事后温存躺床戏或剧本外体位；全集拆镜必须具备完整的“开场环境建立 (`env_establish`) ➔ 双人封堵对峙 (`blocking_2s`) ➔ 单人正反打交锋 (`srs_male` ⇄ `srs_female`) ➔ 场间物象微距 (`prop_insert`) ➔ 多体位冲撞与正反打交替 ➔ 尾声收束 (`outro_solo`)”导演调度，严禁全片仅排双人连体中景；道具微距原语保持抽象槽位 `prop_insert`，严禁写死特定剧集物件（如房卡/婚戒/支票）以免诱发大模型刻板印象；

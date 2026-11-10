@@ -36,6 +36,76 @@ def _import_draft():
         return draft
 
 
+
+def register_in_root_meta_info(draft_root, draft_name, total_duration_us):
+    """
+    自动将新建草稿写入剪映 6.x 的 root_meta_info.json 总索引，确保打开剪映首页即可识别并双击打开！
+    """
+    import uuid, time
+    rmi_path = os.path.join(draft_root, "root_meta_info.json")
+    now_us = int(time.time() * 1_000_000)
+    fold_norm = os.path.abspath(os.path.join(draft_root, draft_name)).replace("\\", "/")
+    root_norm = os.path.abspath(draft_root).replace("\\", "/")
+
+    data = {"all_draft_store": [], "draft_ids": 1}
+    if os.path.exists(rmi_path):
+        try:
+            with open(rmi_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+        except Exception:
+            pass
+
+    store = data.get("all_draft_store", [])
+    # 移除同名旧条目
+    store = [x for x in store if x.get("draft_name") != draft_name]
+
+    new_entry = {
+        "cloud_draft_cover": False,
+        "cloud_draft_sync": False,
+        "draft_cloud_last_action_download": False,
+        "draft_cloud_purchase_info": "",
+        "draft_cloud_template_id": "",
+        "draft_cloud_tutorial_info": "",
+        "draft_cloud_videocut_purchase_info": "",
+        "draft_cover": f"{fold_norm}\\draft_cover.jpg",
+        "draft_fold_path": fold_norm,
+        "draft_id": str(uuid.uuid4()).upper(),
+        "draft_is_ai_shorts": False,
+        "draft_is_cloud_temp_draft": False,
+        "draft_is_infinite_canvas_draft": False,
+        "draft_is_invisible": False,
+        "draft_is_pippit_draft": False,
+        "draft_is_web_article_video": False,
+        "draft_json_file": f"{fold_norm}\\draft_content.json",
+        "draft_name": draft_name,
+        "draft_new_version": "164.0.0",
+        "draft_root_path": root_norm,
+        "draft_timeline_materials_size": 0,
+        "draft_type": "",
+        "draft_web_article_video_enter_from": "",
+        "pippit_avatar_url": "",
+        "pippit_extra_info": "",
+        "pippit_id": "",
+        "pippit_user_name": "",
+        "streaming_edit_draft_ready": True,
+        "tm_draft_cloud_completed": "",
+        "tm_draft_cloud_entry_id": -1,
+        "tm_draft_cloud_modified": 0,
+        "tm_draft_cloud_parent_entry_id": -1,
+        "tm_draft_cloud_space_id": -1,
+        "tm_draft_cloud_user_id": -1,
+        "tm_draft_create": now_us,
+        "tm_draft_modified": now_us,
+        "tm_draft_removed": 0,
+        "tm_duration": int(total_duration_us),
+    }
+    store.insert(0, new_entry)
+    data["all_draft_store"] = store
+    with open(rmi_path, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, separators=(",", ":"))
+    return new_entry["draft_id"]
+
+
 def find_jianying_draft_root():
     """智能探测本机剪映草稿总目录"""
     candidates = [
@@ -383,8 +453,10 @@ def export_to_jianying(project_dir=None, storyboard_file=None, draft_name=None,
 
         current_us += dur_us
 
-    # 保存草稿
+    # 保存草稿并自动写入剪映 root_meta_info.json 首页总索引
     script.save()
+    reg_id = register_in_root_meta_info(draft_root, draft_name, current_us)
+    print(f'[✓] 已自动登记至剪映首页 root_meta_info.json 总索引 (Draft ID: {reg_id})')
 
     target_draft_path = os.path.join(draft_root, draft_name)
     print("\n" + "=" * 65)

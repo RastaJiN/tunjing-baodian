@@ -309,5 +309,16 @@ def main():
             time.sleep(10)
 
 
+    # ── 全集渲染收官后：全自动串联【母带响度精修 + 自动打包打入剪映本地草稿箱】──
+    if not reroll_set and not args.only_first:
+        print("\n" + "=" * 70)
+        print("🎬 全集镜头渲染完毕！正在自动启动【母带精修 (-16 LUFS) ➔ 自动导入剪映草稿箱】流水线...")
+        print("=" * 70)
+        master_script = os.path.join(BASE_DIR, "tunjing_mastering.py")
+        jy_script = os.path.join(BASE_DIR, "export_jianying_draft.py")
+        subprocess.run([sys.executable, master_script, args.project_dir])
+        subprocess.run([sys.executable, jy_script, args.project_dir])
+
+
 if __name__ == "__main__":
     main()

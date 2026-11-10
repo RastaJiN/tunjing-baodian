@@ -54,22 +54,81 @@ OFFICIAL_CUT_PHRASES = (
     "the shot switches to",
 )
 
-# 文戏状态失控谱（3大心理阈值阶段 + 细分微表演物理指令，拒绝死板动作表）
+# 吞鲸 4.0 · 12大核心表演情绪光谱 + 3大心理阈值反应阶段（四维面部解剖物理指令：眉弓+眼眸+鼻翼呼吸+下颌唇角）
 EMOTION_MUSCLE_CUES = {
-    # 阶段 1：防御/掩饰期 (Inhibition) — 试图隐藏信息、动作延迟与视线游移
-    "inhibition": "fingertips tightening subconsciously against the fabric, gaze shifting between the other person's eyes and lips with a 0.5-second hesitation lag before speaking, shallow guarded chest breathing",
-    # 阶段 2：爆发/失控期 (Surge) — 信息量压过阈值、修饰动作骤停与死锁视线
-    "surge": "all secondary hand fidgeting freezing abruptly, unblinking gaze locked dead-on with flared nostrils and deep ribcage expansion, jaw muscles visibly hardening",
-    # 阶段 3：余波/消散期 (Aftermath) — 被击中要害后的物理卸力与失焦
-    "aftermath": "shoulder line dropping 3 cm as torso support relaxes, gaze losing focus and drifting toward the ambient light source while lips part in a silent exhale",
-    # 经典情绪细分兼容
-    "forbearance": "jaw clenched tight, throat bobbing once in a swallow, gaze dropping 10 cm then rising while knuckles whiten",
-    "mockery": "one corner of the mouth lifting 2 mm, eyelids half-lowered sweeping a glance across while fingers tap twice",
-    "provocation": "chin tilted up 15 degrees, steady eye contact locked forward while collarbones rise",
-    "submission": "eyelashes trembling with gaze lowered toward the floor, lower lip pressed between teeth as shoulders sink 2 cm",
-    "ecstasy": "pupils dilated with upward gaze, head tilting back against the support as neck tendons tense",
-    "default": "jaw muscles tensing with visible chest breathing and natural head micro-shifts of 2 cm",
+    # ── 12 大主动表演情绪底色 (Acting Emotion Spectrum) ──
+    "anger_rage":       "brows drawn sharply together with tense glabella, intense unblinking glare, nostrils flaring with heavy sharp inhales, jaw muscles bulging as words are forced through clenched teeth",
+    "cold_wrath":       "expressionless cold mask with narrowed eyes, chin slightly lowered casting shadow over the upper face, slow icy breathing, speaking with minimal lip movement and lethal calm",
+    "grief_sorrow":     "inner eyebrows subtly raised in grief, glistening tear film pooling along the lower eyelids, corners of the mouth pulled faintly downward, chest rising in a shaky broken sigh",
+    "humiliated_tears": "reddened eye rims with a single tear rolling down the cheek, teeth biting hard into the lower lip to suppress a sob, chin trembling slightly",
+    "triumph_smirk":    "eyes curving with sharp satisfaction, one corner of the lips lifting 3 mm into a victorious smirk, chin rising 10 degrees with relaxed confident posture",
+    "warm_joy":         "softened brow and warm bright gaze, cheeks lifting naturally with a gentle genuine smile, relaxed even breathing",
+    "fear_panic":       "pupils widened in sudden alarm, lips parted 5 mm in a frozen gasp, rapid shallow chest heaving as head pulls back 3 cm",
+    "jealousy_spite":   "sideways piercing gaze fixed on the target, lower jaw shifted tensely, fingers digging into the palm as nostrils tighten",
+    "mockery":          "eyelids half-lowered in disdain, sweeping a slow gaze from head to toe, one corner of the mouth lifting 2 mm with a scoffing exhale",
+    "provocation":      "chin tilted up 15 degrees, slow deliberate blink followed by steady seductive eye contact, collarbones rising with a slow breath",
+    "forbearance":      "jaw clenched tight, throat bobbing once in a hard swallow, gaze dropping 10 cm then rising while knuckles whiten",
+    "ecstasy":          "pupils dilated with upward gaze, flushed cheeks, head tilting back against the support as neck tendons tense",
+    # ── 3 大被动心理阈值反应阶段 (State Spectrum) ──
+    "inhibition":       "fingertips tightening subconsciously against the fabric, gaze shifting between the other person's eyes and lips with a 0.5-second hesitation lag before speaking, shallow guarded chest breathing",
+    "surge":            "all secondary hand fidgeting freezing abruptly, unblinking gaze locked dead-on with flared nostrils and deep ribcage expansion, jaw muscles visibly hardening",
+    "aftermath":        "both shoulders dropping 3 cm as torso support relaxes, gaze losing focus and drifting toward the ambient light source while lips part in a silent exhale",
+    "submission":       "eyelashes trembling with gaze lowered toward the floor, lower lip pressed between teeth as shoulders sink 2 cm",
+    "default":          "jaw muscles tensing with visible chest breathing and natural head micro-shifts of 2 cm",
 }
+
+EMOTION_ZH_ALIAS = {
+    "生气": "anger_rage", "暴怒": "anger_rage", "震怒": "anger_rage", "愤怒": "anger_rage", "发火": "anger_rage",
+    "冷怒": "cold_wrath", "阴沉": "cold_wrath", "施压": "cold_wrath", "冰冷": "cold_wrath", "压迫": "cold_wrath",
+    "忧伤": "grief_sorrow", "悲伤": "grief_sorrow", "心碎": "grief_sorrow", "难过": "grief_sorrow", "哀伤": "grief_sorrow",
+    "委屈": "humiliated_tears", "屈辱": "humiliated_tears", "含泪": "humiliated_tears", "哭泣": "humiliated_tears", "流泪": "humiliated_tears",
+    "得意": "triumph_smirk", "冷笑": "triumph_smirk", "算计": "triumph_smirk",
+    "高兴": "warm_joy", "欣喜": "warm_joy", "温柔": "warm_joy", "笑意": "warm_joy", "开心": "warm_joy",
+    "恐惧": "fear_panic", "惊慌": "fear_panic", "害怕": "fear_panic", "惊恐": "fear_panic", "慌乱": "fear_panic",
+    "嫉妒": "jealousy_spite", "怨恨": "jealousy_spite", "不甘": "jealousy_spite", "怨毒": "jealousy_spite",
+    "嘲讽": "mockery", "轻蔑": "mockery", "不屑": "mockery", "讥讽": "mockery",
+    "挑衅": "provocation", "魅惑": "provocation", "勾引": "provocation", "试探": "provocation",
+    "隐忍": "forbearance", "克制": "forbearance", "强撑": "forbearance",
+    "迷离": "ecstasy", "失神": "ecstasy", "沉沦": "ecstasy", "高潮": "ecstasy",
+    "防御": "inhibition", "掩饰": "inhibition",
+    "爆发": "surge", "失控": "surge",
+    "余波": "aftermath", "消散": "aftermath",
+}
+
+
+def resolve_emotion_key(emotion_input="", line_text="", fallback="default"):
+    """
+    将中英文情绪标签或台词内容智能解析为 EMOTION_MUSCLE_CUES 标准键：
+    1) 若显式传入中文别名（如 '生气'/'忧伤'/'委屈'）或英文键，直接命中
+    2) 否则根据台词文本关键词与标点自动感知情绪底色
+    """
+    e = (emotion_input or "").strip()
+    if e in EMOTION_MUSCLE_CUES and e != "default":
+        return e
+    if e in EMOTION_ZH_ALIAS:
+        return EMOTION_ZH_ALIAS[e]
+    for zh_k, en_v in EMOTION_ZH_ALIAS.items():
+        if zh_k in e:
+            return en_v
+
+    txt = (line_text or "").strip()
+    if txt:
+        if any(w in txt for w in ("滚", "混账", "找死", "敢背叛", "闭嘴", "放肆", "该死")):
+            return "anger_rage"
+        if any(w in txt for w in ("呵", "就凭你", "笑话", "太天真", "以为你能")):
+            return "triumph_smirk"
+        if any(w in txt for w in ("求你", "别…", "不要…", "放过我", "好疼", "别这样")):
+            return "humiliated_tears"
+        if any(w in txt for w in ("为什么这样对我", "心痛", "算什么", "眼泪", "忘了我")):
+            return "grief_sorrow"
+        if any(w in txt for w in ("怎么可能", "谁在外面", "别过来", "救命", "会被发现")):
+            return "fear_panic"
+        if any(w in txt for w in ("凭什么她", "不甘心", "毁了")):
+            return "jealousy_spite"
+        if any(w in txt for w in ("真乖", "喜欢吗", "笑一个", "终于见到")):
+            return "warm_joy"
+
+    return fallback if fallback in EMOTION_MUSCLE_CUES else "default"
 
 # 视听决策权触发器 (Visual Strategy Triggers：按戏剧意图动态匹配机位与景别)
 VISUAL_STRATEGY_TRIGGERS = {
@@ -395,7 +454,11 @@ def build_shot_description(shot, index, total_shots, dur, size_desc, cam_desc,
     raw_action = shot.get("text_en") or shot.get("text") or ""
     adapted_action = sanitize_positive_only(with_scene_surface(raw_action, scene))
 
-    body_text = f"{comp_lock}{at_str}{adapted_action}."
+    emo_key_body = resolve_emotion_key(emotion, lines, fallback="default")
+    emo_cue_extra = ""
+    if not lines and (shot.get("size") in ("face", "cu") or first_p in ("srs_male", "srs_female", "blocking_2s", "outro_solo")):
+        emo_cue_extra = f" Facial performance: {EMOTION_MUSCLE_CUES.get(emo_key_body, EMOTION_MUSCLE_CUES['default'])}."
+    body_text = f"{comp_lock}{at_str}{adapted_action}.{emo_cue_extra}"
     if any(k in pid for k in ("kiss", "kiss_fondle", "kiss_pin", "kiss_force", "kiss_her")):
         body_text += " (Anatomical lock: lips gently parted 5 mm with subtle contact and natural lip geometry; his left hand is the single hand in frame)."
 
@@ -416,7 +479,8 @@ def build_shot_description(shot, index, total_shots, dur, size_desc, cam_desc,
         listener_tag = "<Subject 2> (S2)" if is_female_spk else "<Subject 1> (S1)"
         spk_pronoun = "her" if is_female_spk else "his"
         listener_pronoun = "his" if is_female_spk else "her"
-        muscle_cue = EMOTION_MUSCLE_CUES.get(emotion, EMOTION_MUSCLE_CUES["default"])
+        emo_key = resolve_emotion_key(emotion, lines, fallback="default")
+        muscle_cue = EMOTION_MUSCLE_CUES.get(emo_key, EMOTION_MUSCLE_CUES["default"])
 
         if is_oral and is_female_spk and not effective_vo:
             speech_line = (f"\nSPEECH: <Subject 1> (S1) says in an off-screen voiceover: <d>[Chinese]{lines}</d> "
