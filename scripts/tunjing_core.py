@@ -54,13 +54,28 @@ OFFICIAL_CUT_PHRASES = (
     "the shot switches to",
 )
 
+# 文戏状态失控谱（3大心理阈值阶段 + 细分微表演物理指令，拒绝死板动作表）
 EMOTION_MUSCLE_CUES = {
+    # 阶段 1：防御/掩饰期 (Inhibition) — 试图隐藏信息、动作延迟与视线游移
+    "inhibition": "fingertips tightening subconsciously against the fabric, gaze shifting between the other person's eyes and lips with a 0.5-second hesitation lag before speaking, shallow guarded chest breathing",
+    # 阶段 2：爆发/失控期 (Surge) — 信息量压过阈值、修饰动作骤停与死锁视线
+    "surge": "all secondary hand fidgeting freezing abruptly, unblinking gaze locked dead-on with flared nostrils and deep ribcage expansion, jaw muscles visibly hardening",
+    # 阶段 3：余波/消散期 (Aftermath) — 被击中要害后的物理卸力与失焦
+    "aftermath": "shoulder line dropping 3 cm as torso support relaxes, gaze losing focus and drifting toward the ambient light source while lips part in a silent exhale",
+    # 经典情绪细分兼容
     "forbearance": "jaw clenched tight, throat bobbing once in a swallow, gaze dropping 10 cm then rising while knuckles whiten",
     "mockery": "one corner of the mouth lifting 2 mm, eyelids half-lowered sweeping a glance across while fingers tap twice",
     "provocation": "chin tilted up 15 degrees, steady eye contact locked forward while collarbones rise",
     "submission": "eyelashes trembling with gaze lowered toward the floor, lower lip pressed between teeth as shoulders sink 2 cm",
     "ecstasy": "pupils dilated with upward gaze, head tilting back against the support as neck tendons tense",
     "default": "jaw muscles tensing with visible chest breathing and natural head micro-shifts of 2 cm",
+}
+
+# 视听决策权触发器 (Visual Strategy Triggers：按戏剧意图动态匹配机位与景别)
+VISUAL_STRATEGY_TRIGGERS = {
+    "suffocation": ("macro", "push_tension", "Intrusive suffocating perspective: extreme close framing with slow relentless push-in and high-contrast shadow falloff"),
+    "duel":        ("cu",    "ots_depth",    "Psychological duel perspective: over-the-shoulder framing with dark soft-focus foreground shoulder and 0.5s reaction delay"),
+    "cold_gaze":   ("cu",    "static_side",  "Detached clinical observation: locked tripod portrait capturing internal panic against a still frame"),
 }
 
 # 仅供离线审计或独立字段存档，严禁拼入送模正向 Node 263 文本！

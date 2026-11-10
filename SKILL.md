@@ -83,6 +83,8 @@ metadata:
 | `export_comfy_payload.py` | **渲染门禁核验与批量任务帧长校验器**：核验 5 大门禁状态与 `批量任务.json` 物理帧长 `(F-5)%17==0` |
 | `export_jianying_draft.py` | **剪映专业版草稿自动打包器**：读取分镜与成片，自动生成包含视频轨、音频轨与自动卡点字幕轨的剪映本地草稿 |
 | `tunjing_diff_audit.py` | **真源偏离度与模型执行审计器**：专治发散型大模型（DeepSeek/GPT）夹带私货，一键输出六段式完整度、真源纯度与前戏冲突对比数据 |
+| `tunjing_runner.py` | **ComfyUI 全自动后台批跑与微创重摇点火器**：支持断点续跑、`--reroll 7,19 --candidates 2` 点名重摇、自动五联抽帧质检板生成与 `series_bible.json` 跨集资产声线锁死 |
+| `tunjing_mastering.py` | **母带音画精修与无损缝合器**：自动切除每镜首部 2 帧起势微顿帧、执行 EBU R128 (`-16 LUFS`) 广播级响度统一与切点消爆音微淡化 |
 | `dryrun_test.py` | **跨机端到端全链路自检器**：零人工干预跑通 Gate 1 ~ Gate 6 全流程，验证目标机 100% 可用 |
 
 ### 剧作节拍器模板 (`templates/`)

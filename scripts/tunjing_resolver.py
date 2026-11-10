@@ -61,6 +61,15 @@ ALIAS = {
     # 导演结构性动作词（默认落到约定动作，避免漏识别）
     "前戏": "kiss_fondle", "破防": "kiss_pin", "脱衣": "undress",
     "第一个位": "missionary", "第一体位": "missionary", "换体位": "cowgirl", "体位": "missionary",
+    # v4.0 导演调度原语别名
+    "空镜": "env_establish", "环境空镜": "env_establish", "建立空镜": "env_establish",
+    "走位封堵": "blocking_2s", "对峙": "blocking_2s", "壁咚对峙": "blocking_2s",
+    "男正打": "srs_male", "正打": "srs_male", "男特写": "srs_male", "过肩正打": "srs_male",
+    "女反打": "srs_female", "反打": "srs_female", "女特写": "srs_female", "反应特写": "srs_female",
+    "道具特写": "prop_insert", "信物微距": "prop_insert", "道具微距": "prop_insert",
+    "生理阻断": "cut_insert", "抓白微距": "cut_insert",
+    "空间转移": "spatial_shift", "换场地": "spatial_shift",
+    "尾声独处": "outro_solo", "结尾收束": "outro_solo", "余韵": "outro_solo",
 }
 
 

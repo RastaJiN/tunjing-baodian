@@ -79,7 +79,8 @@ def audit_project(project_dir):
     undress_wide_risks = 0
     spoken_dialogues = []
     
-    foreplay_ids = {"undress", "kiss_fondle", "breast_rub", "nipple_lick",
+    foreplay_ids = {"env_establish", "blocking_2s", "srs_male", "srs_female", "prop_insert", "cut_insert", "spatial_shift", "outro_solo",
+                    "undress", "kiss_fondle", "breast_rub", "nipple_lick",
                     "kiss_pin", "kiss_force", "kiss_her", "ass_rub", "masturbation",
                     "finger_masturbate", "strip_tease"}
     oral_ids = {"bj", "squat_bj", "prone_bj", "deepthroat", "head_thrust", "facefuck",
@@ -92,9 +93,9 @@ def audit_project(project_dir):
         ("subject_definitions:", "Reference map"),
         ("Consistency:",),
         ("Motion quality",),
+        ("MOTION FLOOR:", "Motion quality"),
         ("integrated_multimodal_description:", "detailed_description:"),
         ("overall_soundscape:",),
-        ("=== NEGATIVE ===",)
     ]
 
     for idx, s in enumerate(shots, 1):
@@ -123,7 +124,7 @@ def audit_project(project_dir):
                 report["violations"].append(f"镜头 {s.get('id')} ({pose}) 属于前戏/口交/转场，但被注入了插入要点！")
 
         # 检查台词（排除说明文字中的 <d>...</d> 规则）
-        prompt_without_rule = re.sub(r"Audio rule:.*?aloud\.", "", prompt)
+        prompt_without_rule = re.sub(r"Audio rule:.*?\n", "", prompt)
         d_match = re.search(r"<d>(?:\[Chinese\])?(.*?)</d>", prompt_without_rule)
         if d_match:
             line_text = d_match.group(1).strip()

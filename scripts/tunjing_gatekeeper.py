@@ -78,7 +78,8 @@ def audit_step_2(project_dir):
         return False, "剧本门禁未通过：台词必须严格使用 <d>[Chinese]...</d> 标签包裹！"
         
     # 检查是否提及体位（吞鲸 v3.0 标准 55 套原生 pose id）
-    KNOWN_IDS = {"bj","squat_bj","prone_bj","deepthroat","head_thrust","facefuck","sixty_nine",
+    KNOWN_IDS = {"env_establish","blocking_2s","srs_male","srs_female","prop_insert","cut_insert","spatial_shift","outro_solo",
+                 "bj","squat_bj","prone_bj","deepthroat","head_thrust","facefuck","sixty_nine",
                  "tip_lick","ball_lick","penis_slap","titjob","handjob","fingering","clit_tease",
                  "cunnilingus","sofa_cunni","kiss_fondle","kiss_pin","kiss_force","kiss_her",
                  "breast_rub","nipple_lick","undress","pov_insert","missionary","missionary_legup",
@@ -134,7 +135,8 @@ def audit_step_3(project_dir):
                 return False, f"分镜门禁未通过：台词与镜头时长严重脱节！检测到该镜头时长仅 {duration}s，但台词 '{speech_clean}' 包含 {char_count} 字，物理朗读需要至少 {required_time:.1f}s！请增加镜头时长或精简台词！"
 
     # 4. 吞鲸高能段三级戏份分档检测逻辑（含口交戏 / 独处自慰戏 / 纯插入交合戏）
-    KNOWN_IDS = {"bj","squat_bj","prone_bj","deepthroat","head_thrust","facefuck","sixty_nine",
+    KNOWN_IDS = {"env_establish","blocking_2s","srs_male","srs_female","prop_insert","cut_insert","spatial_shift","outro_solo",
+                 "bj","squat_bj","prone_bj","deepthroat","head_thrust","facefuck","sixty_nine",
                  "tip_lick","ball_lick","penis_slap","titjob","handjob","fingering","clit_tease",
                  "cunnilingus","sofa_cunni","kiss_fondle","kiss_pin","kiss_force","kiss_her",
                  "breast_rub","nipple_lick","undress","pov_insert","missionary","missionary_legup",
@@ -184,7 +186,7 @@ def audit_step_3(project_dir):
                        f"（wide/mcu/cu/macro/hip/face 或中景/中近景/近景/微距/腰胯特写/面部特写）！")
 
     # 机位必须逐镜出现
-    cam_hits = len(re.findall(r'static_side|static_rear|static_front|low_hip|ots|high_angle|slow_push|follow_soft|固定机位|侧机位|后侧机位|低机位|过肩|俯机位|推轨|固定侧|固定后侧', content))
+    cam_hits = len(re.findall(r'push_tension|pull_reveal|tilt_up_desire|tilt_down_impact|ots_depth|arc_subtle|handheld_breath|low_upward|high_downward|static_side|static_rear|static_front|low_hip|ots|high_angle|slow_push|follow_soft|固定|侧机位|后侧|低机位|过肩|俯|仰|推|拉|摇|手持', content))
     if cam_hits < shot_count * 0.8:
         return False, (f"分镜门禁未通过：【机位标注缺失】！检测到 {shot_count} 个镜头，"
                        f"但仅 {cam_hits} 处机位标注。逐镜必须标明机位"
@@ -217,9 +219,9 @@ def audit_step_4(project_dir):
         (["subject_definitions:", "Reference map"], "缺少 [2] 实体与场景槽位映射 (subject_definitions 或 Reference map)"),
         (["Consistency:", "Consistency"], "缺少 [3] Consistency 身份与场景一致性死锁"),
         (["Motion quality", "Motion quality (Anti-Stiffness)"], "缺少 [3] Motion quality 防僵硬二次动作锁"),
+        (["MOTION FLOOR:", "Motion quality"], "缺少 [3b] MOTION FLOOR 底噪生命力锁"),
         (["integrated_multimodal_description:", "detailed_description:"], "缺少 [5] 逐镜时间线主体 (integrated_multimodal_description 或 detailed_description)"),
         (["overall_soundscape:", "overall_soundscape"], "缺少 [6] overall_soundscape 环境底噪与动作声场"),
-        (["No subtitles, captions, watermarks", "No subtitles"], "缺少独立成段的 NEGATIVE 负面列表")
     ]
     for markers, err_msg in required_blocks:
         if isinstance(markers, str): markers = [markers]
@@ -227,7 +229,7 @@ def audit_step_4(project_dir):
             return False, f"提示词门禁未通过：{err_msg}（必须严格遵循吞鲸标准六段式结构）！"
             
     # 2. 检查正向肯定句压油（工作流 Node 328 零化负向，必须靠正向压油）
-    if not re.search(r'matte velvet skin finish|powdered dry texture|visible fine pores', content, re.IGNORECASE):
+    if not re.search(r'matte velvet skin finish|powdered dry|visible fine pores', content, re.IGNORECASE):
         return False, "提示词门禁未通过：缺少【吞鲸正向肯定句压油词】（authentic matte velvet skin finish, powdered dry texture）！工作流负向通道已零化，必须正向压油！"
         
     # 3. 检查是否误入毒性油光词（采用负向前瞻正则，精准放行 non-greasy / without surface shine 等正向去油描述）

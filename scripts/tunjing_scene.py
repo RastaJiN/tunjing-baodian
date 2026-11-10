@@ -454,10 +454,19 @@ def save_project_artifacts(out_dir, shots, actual_total, want_total, lines="",
             s["size"], s["pose"], is_nude_state=is_nude_state, asset_dir=asset_dir
         )
 
+        # 自动按剧集推进阶段匹配【文戏/情绪状态失控谱】：前段防御掩饰(inhibition) -> 中段爆发失控(surge) -> 尾段余波消散(aftermath)
+        prog = i / max(1, len(shots))
+        if first_p == "outro_solo" or first_p in FINISH_IDS or prog > 0.82:
+            auto_emotion = "aftermath"
+        elif first_p in ("env_establish", "blocking_2s", "undress") or prog < 0.30:
+            auto_emotion = "inhibition"
+        else:
+            auto_emotion = "surge"
+
         prompt_text = single_shot_prompt(
             s, i - 1, len(shots), s["dur"], size_desc_en, cam_desc_en,
             lines=shot_line, speaker=shot_speaker, idea=idea, scene=scene, pose_names=pose_names,
-            tier=tier_label, has_audio_refs=True
+            emotion=auto_emotion, tier=tier_label, has_audio_refs=True
         )
 
         extra_tags = []
