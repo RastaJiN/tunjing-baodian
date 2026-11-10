@@ -419,8 +419,10 @@ def export_to_jianying(project_dir=None, storyboard_file=None, draft_name=None,
                 fl = f.lower()
                 if fl.endswith((".mp4", ".mov", ".webm")) and (
                     shot_tag.lower() in fl
+                    or f"shot_{s['index']:03d}" in fl
                     or f"shot_{s['index']:02d}" in fl
                     or f"shot_{s['index']}." in fl
+                    or f"shot-{s['index']:03d}" in fl
                     or f"shot-{s['index']:02d}" in fl
                 ):
                     matched_mp4 = os.path.join(sd, f)

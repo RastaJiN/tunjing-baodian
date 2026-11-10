@@ -4328,7 +4328,7 @@
         1344,
         768,
         124,
-        "max"
+        "match"
       ],
       "widgets_values_named": {
         "prompt": "",
@@ -4801,7 +4801,7 @@
       "widgets_values": {
         "frame_rate": 24,
         "loop_count": 0,
-        "filename_prefix": "YZ_H3_",
+        "filename_prefix": "EP001_SHOT_001",
         "format": "video/h264-mp4",
         "pix_fmt": "yuv420p",
         "crf": 16,

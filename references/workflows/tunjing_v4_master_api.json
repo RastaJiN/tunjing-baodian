@@ -285,7 +285,7 @@
     "inputs": {
       "frame_rate": 24.0,
       "loop_count": 0,
-      "filename_prefix": "TunjingV4_Shot_",
+      "filename_prefix": "EP001_SHOT_001",
       "format": "video/h264-mp4",
       "pix_fmt": "yuv420p",
       "crf": 16,

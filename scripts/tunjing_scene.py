@@ -567,9 +567,13 @@ def save_project_artifacts(out_dir, shots, actual_total, want_total, lines="",
         prompt_lines.append("```")
         prompt_lines.append("")
 
+        ep_m = re.search(r"EP(\d+)", os.path.basename(os.path.abspath(out_dir)), re.IGNORECASE)
+        ep_tag = f"EP{int(ep_m.group(1)):03d}" if ep_m else "EP001"
+        std_prefix = f"{ep_tag}_SHOT_{i:03d}"
         batch_shots.append({
             "id": f"shot_{i}",
             "shot_id": f"shot_{i:02d}",
+            "filename_prefix": std_prefix,
             "title": f"镜头 {i:02d} · {s['pose_zh']} ({s['size']})",
             "prompt": prompt_text,
             "negative_prompt": NEG,

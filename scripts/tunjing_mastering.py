@@ -38,6 +38,9 @@ def load_shot_audio_fx_map(project_dir):
                 mode = "inner_os"
             fx_map[f"shot_{idx:02d}"] = mode
             fx_map[f"shot_{idx}"] = mode
+            fx_map[f"EP001_SHOT_{idx:03d}"] = mode
+            if s.get("filename_prefix"):
+                fx_map[s.get("filename_prefix")] = mode
     except Exception:
         pass
     return fx_map
@@ -98,7 +101,7 @@ def master_episode(project_dir, trim_head_frames=2, out_name="全集精修母带
         print(f"[i] 目录 {in_dir} 尚未生成切片（请先在 ComfyUI 渲染出片后运行本脚本）。")
         return False
 
-    raw_clips = sorted(glob.glob(os.path.join(in_dir, "shot_*.mp4")))
+    raw_clips = sorted(glob.glob(os.path.join(in_dir, "EP*_SHOT_*.mp4")) or glob.glob(os.path.join(in_dir, "shot_*.mp4")))
     main_clips = [c for c in raw_clips if "_v" not in os.path.basename(c)]
     if not main_clips:
         print(f"[i] {in_dir} 下未找到任何 shot_XX.mp4 镜头文件。")

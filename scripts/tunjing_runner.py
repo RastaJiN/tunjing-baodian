@@ -12,6 +12,7 @@
 """
 
 import os
+import re
 import sys
 import json
 import time
@@ -177,7 +178,10 @@ def build_shot_workflow(base_wf, shot, custom_seed=None, prefix_override=None):
     if "265" in wf:
         wf["265"]["inputs"]["ref_image_size"] = "match"
     if "364" in wf:
-        wf["364"]["inputs"]["filename_prefix"] = prefix_override or f"TunjingV4_{shot.get('shot_id', 'shot')}_"
+        num_m = re.search(r"(\d+)", str(shot.get("shot_id") or shot.get("id") or "1"))
+        s_num = int(num_m.group(1)) if num_m else 1
+        default_pfx = shot.get("filename_prefix") or f"EP001_SHOT_{s_num:03d}"
+        wf["364"]["inputs"]["filename_prefix"] = prefix_override or default_pfx
 
     return wf
 
@@ -291,7 +295,18 @@ def main():
     print(f"[✓] ComfyUI 在线 | 已同步 {n_sync} 个 ASCII 资产至真实 Input 目录: {input_dir}")
 
     for idx, s in enumerate(shots, 1):
-        sid = s.get("shot_id", f"shot_{idx:02d}")
+        ep_m = re.search(r"EP(\d+)", str(batch.get("project", "")) + " " + os.path.basename(os.path.abspath(args.project_dir)), re.IGNORECASE)
+        ep_tag = f"EP{int(ep_m.group(1)):03d}" if ep_m else "EP001"
+        sid_raw = str(s.get("shot_id") or s.get("id") or f"{idx:03d}")
+        num_m = re.search(r"(\d+[A-Za-z]?)", sid_raw)
+        s_tok = num_m.group(1) if num_m else f"{idx:03d}"
+        if s_tok.isdigit():
+            std_shot_name = f"{ep_tag}_SHOT_{int(s_tok):03d}"
+        else:
+            # 兼容如 04B 这种拆分镜号 -> EP001_SHOT_004B
+            d_part = re.match(r"(\d+)([A-Za-z]+)", s_tok)
+            std_shot_name = f"{ep_tag}_SHOT_{int(d_part.group(1)):03d}{d_part.group(2).upper()}" if d_part else f"{ep_tag}_SHOT_{idx:03d}"
+        sid = s.get("filename_prefix") or std_shot_name
         target_mp4 = os.path.join(out_video_dir, f"{sid}.mp4")
 
         # 断点续跑保护：非 reroll 且非 force 时，若已存在合格 mp4 则自动跳过
@@ -303,7 +318,7 @@ def main():
         for c_idx in range(1, n_cand + 1):
             seed_val = random.randint(10**13, 9 * 10**14)
             ver_suffix = f"_v{c_idx}" if n_cand > 1 or reroll_set else ""
-            prefix = f"TunjingV4_{sid}{ver_suffix}_"
+            prefix = f"{sid}{ver_suffix}"
             wf = build_shot_workflow(base_wf, s, custom_seed=seed_val, prefix_override=prefix)
 
             # 反作弊锁 4A：提交前核验本镜 3 张参考图在 ComfyUI 真实 input 目录中物理存在（彻底杜绝空占位符 0.0s 秒退）
