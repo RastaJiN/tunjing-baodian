@@ -1,7 +1,7 @@
 ---
 name: tunjing-baodian
 description: "Use when producing or auditing short dramas with Tunjing."
-version: 4.0.0
+version: 4.5.0
 author: 吞鲸工作室 (Swallowing Whale Studio)
 license: MIT
 metadata:
@@ -9,10 +9,10 @@ metadata:
     tags: [tunjing, baodian, drama, pure-ref2v, gatekeeper]
 ---
 
-# 🐳 吞鲸宝典 · 全剧集视听导演调度生产引擎 (Tunjing Baodian v4.0)
+# 🐳 吞鲸宝典 · 全剧集视听导演调度生产引擎 (Tunjing Baodian v4.5)
 
 > **吞鲸宗旨**：**文戏带刀有张力，动作带电有花样，步步门禁不跳步，纯血管线一次过。**
-> 吞鲸工作室 100% 自包含权威生产母版。内置 87 套全剧集纯英文动量真源矩阵（8 大导演调度原语 + 10 大暧昧挑逗诱惑肢体 + 14 大权力对峙与情绪宣泄肢体 + 55 套核心肉戏体位）+ 12 大主动表演情绪四维解剖光谱、40 条物理换位配方、13 类场地中英双轨动态适配内核、分号 (`;`) 黄金分割律与双轨物理分流构图死锁，零外部依赖、零脑补词汇、跨机器跨大模型 100% 无差别出片。
+> 吞鲸工作室 100% 自包含权威生产母版。内置 90 套全剧集纯英文动量真源矩阵（8 大导演调度原语 + 10 大暧昧挑逗诱惑肢体 + 14 大权力对峙与情绪宣泄肢体 + 55 套核心肉戏体位 + 3 套高频兼容别名）+ 12 大主动表演情绪四维解剖光谱、40 条物理换位配方、13 类场地中英双轨动态适配内核、分号 (`;`) 黄金分割律与双轨物理分流构图死锁，零外部依赖、零脑补词汇、跨机器跨大模型 100% 无差别出片。
 
 ---
 
@@ -160,7 +160,7 @@ python scripts/tunjing_scene.py \
     - 严禁在画面段出现 `axis`、`line`、`lines`、`越轴`、`轴线`、`分界线` 等具象构图名词（会被视觉编码器直接画成实体线条），统一采用**正向空间不变式（Positive Invariant）**：`The camera stays on the same side of them throughout; <Subject 1> is on the left, <Subject 2> is on the right.`；
     - 严禁使用 `very slowly`、`extremely`、`slightly`、`suddenly` 等模糊程度副词，一律替换为厘米与秒数的确定性物理量；多镜切换仅允许使用官方 5 大英文切镜绑定短语（`the camera cuts to` / `the shot cuts to` / `the shot transitions to` / `the shot changes to` / `the shot switches to`），严禁使用 `fade / dissolve / wipe` 或中文“镜头切至”。
 17. **A/B/C 三档槽位物理隔离、单调服装状态机与弱构图引用铁律（防单人镜鬼影与透视畸变）**：
-    - **三档槽位隔离与 9 图 3 音扩展挂载**：双人同框镜（Tier A）挂载 `[女母版, 男母版, 场景底图]`；单人正反打特写镜（Tier B，`srs_female` / `srs_male`）必须将未入画角色的槽位强制替换为纯净场景底图占位，从硬件输入端根除背景暗部裂殖出第二张人脸鬼影；纯环境/道具空镜（Tier C，`env_cut` / `prop_macro`）三槽全挂场景底图；工作流完整保留 9 个图像参考槽（`ref_image_0~8`：槽 0~2 为女/男/全景，槽 3~8 按需挂载近景承托面空间图与核心道具母版）与 3 个音频参考槽（`ref_audio_0~2`，挂载男女主定版干声 `<Audio 1>` / `<Audio 2>` 锁死全集音色），未用到的扩展槽在当前镜自动静音绕过；
+    - **三档槽位隔离与 9 图 3 音扩展挂载**：永远保持 `<Picture 1>`（Node 51）为女主槽、`<Picture 2>`（Node 49）为男主槽、`<Picture 3>`（Node 50）为场景槽；双人同框镜（Tier A）挂载 `[女母版, 男母版, 场景底图]`；单人正反打特写镜（Tier B，`srs_female` / `srs_male`）必须将未入画角色的槽位强制替换为纯净场景底图占位（女单人 `[女母版, 场景图, 场景图]`、男单人 `[场景图, 男母版, 场景图]`，严禁将男主图错塞入 Node 51 女主槽导致性别特征错乱），从硬件输入端根除背景暗部裂殖出第二张人脸鬼影；纯环境空镜（Tier C，`env_establish` / `empty_cut`）三槽全挂场景底图；工作流完整保留 9 个图像参考槽（`ref_image_0~8`：Nodes 51/49/50 为常驻 3 槽，Nodes 43/19/23/199/200/201 为 `<Picture 4~9>` 扩展槽；当 `00_资产/` 含 `daoju_*` / `prop_*` 道具图且镜头为 `prop_insert` / `present_item` 时，自动挂载至第 4 槽 Node 43 `<Picture 4>` 并在头部声明 `<Subject 4>`，严禁拔掉 Node 50 场景槽顶替道具，无道具镜自动断开 `ref_image_3~8`）与 3 个音频参考槽（`ref_audio_0~2`，Nodes 14/15/48 挂载男女主定版干声 `<Audio 1>` / `<Audio 2>` 锁死全集音色）；
     - **单调不可逆服装状态机**：全片服装按 `穿衣 (dressed) ➔ 半脱 (partially_undressed) ➔ 全裸 (nude)` 单向演进，一旦完成脱衣，后续镜头永久锁死素身母版，严禁回跳穿衣；
     - **场景弱构图引用**：`retention_analysis` 中 `<Subject 3>` 必须声明 `weak_reference for exact camera framing`，防止切近景/特写时被广角场景底图的远景透视拉扯导致家具畸变。
 18. **空镜/闪回三不铁律与场景陈设白名单铁律（防门框拉丝与假家具脑补）**：
@@ -175,4 +175,4 @@ python scripts/tunjing_scene.py \
     - **原义死锁与全剧集视听导演调度**：严禁自发温吞慢热降级篡改剧本开篇强冲突动作，严禁私加事后温存躺床戏或剧本外体位；全集拆镜必须具备完整的“开场环境建立 (`env_establish`) ➔ 双人封堵对峙 (`blocking_2s`) ➔ 单人正反打交锋 (`srs_male` ⇄ `srs_female`) ➔ 场间物象微距 (`prop_insert`) ➔ 多体位冲撞与正反打交替 ➔ 尾声收束 (`outro_solo`)”导演调度，严禁全片仅排双人连体中景；道具微距原语保持抽象槽位 `prop_insert`，严禁写死特定剧集物件（如房卡/婚戒/支票）以免诱发大模型刻板印象；
     - **空间图池单槽轮换法（Multi-View Pool, Single-View Per Shot）**：同一房间准备 3~4 张不同视角底图（主全景 `scene_main.png`、墙面立面 `scene_wall.png`、承托面近景 `scene_close.png`），但每一镜的 `<Picture 3>`（槽位 2）**只挂 1 张最匹配当前机位/景别的空间底图**（切特写/微距挂 `scene_close.png` 防丢背景，墙边戏挂 `scene_wall.png`），严禁单镜同时混喂多张空间图导致空间错乱，且 `<Picture 3>` 全片永不断电；
     - **三级戏份门禁**：Gate 3 自动按「含口交戏 / 独处自慰戏 / 纯插入交合戏」三级分档核验，不强迫无口交剧本硬塞口交；
-    - **工作流黄金拓扑与满血底模锁**：Node 38 优先挂载 `qwen3vl_32b_minimax_h3_ultra_uncensored_heretic_int8_convrot.safetensors`（大内存下替代 4-bit `nvfp4` 以保多图跨模态对齐精度），Node 400 挂载 `MysticXXX_MMH3-V5-ref2va.safetensors`（文戏/穿衣/空镜权重强制归 `0.0`，肉戏恢复 `0.45~0.50`），Node 53 (DMAD) 与 Node 404 (如梦似幻) 锁定 `0.80`；物理切除悬空的 `Node 333 (MiniMaxH3SigmaShift)` 与武打倍速 LoRA 组（342~345），锁死 12GB 低显存四护法链（`Node 331 -> 332 -> 403 -> 401`）；所有资产文件名必须为纯 ASCII 英文/数字/下划线，启动前动态校验 ComfyUI `--input-directory` 真实挂载目录，确保单实例进程运行防 OOM；跨镜接缝两边必须换视角或换景别，需要定格抽尾帧时追加 `The movement stops and the picture holds still for the last second.`。
+    - **工作流黄金拓扑与满血底模锁**：Node 38 优先挂载 `qwen3vl_32b_minimax_h3_ultra_uncensored_heretic_int8_convrot.safetensors`（大内存下替代 4-bit `nvfp4` 以保多图跨模态对齐精度），Node 400 挂载 `MysticXXX_MMH3-V5-ref2va.safetensors`（文戏/穿衣/空镜权重强制归 `0.0`，肉戏恢复 `0.45~0.50`），Node 53 (DMAD) 与 Node 404 (如梦似幻) 锁定 `0.80`，Node 265 `ref_image_size` 统一设为 `match`，Node 364 `filename_prefix` 与全链路切片命名统一采用 `EP00X_SHOT_00X` 格式；物理切除悬空的 `Node 333 (MiniMaxH3SigmaShift)` 与武打倍速 LoRA 组（342~345），锁死 12GB 低显存四护法链（`Node 331 -> 332 -> 403 -> 401`）；每次提交动态更新帧长时必须同时同步 `Node 259 (PrimitiveFloat 秒数)` 与 `Node 250 (ComfyMathExpression)`，严禁锁死 15.0s 导致台词后半段进入无指令真空期诱发字幕；每镜渲染后调用 `/free` 释放显存时仅执行 `.read()`，严禁对空响应调用 `json.loads()`；所有资产文件名必须为纯 ASCII 英文/数字/下划线，启动前动态校验 ComfyUI `--input-directory` 真实挂载目录并覆盖 `male_master.png / female_master.png / scene_main.png` 模板占位符，确保单实例进程运行防 OOM；跨镜接缝两边必须换视角或换景别，需要定格抽尾帧时追加 `The movement stops and the picture holds still for the last second.`。
