@@ -191,6 +191,7 @@ def main():
     ap.add_argument("--reroll", default="", help="点名微创重摇指定镜号（逗号分隔，如 --reroll 7,19）")
     ap.add_argument("--candidates", type=int, default=1, help="每个重摇镜头生成的候选版本数（默认1，可设2~3挑片）")
     ap.add_argument("--force", action="store_true", help="忽略断点续跑缓存，强制重跑全部目标镜头")
+    ap.add_argument("--confirm-token", default="", help="监制审阅《监制五维核对签字单.md》后签发的 8 位 SHA-256 点火授权码（未提供严禁连接 ComfyUI 渲染！）")
     args = ap.parse_args()
 
     bj_path = os.path.join(args.project_dir, "批量任务.json")
@@ -234,6 +235,34 @@ def main():
     if args.dry_build:
         return
 
+    # ── 物理防擅自开跑死锁 (Anti-Autostart Ignition Lock) ──
+    # 1) 必须已通过 Gate 1 ~ Gate 5
+    import hashlib
+    status_file = os.path.join(args.project_dir, ".tunjing_status.json")
+    if not os.path.exists(status_file):
+        print("[X 越权拦截] 未找到 .tunjing_status.json！严禁跳过 Gate 1~5 擅自启动 ComfyUI 渲染！")
+        sys.exit(1)
+    st_data = json.load(open(status_file, "r", encoding="utf-8"))
+    if not {1, 2, 3, 4, 5}.issubset(set(st_data.get("passed_steps", []))):
+        print(f"[X 越权拦截] Gate 1~5 尚未全部通过 (当前仅通过: {st_data.get('passed_steps')})！严禁擅自提交渲染！")
+        sys.exit(1)
+
+    # 2) 必须校验 --confirm-token 与当前 批量任务.json 的前 8 位 SHA-256 一致
+    h = hashlib.sha256()
+    with open(bj_path, "rb") as bf:
+        h.update(bf.read())
+    expected_token = h.hexdigest()[:8]
+    if args.confirm_token.strip() != expected_token:
+        receipt_path = os.path.join(args.project_dir, "监制五维核对签字单.md")
+        print("=" * 75)
+        print("🛑 【吞鲸防擅自开跑物理死锁 (Ignition Lock) 触发】")
+        print("原因：Agent 严禁在未经监制明确批准的情况下擅自向 ComfyUI 提交渲染任务！")
+        print(f"请先向监制呈报对账表：{receipt_path}")
+        print(f"待监制确认「参考图对齐、体位正确、交合特写齐备、台词无误」并下令渲染后，")
+        print(f"方可使用当前任务包唯一授权码点火：--confirm-token {expected_token}")
+        print("=" * 75)
+        sys.exit(1)
+
     try:
         stats = http_json(f"{COMFY_URL}/system_stats")
     except Exception as e:
@@ -267,19 +296,33 @@ def main():
             prefix = f"TunjingV4_{sid}{ver_suffix}_"
             wf = build_shot_workflow(base_wf, s, custom_seed=seed_val, prefix_override=prefix)
 
+            # 反作弊锁 4A：提交前核验本镜 3 张参考图在 ComfyUI 真实 input 目录中物理存在（彻底杜绝空占位符 0.0s 秒退）
+            if input_dir and os.path.isdir(input_dir):
+                missing_refs = [r for r in s.get("ref_images", []) if not os.path.exists(os.path.join(input_dir, r))]
+                if missing_refs:
+                    print(f"[X 致命阻断] {sid} 绑定的参考图 {missing_refs} 在 ComfyUI Input 目录 ({input_dir}) 中不存在！拒绝提交空跑！")
+                    sys.exit(1)
+
+            t_start = time.time()
             print(f"\n[▶] ({idx}/{len(shots)}) 提交 {sid}{ver_suffix} | Seed={seed_val} | 姿势={s.get('pose')} | 时长={s.get('duration')}s ({s.get('frames')}f) | LoRA={s.get('lora_mystic_strength')}")
             resp = http_json(f"{COMFY_URL}/prompt", method="POST", payload={"prompt": wf})
             pid = resp.get("prompt_id")
             if not pid:
                 print(f"[X] {sid} 提交失败: {resp}")
-                continue
+                sys.exit(1)
 
             while True:
                 time.sleep(5)
                 hist = http_json(f"{COMFY_URL}/history/{pid}")
                 if pid in hist:
+                    elapsed = round(time.time() - t_start, 1)
+                    st_info = hist[pid].get("status", {})
                     outputs = hist[pid].get("outputs", {})
                     gifs = outputs.get("364", {}).get("gifs", [])
+                    # 反作弊锁 4B：拦截 0.0s 秒退或无 MP4 产物的假完成！
+                    if st_info.get("status_str") == "error" or not gifs or elapsed < 10.0:
+                        print(f"[X 渲染异常中断] {sid} 耗时仅 {elapsed}s 且未产出有效视频！底层状态: {st_info}")
+                        sys.exit(1)
                     picked = None
                     for g in gifs:
                         fn = g.get("filename", "")
@@ -293,13 +336,14 @@ def main():
                         sub = picked.get("subfolder", "")
                         src_vid = os.path.join(output_dir, sub, fn) if output_dir else fn
                         dst_vid = os.path.join(out_video_dir, f"{sid}{ver_suffix}.mp4")
-                        if os.path.exists(src_vid):
+                        if os.path.exists(src_vid) and os.path.getsize(src_vid) > 100_000:
                             shutil.copy2(src_vid, dst_vid)
                             qc_jpg = os.path.join(qc_sheet_dir, f"{sid}{ver_suffix}_qc5.jpg")
                             generate_5frame_contact_sheet(dst_vid, qc_jpg)
-                            print(f"[✓] {sid}{ver_suffix} 已入库 -> {dst_vid} | 五联质检板 -> {qc_jpg}")
+                            print(f"[✓] {sid}{ver_suffix} 真实渲染入库 ({elapsed}s) -> {dst_vid} | 五联质检板 -> {qc_jpg}")
                         else:
-                            print(f"[✓] {sid}{ver_suffix} 渲染完成 -> {fn}")
+                            print(f"[X] {sid}{ver_suffix} 产物文件缺失或损坏: {src_vid}")
+                            sys.exit(1)
                     break
 
             try:

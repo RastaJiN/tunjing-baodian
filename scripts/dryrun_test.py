@@ -86,24 +86,7 @@ def run_dryrun(target_dir):
     assert not errs, f"tunjing_compiler 体检报错: {errs}"
     print("[✓] tunjing_compiler.py 六段式体检 0 错误 PASS！")
 
-    # ── 4. 准备 Gate 5 生成前自我终审报告 ──
-    audit_dir = os.path.join(target_dir, "审查")
-    os.makedirs(audit_dir, exist_ok=True)
-    report_content = """# 吞鲸工作室 · 渲染放行终审报告 (Clearance Report)
-- 剧集：吞鲸标准测试剧集 · EP01
-- 自审执行人：鲸鲸 (执行导演)
-- 审查结论：[PASS 放行]
-
-### 核查清单对账：
-1. 资产实名与槽位：[PASS] (男女母版与场景底图齐全，无第三人裂殖隐患)
-2. 音画台词咬合：[PASS] (台词均满足 3.0字/s+1.0s 余量)
-3. 换体位与特写契约：[PASS] (missionary ➔ cowgirl ➔ doggy，交合特写3次，口交特写齐全)
-4. 受控运镜规范：[PASS] (逐镜标明景别与机位，无环绕/无快变焦)
-5. 提示词纯净度：[PASS] (吞鲸标准六段式结构，内嵌正向肯定句压油词)
-6. 纯血Ref2V单轨规范：[PASS] (全片 100% 纯血 Ref2V 单轨，零首帧垫图，29 镜每镜 2~5s)
-"""
-    with open(os.path.join(audit_dir, "生成前终审报告.md"), "w", encoding="utf-8") as f:
-        f.write(report_content)
+    # ── 4. 运行 Gate 5 机器盲检与 SHA-256 防伪签名终审 ──
 
     assert gate_mod.check_gate(target_dir, 5), "Gate 5 终审门禁未通过！"
     assert gate_mod.check_gate(target_dir, 6), "Gate 6 渲染放行门禁未通过！"

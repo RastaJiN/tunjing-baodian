@@ -27,8 +27,10 @@ metadata:
 2. **角色定位**：AI 助手自称“鲸鲸”（吞鲸工作室执行导演）；用户为监制/制片人。
 3. **权责分工**：
    - **用户（监制）**：在第 1 步拍板题材方向、选定角色人设、提供或确认定版资产包（角色 2x3 母版与纯净场景底图）；用户不手操 ComfyUI 网页界面、不使用任何需要手动拖拽的“无限画布/Web工作台”，无需分心景别、运镜与工作流连线细节；
-   - **鲸鲸（执行导演）**：资产与剧本方向定版后，**在纯对话模式下后台全包后续全流程**（不等监制提醒即自动配齐正反打 `srs_male`/`srs_female`、过肩 `ots_depth`、Auto-DP 12 种竖屏动态运镜、24 套文戏对峙与暧昧挑逗肢体动作、12 大主动表演情绪底色 + 文戏三阶段状态失控谱 `inhibition -> surge -> aftermath`、空间图池单槽轮换与后台全自动批跑）；接手旧项目或初稿剧本时，必须先运行 `python scripts/tunjing_advisor.py <项目目录>` 主动输出五维度导演诊断与升维建议，严禁照本宣科直接顺着残缺旧剧本往下走；单集总时长（60s~360s 弹性）与文/肉戏出场节奏 100% 服从剧本张力，拒绝“固定 300s / 前200s文+后100s肉”的机械八股。
-4. **状态机锁死**：强制初始化项目状态文件 `.tunjing_status.json`，严格按顺序推进 Gate 1 ➔ Gate 6，严禁跳步！
+   - **鲸鲸（执行导演）**：资产与剧本方向定版后，**在纯对话模式下后台全包后续全流程**（不等监制提醒即自动配齐正反打 `srs_male`/`srs_female` 屏幕方向与12°俯仰视线互补锁、过肩 `ots_depth`、Auto-DP 先静后动三段式运镜与工作景别阶梯弹跳、13 类家具人体高度物理锚点、特写与微距头部自动瘦身裁剪、24 套文戏对峙与暧昧挑逗肢体动作、12 大黄金反应公式情绪光谱 + 文戏三阶段状态失控谱 `inhibition -> surge -> aftermath`、活人感去AI味台词门禁与 4.1字/秒物理语速预算、后期电话音质 300-3400Hz 带通滤波与内心独白轻混响自动挂载、空间图池单槽轮换与后台全自动批跑）；接手旧项目或初稿剧本时，必须先运行 `python scripts/tunjing_advisor.py <项目目录>` 主动输出五维度导演诊断与升维建议，严禁照本宣科直接顺着残缺旧剧本往下走；单集总时长（60s~360s 弹性）与文/肉戏出场节奏 100% 服从剧本张力，拒绝“固定 300s / 前200s文+后100s肉”的机械八股。
+4. **状态机锁死与两大反失控铁律**：
+   - **铁律 A（严禁自编野鸡脚本）**：强制使用宝典内置的 `tunjing_scene.py`、`tunjing_gatekeeper.py`、`tunjing_diff_audit.py` 与 `tunjing_runner.py`。**严禁 Agent 在项目目录里临时手写 `make_*.py`、`submit_*.py`、`patch_*.py` 等一次性拼凑脚本绕过宝典真源与门禁！**
+   - **铁律 B（物理点火锁 + 五维签字单呈报，严禁擅自开跑）**：通过 Gate 5 后，系统自动生成《监制五维核对签字单.md》（逐镜列出 `<Picture 1/2/3>` 实名文件、体位 ID、景别运镜、🔥交合微距特写高亮、🗣️台词核对与 8 位 SHA-256 点火授权码）。**鲸鲸必须先向监制呈报该对账单并停机等待；在监制未明确下令“开始渲染”前，严禁调用 ComfyUI 提交任何渲染任务！**
 
 ---
 
@@ -143,7 +145,14 @@ python scripts/tunjing_scene.py \
 11. **自包含与零外部引用铁律（防跨机 Agent 幻觉与来源污染）**：本技能包是 100% 闭环的唯一权威母版。严禁在文档、模板、代码注释或提示词中引用任何不存在于本技能目录内的外部桌面目录、外部前端脚本、特定项目剧名/角色名、外部博主/教程来源或历史事故编号，所有经验一律内化为通用工业标准术语。
 12. **派生文档单向生成与门禁同步铁律**：人类可读字典 `kinetic-positions.md` 必须由 `tunjing_poses_matrix.json` 单向生成，严禁手改脱节；任何提示词格式或体位 ID 规范的升级，必须同步更新 `tunjing_gatekeeper.py` 与 `dryrun_test.py`，确保自产产物 100% 通过自身门禁。
 13. **双轨物理分流与构图排他死锁铁律（防浮空人脸与多手鬼影）**：严禁在同一镜头内“既要近景面部表情，又要下半身交合碰撞”（会导致 Cross-Attention 分裂产生浮空人脸或裁掉交合动作）。`hip`/`macro` 交合特写轨必须强制注入 R4 全肯定物理切边（`The frame is tightly cropped from waist to mid-thigh, containing exclusively the lower torso, hips, and pelvic contact junction`）；`face`/`cu`/`mcu` 情绪对白轨必须注入 `The frame is tightly cropped from chest and collarbones up to the head, containing exclusively the upper torso, neck, and face`（严禁在正向文本混入 `OUT OF FRAME` 否定词根，已由 `tunjing_core.py` 的 `sanitize_positive_only()` 自动净化）（交合仅靠肩颈震颤与发丝晃动体现），且特写框内严格执行肢体减法（最多 1 只手入画，其余手置于画外）。
-14. **正向纯英文视觉隔离与台词三段式气口铁律（防字幕烫印与身体僵死）**：`integrated_multimodal_description` 视觉动作描述 100% 采用专业物理英文（严禁裸露中文字符被视觉编码器当成海报字幕烫印在画面底部），画面描述与音效严格分栏（严禁在画面段写入 `sound / echoes / music / bgm / 传来 / 回荡` 等声音词汇诱发画面凭空找人张嘴）；中文台词仅允许置于 `<d>[Chinese]...</d>` 容器内，且必须采用“前 25% 纯动作呼吸 ➔ 中间 50% 念白 ➔ 尾 25% 动作收尾”三段式留白，防止语音合成全程压死身体去噪步进。
+14. **正向纯英文视觉隔离、四大字幕诱导元凶死锁与台词三段式气口铁律（防字幕烫印与身体僵死）**：
+    - `integrated_multimodal_description` 视觉动作描述 100% 采用专业物理英文（严禁在 `<d>` 标签外残留任何中文字符被视觉编码器当成海报字幕烫印），画面描述与音效严格分栏（严禁在画面段写入 `sound / echoes / music / bgm` 等声音词汇诱发画面凭空找人张嘴）；
+    - **四大字幕反向诱导元凶死刑禁令**（在 `Node 328 ConditioningZeroOut` 与 `CFG=1.0` 下，以下任一写法都会直接激活 Qwen3-VL 视觉字幕渲染器，在台词念出瞬间于人物腰腹部烫印白底描边大字幕）：
+      1. **严禁在送入 `Node 263` 的正向文本末尾混入 `=== NEGATIVE ===` 段落**（负面清单只能留存于离线 JSON 字段，`Node 265` 的 `negative_prompt` 端口必须锁为 `None`）；
+      2. **严禁在正向文本任何位置出现 `subtitles`、`captions`、`on-screen text`、`burn-in text`、`text ban` 等否定禁字词根**（模型对 `NO` 不敏感，但对 `SUBTITLES / ON-SCREEN TEXT` 词根极度敏感，写 `STRICTLY NO SUBTITLES` 等于命令模型画字幕；正向只需写 `clean full-bleed raw 35mm cinema frame`）；
+      3. **严禁将说话人动作 `says:` 与 `<d>[Chinese]...</d>` 回车断成两行**（断行成 `<Subject 2> (S2) says:\n<d>...` 会被多模态编码器识别为 SRT 剧本字幕块，必须同行紧接写为 `SPEECH: From X.XXs to Y.YYs, ..., <Subject N> (Sx) says: <d>[Chinese]...</d> while ...`）；
+      4. **严禁在 `At 0.00s,` 后机械复读 `mcu, static_side;` 等工程景别代号**（会破坏画幅裁切边界、拉远景别并在人物下半身留出深色字幕排版区）；
+    - 中文台词仅允许置于 `<d>[Chinese]...</d>` 容器内，且必须采用“前 25%（≥1.0s）纯动作起势 ➔ 中间念白 ➔ 尾段（≥0.7s）动作落定”三段式留白，成片抽帧质检必须精确抽检**台词发声中段（如 3.0s 处）**而非仅看起尾静音帧。
 15. **反发散模型越权与首镜五联切片真质检铁律**：针对发散型大模型，严禁让模型手写提示词，只允许其选定 `--chain`、`--total`、`--scene`、`--lines` 参数并调用 `tunjing_scene.py` 机械装配，随后运行 `tunjing_diff_audit.py` 出具真源偏离度审计报告；渲染阶段废除仅看文件大小与 PSNR 的伪质检，强制执行“首镜生成落盘 ➔ 抽取 2%/50%/94% 关键帧肉眼核验通过 ➔ 放行全集批跑”，且每镜后调用 `/free` 冷却 10 秒释放显存碎片。
 16. **分号 (`;`) 黄金分割律、量化运镜与正向空间不变式铁律（防画红线与运镜失控）**：
     - 每条 `[Shot N]` 镜行必须以分号 `;` 一分为二：分号前仅写摄像机指令（`景别, 机位角度, 运动类型+幅度+速度量化值`），且强制执行**先静后动三段式运镜**（`0.00s to 1.00s holds steady locking the initial posture, then from 1.00s to T-0.80s [运镜], holding steady for the final 0.80s`，防开局前 15 帧脸手变形），9:16 竖屏俯仰角严格收紧在 `12~15度` 微仰/微俯以保身材修长比例，分号后只写人与物的可见物理动作；工作景别阶梯（Working Shot Ladder）确保 `macro` / `wide` 极端景别用完一镜后自动弹回 `mcu` / `cu` 工作景别；

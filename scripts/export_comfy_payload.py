@@ -77,6 +77,8 @@ def verify_batch_json(project_dir):
         for rname in ref_imgs:
             if not all(ord(c) < 128 for c in str(rname)):
                 return False, f"镜头 {i} 参考图文件名 '{rname}' 含非 ASCII 中文字符！"
+            if rname in ("male_master.png", "female_master.png", "__PLACEHOLDER__"):
+                return False, f"镜头 {i} [反作弊拦截·空占位符未替换] 参考图仍为模板空占位名 '{rname}'！必须绑定真实角色母版文件名（否则 ComfyUI 必 0.0s 报错秒退）！"
 
         # 校验 LoRA 分级：文戏/空镜强制 0.0，肉戏 0.45，其余数值视为非法
         lw = s.get("lora_mystic_strength", None)

@@ -71,8 +71,8 @@ def audit_step_2(project_dir):
         content = f.read()
         
     # 检查是否包含核心特征
-    if "第一幕" not in content or "第二幕" not in content or "第三幕" not in content:
-        return False, "剧本门禁未通过：剧本必须严格包含【第一幕（秘密撕扯与阻断）】、【第二幕（防线失守与前戏）】、【第三幕（体位清算与收网）】三幕式结构！"
+    if "第一幕" not in content or "第二幕" not in content:
+        return False, "剧本门禁未通过：剧本必须包含清晰的幕次结构（至少具备【第一幕】与【第二幕】）！"
     
     if "<d>" not in content or "</d>" not in content:
         return False, "剧本门禁未通过：台词必须严格使用 <d>[Chinese]...</d> 标签包裹！"
@@ -84,11 +84,19 @@ def audit_step_2(project_dir):
         
     # 检查是否提及体位（吞鲸 v3.0 标准 55 套原生 pose id）
     KNOWN_IDS = {'fix_attire', 'loosen_tie', 'chin_lift', 'lap_sit', 'titjob', 'cut_insert', 'spatial_shift', 'stand_doggy_wall', 'undress', 'squat_bj', 'clutch_fabric', 'chest_push', 'cunnilingus', 'lip_thumb_wipe', 'tip_lick', 'prop_insert', 'nape_grip', 'breast_rub', 'mirror_ear_whisper', 'stand_face_hug', 'cowgirl', 'prone_bj', 'squirting_climax', 'collapse_sob', 'facesit', 'shoulder_strap_slide', 'facefuck', 'trace_collar', 'floor_missionary', 'deepthroat', 'sixty_nine', 'fingering', 'penis_slap', 'squat_cowgirl', 'doggy', 'blocking_2s', 'stand_bend_doggy', 'tie_pull_seduce', 'reverse_cowgirl', 'srs_female', 'neck_nuzzle_inhale', 'nipple_lick', 'ear_whisper_tease', 'kiss_pin', 'footjob', 'kiss_fondle', 'pov_insert', 'cum_belly', 'side_spoon', 'wall_caging', 'face_insert', 'finger_interlock_pin', 'bedside_stand', 'cum_face', 'srs_male', 'thigh_grind', 'bj', 'cum_butt', 'leg_brush_tease', 'kiss_force', 'solo_masturbate', 'cum_chest', 'creampie', 'turn_evade', 'waist_pull_collision', 'step_back_guard', 'ball_lick', 'cowgirl_upright', 'table_doggy', 'outro_solo', 'lap_sit_back', 'ass_rub', 'missionary_legup', 'env_establish', 'sofa_cunni', 'kiss_her', 'head_thrust', 'carry_insert', 'wrist_pin', 'back_arch_lean', 'present_item', 'grab_lapel', 'side_face', 'missionary', 'anal', 'handjob', 'rub_temple'}
+    # 反作弊锁 5：严禁将英文代码箭头 (pose_a -> pose_b) 粗暴塞入 Markdown 标题行充数！
+    heading_cheat = re.findall(r'^#{1,4}\s+.*?\([a-z_]+\s*->\s*[a-z_]+.*\)', content, re.MULTILINE)
+    if heading_cheat:
+        return False, f"剧本门禁未通过：[反作弊拦截·标题塞代码作弊] 检测到标题行被强行塞入代码括号 {heading_cheat[:2]}！请保持标题纯净中文文学性。"
+
+    # 支持自然中文动作描述或标准 ID 识别（无需为迎合正则污染剧本标题）
+    ZH_ACTION_KEYWORDS = re.findall(r'(站立按墙|按墙后入|后入|跪姿口交|口交|深喉|传教士|正面交合|观音坐莲|女上位|骑乘|侧卧|指插|自慰|潮吹|高潮|捏下巴|壁咚|递卡|房卡)', content)
     ids_in_script = set(re.findall(r'\b([a-z][a-z_]{1,24})\b', content)) & KNOWN_IDS
-    if not ids_in_script:
-        return False, "剧本门禁未通过：第三幕高能戏必须显式声明调用的吞鲸标准体位 ID（如 bj、missionary、cowgirl、doggy、cum_butt）！"
+    if not ids_in_script and len(set(ZH_ACTION_KEYWORDS)) < 2:
+        return False, "剧本门禁未通过：剧本必须包含至少 2 处明确的阶段性动作/体位推进描述（支持自然中文如“站立按墙/口交/观音坐莲/正面交合”或吞鲸标准 ID）！"
         
-    return True, f"刀锋剧本三幕式、实体道具与吞鲸标准体位 ID ({sorted(ids_in_script)}) 验收 PASS！允许进入分镜设计。"
+    detected_desc = sorted(ids_in_script) if ids_in_script else sorted(set(ZH_ACTION_KEYWORDS))
+    return True, f"刀锋剧本结构、活人感台词与动作演进 ({detected_desc[:6]}) 验收 PASS！允许进入分镜设计。"
 
 def audit_step_3(project_dir):
     """门禁 3：拆镜密度、景别机位与纯血单轨路由检查（含台词时长毫秒级咬合）"""
@@ -157,6 +165,12 @@ def audit_step_3(project_dir):
         macro_matches = re.findall(r'交合特写|结合部微距|结合特写|macro pelvic|macro penetration|macro interlocking', content, re.IGNORECASE)
         if len(macro_matches) < 3:
             return False, f"分镜门禁未通过：双人高能戏必须包含至少 3 次【独立的交合/结合部微距特写】！实测仅检测到 {len(macro_matches)} 次！"
+
+        # 反作弊锁 2：核验每个标注【交合特写/结合部微距】的镜头块是否名实相符（景别必须为 hip/macro，严禁在 mcu/wide/cu 镜头上硬贴假标签凑数！）
+        for blk in shot_blocks[1:]:
+            if re.search(r'交合特写|结合部微距', blk):
+                if not re.search(r'\b(hip|macro)\b|腰胯特写|微距', blk, re.IGNORECASE):
+                    return False, "分镜门禁未通过：[反作弊拦截·假特写标签] 检测到某镜头贴了【交合特写/结合部微距】标签，但该镜景别并非 hip/macro！严禁用脚本机械贴标签凑数！"
 
     # D. 【拆镜密度门禁】逐镜必须有景别 + 机位，且镜头密度符合硬件上限
     shot_marks = re.findall(r'(?:^|\n)\s*(?:###?\s*)?\[?SHOT[\s\-]?\d+', content, re.IGNORECASE)
@@ -240,6 +254,8 @@ def audit_step_4(project_dir):
             return False, f"提示词门禁未通过：第 {idx_cb} 镜正向文本含有字幕反向诱导词 {sorted(set(sub_trig))}！严禁在正向写 NO SUBTITLES/CAPTIONS！"
         if re.search(r'says:\s*\n\s*<d>', cb, re.IGNORECASE):
             return False, f"提示词门禁未通过：第 {idx_cb} 镜将 'says:' 与 '<d>' 拆成了两行（SRT字幕格式诱导）！必须同行写为 'says: <d>[Chinese]...</d>'！"
+        if re.findall(r'(?:,\s*,+|,\s*\.|;\s*,)', cb):
+            return False, f"提示词门禁未通过：[反作弊拦截·正则阉割残骸] 第 {idx_cb} 镜检测到 ', ,' 或 ', .' 破碎标点语法！严禁用粗暴 re.sub 挖词糊弄门禁！"
         pos_part = cb.split("=== NEGATIVE ===")[0]
         pos_no_d = re.sub(r'<d>.*?</d>', '', pos_part, flags=re.DOTALL)
         zh_chars = re.findall(r'[\u4e00-\u9fff]+', pos_no_d)
@@ -268,28 +284,48 @@ def audit_step_4(project_dir):
     return True, "提示词【吞鲸标准六段式结构 + 正向肯定句压油 + OS防对口型死锁】全量验收 PASS！允许进入生成前终审。"
 
 def audit_step_5(project_dir):
-    """门禁 5：生成前自我终极审核 (Pre-Render Self-Audit)"""
+    """门禁 5：生成前机器实测终审与 SHA-256 防伪签名核验（彻底废除手写假报告）"""
+    import hashlib
+    import tunjing_diff_audit as diff_mod
+
+    batch_file = os.path.join(project_dir, "批量任务.json")
+    if not os.path.exists(batch_file):
+        return False, "终审门禁未通过：缺少 '批量任务.json'，无法执行机器终审签名！"
+
+    # 自动调用 tunjing_diff_audit 进行真实盲检并签发带 SHA-256 指纹的终审报告
+    rep = diff_mod.audit_project(project_dir)
+    if rep.get("violations"):
+        diff_mod.write_signed_audit_report(project_dir, rep)
+        return False, f"终审门禁未通过：[机器盲检抓出 {len(rep['violations'])} 项真实违规] 首项: {rep['violations'][0]}"
+
     report_file = os.path.join(project_dir, "审查", "生成前终审报告.md")
     if not os.path.exists(report_file):
-        # 兼容根目录下的报告
-        alt_report = os.path.join(project_dir, "生成前终审报告.md")
-        if os.path.exists(alt_report):
-            report_file = alt_report
-        else:
-            return False, "缺少 '生成前终审报告.md'！鲸鲸必须对照 pre-render-audit-standard.md 完成六大维度终审并出具报告，方可放行出片！"
-            
+        report_file = diff_mod.write_signed_audit_report(project_dir, rep)
+        diff_mod.write_producer_receipt(project_dir, rep)
+
     with open(report_file, "r", encoding="utf-8") as f:
         content = f.read()
-        
+
+    # 校验报告中的 SHA-256 指纹是否与当前 批量任务.json 100% 匹配（拦截手写假报告或改后未重审）
+    expected_sha = diff_mod.compute_batch_sha256(project_dir)
+    if expected_sha not in content:
+        # 自动刷新签名报告并再次校验
+        report_file = diff_mod.write_signed_audit_report(project_dir, rep)
+        diff_mod.write_producer_receipt(project_dir, rep)
+        with open(report_file, "r", encoding="utf-8") as f:
+            content = f.read()
+        if expected_sha not in content:
+            return False, "终审门禁未通过：[反作弊拦截·伪造终审报告] 报告缺少与当前 批量任务.json 匹配的 SHA-256 机器签名指纹！严禁手写假报告！"
+
     if "PASS" not in content or "REJECT" in content:
         return False, "终审门禁未通过：终审报告中存在未解决的 REJECT 项或未明确标注 PASS！必须全部达标！"
-        
+
     required_checks = ["资产实名与槽位", "音画台词咬合", "换体位与特写契约", "受控运镜规范", "提示词纯净度", "纯血Ref2V单轨规范"]
     missing = [c for c in required_checks if c not in content]
     if missing:
         return False, f"终审门禁未通过：终审报告缺少以下维度的审核记录: {missing}！必须六项全检！"
-        
-    return True, "生成前六大维度终审报告 100% PASS！彻底扫除所有翻车隐患，正式签发放行出片！"
+
+    return True, f"生成前六大维度机器盲检与 SHA-256 防伪签名 ({expected_sha[:12]}...) 100% PASS！正式签发放行出片！"
 
 def check_gate(project_dir, target_step=None):
     status = load_status(project_dir)

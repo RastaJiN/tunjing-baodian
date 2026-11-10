@@ -82,6 +82,11 @@ def lint_tunjing_prompt(text):
         if re.search(r'At 0\.00s,\s*(?:wide|mcu|cu|macro|hip|face)\s*,', pos_no_d, re.IGNORECASE):
             errors.append(f"镜头块 {idx_b} [工程代码复读错误]：检测到 'At 0.00s, mcu, static_side;' 机械代号复读，破坏相机与动作分区！")
 
+        # 反作弊锁 1：拦截粗暴 re.sub 删词留下的标点残骸（如 ', ,' / ', .' / '; ,' / 空头标签 'TEXT BAN: .'）
+        wreckage = re.findall(r'(?:,\s*,+|,\s*\.|;\s*,|\b(?:STRICTLY|TEXT BAN|BACKGROUND LOCK|FRAME EDGE)\s*[:;,.]\s*(?:\n|$))', pos_no_d)
+        if wreckage:
+            errors.append(f"镜头块 {idx_b} [反作弊拦截·正则阉割残骸]：检测到粗暴正则删词遗留的破碎标点/空壳语法 {wreckage[:3]}！严禁用 re.sub 挖词糊弄门禁，必须逐句重构完整英文语法！")
+
         # R1/H9: 剥离 <d> 后零汉字扫描
         zh_left = re.findall(r'[\u4e00-\u9fff]+', pos_no_d)
         if zh_left:
