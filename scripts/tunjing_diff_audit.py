@@ -152,6 +152,15 @@ def audit_project(project_dir):
             else:
                 report["warnings"].append(f"镜头 {s.get('id')} ({pose}) 疑似脱稿自编（未匹配到宝典真源 beats 原文）")
 
+    # 2b. 剧本台词完整性契约（核对 剧本.md / 分镜.md 中的台词是否在送模提示词中零遗漏）
+    if os.path.exists(sb_file):
+        sb_content = open(sb_file, "r", encoding="utf-8").read()
+        sb_lines_all = [x.strip() for x in re.findall(r"<d>(?:\[Chinese\])?(.*?)</d>", sb_content) if x.strip()]
+        prompt_lines_set = {x[1] for x in spoken_dialogues}
+        missing_lines = [ln for ln in sb_lines_all if ln not in prompt_lines_set]
+        if missing_lines:
+            report["violations"].append(f"[台词遗漏] 分镜稿中有 {len(missing_lines)} 句台词未进入送模提示词: {missing_lines[:3]}")
+
     # 3. 台词连续复读检查
     dup_lines = []
     for k in range(len(spoken_dialogues) - 1):

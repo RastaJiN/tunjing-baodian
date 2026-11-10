@@ -3,7 +3,7 @@
 """
 吞鲸宝典 v4.0 · 极速提示词校验引擎 (Tunjing Prompt Linter v4.0 — R1~R12 全肯定语法内核)
 
-融合《不完全手册》h3_lint.py 12 条硬规则与吞鲸结构规范：
+核心校验规则：
 1. 校验核心结构锚点（Goal & Audio Contract / Audio rule / subject_definitions / Consistency / Motion quality / MOTION FLOOR / integrated_multimodal_description / overall_soundscape）
 2. 校验 R4 正向全肯定语法（严禁在正向文本末尾混入 === NEGATIVE === 清单或 OUT OF FRAME 否定词根）
 3. 校验正向肯定句压油词（authentic matte velvet skin finish, powdered dry...）并拦截油光毒性词

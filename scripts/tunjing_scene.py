@@ -3,7 +3,7 @@
 """
 吞鲸宝典 v4.0 · 全剧集视听导演调度与自动摄影拆镜引擎 (Tunjing Scene & Auto-DP Engine v4.0)
 
-核心融合特性（《不完全手册》×《吞鲸宝典》终极合体版）：
+核心特性：
 1. 全剧集弹性时长（60s ~ 360s 任意定）與自由文/肉节奏：
    - 原生支持 8 大非肉戏导演调度原语（`env_establish`, `blocking_2s`, `srs_male`, `srs_female`, `prop_insert`, `cut_insert`, `spatial_shift`, `outro_solo`）与 55 套肉戏真源无缝混排
    - 正反打（`srs_male` 男方施压正打 ⇄ `srs_female` 女方承受反打）贯穿全片文戏、前戏与肉戏
@@ -15,13 +15,13 @@
 4. 动态 LoRA 分级与 9图3音槽位输出：
    - 自动在 `批量任务.json` 为每镜输出 `lora_mystic_name: "MysticXXX_MMH3-V5-ref2va.safetensors"` 与动态权重（文戏/穿衣/空镜 `0.0`，前戏/肉戏 `0.45`）
    - 自动输出 `ref_audios: ["female_voice.wav", "male_voice.wav"]` 锁定全集声线
-5. 全集总帧数同余配平 `(F - 5N) % 17 == 0` 與六种接戏过继（`承接：前镜末态 → 本镜起态`）
+5. 全集总帧数同余配平 `(F - 5N) % 17 == 0` 与接戏过继（`承接：前镜末态 → 本镜起态`）
 """
 
 import json, os, argparse, re
 from tunjing_core import (
     load_poses, DE_OIL, NEG, FINISH_IDS, ORAL_ONLY, FOREPLAY, STAGING_IDS, TEASE_IDS, DRAMATIC_BODY_IDS,
-    single_shot_prompt
+    single_shot_prompt, parse_audio_fx_mode
 )
 
 BASE = os.path.dirname(os.path.abspath(__file__))
@@ -55,15 +55,15 @@ CAMS = {
     "ots_depth":       "深景深过肩微移（前景虚焦肩部占20%，横向微移6cm撑开纵深）",
     "arc_subtle":      "微弧度立体偏转（10度侧向微弧滑动12cm，制造背景立体视差）",
     "handheld_breath": "呼吸感手持微晃（2cm有机呼吸律动，跟随肉体节奏）",
-    "low_upward":      "仰角权力压迫（25度低机位向上仰拍并慢推10cm）",
-    "high_downward":   "俯角脆弱承受（30度高机位向下俯拍并微降8cm）",
+    "low_upward":      "微仰权力压迫（12度竖屏防变形微仰角向上仰拍并慢推10cm）",
+    "high_downward":   "微俯脆弱承受（15度竖屏防变形微俯角向下俯拍并微降8cm）",
     "static_side":     "90度侧向定轴（三脚架稳固锁定，靠纯肉体冲撞带动画面）",
     "static_rear":     "后斜向定轴（三脚架稳固锁定，展现背部与臀胯发力）",
     "low_hip":         "低机位贴腰跟拍（贴近腰胯高度，随冲撞微幅呼吸）",
     # 兼容旧代号映射
     "static_front":    "正面中轴慢推（平视缓推10cm）",
     "ots":             "深景深过肩微移（前景虚焦肩部占20%）",
-    "high_angle":      "俯角脆弱承受（30度高机位向下俯拍）",
+    "high_angle":      "微俯脆弱承受（15度竖屏防变形微俯角向下俯拍）",
     "slow_push":       "压迫感慢推（Z轴向前推进15cm）",
     "follow_soft":     "微弧度立体跟随（侧向柔和跟随10cm）",
 }
@@ -76,15 +76,15 @@ CAMS_EN = {
     "ots_depth":       "over-the-shoulder angle with soft-focus foreground shoulder occupying 20% frame edge, subtle 6 cm lateral drift over three seconds",
     "arc_subtle":      "side-oblique angle, subtle 10-degree lateral dolly arc shifting 12 cm sideways over four seconds for parallax depth",
     "handheld_breath": "intimate close perspective, organic handheld camera with subtle 2 cm breathing micro-sway synchronized with body rhythm",
-    "low_upward":      "low-angle 25-degree upward perspective looking up at the dominant figure, slow 10 cm push-in over three seconds",
-    "high_downward":   "high-angle 30-degree downward perspective looking down at the subject, subtle 8 cm vertical descent over three seconds",
+    "low_upward":      "subtle 12-degree low-angle upward perspective preserving natural vertical body proportions, slow 10 cm push-in over three seconds",
+    "high_downward":   "subtle 15-degree high-angle downward perspective preserving natural vertical body proportions, subtle 8 cm vertical descent over three seconds",
     "static_side":     "90-degree side profile angle, camera locked steady on a heavy tripod",
     "static_rear":     "rear-oblique angle, camera locked steady on a heavy tripod",
     "low_hip":         "low-angle hip-level perspective, subtle 4 cm forward tracking with pelvic rhythm",
     # 兼容旧代号
     "static_front":    "eye-level front angle, slow 10 cm dolly push-in over three seconds",
     "ots":             "over-the-shoulder angle with foreground shoulder in soft focus, subtle 6 cm lateral drift",
-    "high_angle":      "30-degree high-angle downward perspective, subtle 8 cm vertical descent",
+    "high_angle":      "subtle 15-degree high-angle downward perspective, subtle 8 cm vertical descent",
     "slow_push":       "eye-level angle, camera pushes in sliding forward 12 cm over three seconds",
     "follow_soft":     "side-oblique angle, camera tracks smoothly moving 10 cm over three seconds",
 }
@@ -196,7 +196,7 @@ def plan_shot(pid, poses):
 
 def allocate_exact_h3_frames(shots, want_total_sec):
     """
-    全集总帧同余配平算法（源自《不完全手册》数学闭环）：
+    全集总帧同余配平算法：
     1. 每镜必须严格满足 f_i = 5 + 17 * k_i (k_i >= 2，即单镜至少 39 帧 ≈ 1.62s)
     2. 全集总帧数 sum(f_i) = 5 * N + 17 * sum(k_i)
        自动将目标总帧数对齐到最近的合法同余值，并按权重分配 k_i，实现分镜表、提示词与 JSON 帧数 100% 闭合！
@@ -257,7 +257,7 @@ def build_scene(chain, total_sec, poses):
     1) 支持文戏/转场原语与 55 套肉戏真源自由混排，绝不强制固定套路
     2) 在主力多拍动作中自动穿插 srs_male (男正打) / srs_female (女反打)，打破全双人同框死板感
     3) 相邻肉戏体位之间自动插入物理换位桥（文戏原语与正反打之间直接硬切，不乱塞换体位桥）
-    4) Auto-DP 强制消除连续同景别或连续静态机位，并生成《不完全手册》六种接戏过继说明
+    4) Auto-DP 强制消除连续同景别或连续静态机位，执行工作景别阶梯弹跳（Working Shot Ladder）与接戏过继说明
     """
     shots = []
     for i, pid in enumerate(chain):
@@ -307,15 +307,23 @@ def build_scene(chain, total_sec, poses):
                     "type": "transition",
                 })
 
-    # Auto-DP 动态运镜防死板巡检：严禁连续两镜同机位同景别，严禁连续两镜 static
+    # Auto-DP 动态运镜与工作景别阶梯（Working Shot Ladder）巡检：
+    # 1) 严禁连续两镜同机位同景别，严禁连续两镜 static
+    # 2) 极特写(macro)与全景(wide)作为标记镜头，用完一镜后若下一镜仍为同类极端景别，自动弹回工作景别(mcu/cu)
     dynamic_cycle = ["push_tension", "ots_depth", "tilt_up_desire", "arc_subtle", "handheld_breath", "high_downward", "low_upward"]
     for idx in range(1, len(shots)):
+        prev_size = shots[idx - 1]["size"]
+        curr_size = shots[idx]["size"]
+        if prev_size == "macro" and curr_size == "macro":
+            shots[idx]["size"] = "cu"
+        elif prev_size == "wide" and curr_size == "wide":
+            shots[idx]["size"] = "mcu"
         prev_cam = shots[idx - 1]["cam"]
         curr_cam = shots[idx]["cam"]
         if (shots[idx]["size"] == shots[idx - 1]["size"] and curr_cam == prev_cam) or ("static" in prev_cam and "static" in curr_cam):
             shots[idx]["cam"] = dynamic_cycle[idx % len(dynamic_cycle)]
 
-    # 生成《不完全手册》CUT-READY 接戏过继契约（前镜末态 → 本镜起态）
+    # 生成 CUT-READY 接戏过继契约（前镜末态 → 本镜起态）
     handoff_types = [
         "动作接动作（前镜发力末势无缝切入本镜受力起势）",
         "视线/正反打接戏（前镜施压视线切入本镜面部微表情反应）",
@@ -560,6 +568,7 @@ def save_project_artifacts(out_dir, shots, actual_total, want_total, lines="",
             "lora_mystic_strength": lora_w,
             "clip_model": "qwen3vl_32b_minimax_h3_ultra_uncensored_heretic_int8_convrot.safetensors",
             "references": ref_keys,
+            "audio_fx_mode": parse_audio_fx_mode(shot_speaker, shot_line, voiceover=("心声" in explicit_emo or "独白" in explicit_emo or "OS" in explicit_emo.upper())),
             "ref_images": ref_imgs,
             "ref_audios": ["female_voice.wav", "male_voice.wav"]
         })

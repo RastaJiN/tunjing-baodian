@@ -1,33 +1,76 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-吞鲸宝典 v4.0 · 母带音画精修与无损缝合引擎 (Tunjing v4.0 Audio-Visual Mastering Engine)
+吞鲸宝典 v4.0 · 母带音画精修与声学特效缝合引擎 (Tunjing v4.0 Audio-Visual Mastering Engine)
 
-专门根治 AI 多镜头拼接的三大廉价感：
+核心特性：
 1. 首部 2 帧“起势微顿帧”自动修剪 (`--trim-head-frames 2`，即 0.083s)：切除扩散模型从参考图刚起势的微僵硬帧，保留最流畅的中后段动量。
 2. EBU R128 广播级响度统一 (`loudnorm=I=-16:TP=-1.5:LRA=11`)：彻底解决各镜头独立生成导致的台词/喘息音量忽大忽小。
-3. 切点爆音消除与呼吸微淡化：对每镜首尾音频施加 0.12s 微淡入淡出 (`afade`)，彻底消灭硬切处的波形阶跃“啪/咔哒”爆音，最终无损合并为全集母带 MP4！
+3. 声学特效自动挂载（Phone Bandpass & Inner Monologue Reverb）：
+   - 自动读取 `批量任务.json` 中每镜的 `audio_fx_mode`（或根据台词标注自动识别）：
+   - `phone`（电话/听筒/免提对白）：自动注入 `highpass=f=300,lowpass=f=3400,acompressor=threshold=-18dB:ratio=3` 真实电话滤波音质；
+   - `inner_os`（内心独白/心声）：自动注入 `aecho=0.8:0.88:45:0.28` 轻空间混响；
+   - `normal`（同期实录干声）：保持纯净同期声场。
+4. 切点爆音消除与呼吸微淡化：对每镜首尾音频施加 0.08s 微淡入 (`afade`)，彻底消灭硬切处的波形阶跃爆音，最终无损合并为全集母带 MP4！
 """
 
 import os
 import sys
 import glob
 import json
-import shutil
+import re
 import subprocess
 import argparse
 
 
-def process_single_clip(in_mp4, out_mp4, trim_head_frames=2, fps=24.0, normalize_audio=True):
+def load_shot_audio_fx_map(project_dir):
+    """从 批量任务.json 读取每个镜头的声学特效模式 (`normal` / `phone` / `inner_os`)"""
+    bj_path = os.path.join(project_dir, "批量任务.json")
+    fx_map = {}
+    if not os.path.exists(bj_path):
+        return fx_map
+    try:
+        data = json.load(open(bj_path, "r", encoding="utf-8"))
+        for idx, s in enumerate(data.get("batch_shots") or data.get("shots") or [], 1):
+            mode = s.get("audio_fx_mode", "normal")
+            prompt_txt = s.get("prompt", "")
+            if mode == "normal" and "off-screen voiceover" in prompt_txt:
+                mode = "inner_os"
+            fx_map[f"shot_{idx:02d}"] = mode
+            fx_map[f"shot_{idx}"] = mode
+    except Exception:
+        pass
+    return fx_map
+
+
+def build_audio_filter_chain(fx_mode="normal", normalize_audio=True):
+    """
+    构建 FFmpeg 音频滤镜链：
+    - phone: 300Hz–3400Hz 带通滤波 + 听筒动态压缩
+    - inner_os: 45ms 轻空间混响 (aecho)
+    - EBU R128 (-16 LUFS) 响度标准化 + 0.08s 首部消爆音微淡入
+    """
+    filters = []
+    if fx_mode == "phone":
+        filters.append("highpass=f=300,lowpass=f=3400,acompressor=threshold=-18dB:ratio=3:attack=5:release=50")
+    elif fx_mode == "inner_os":
+        filters.append("aecho=0.8:0.88:45:0.28")
+
+    if normalize_audio:
+        filters.append("loudnorm=I=-16:TP=-1.5:LRA=11")
+    filters.append("afade=t=in:st=0:d=0.08")
+    return ",".join(filters)
+
+
+def process_single_clip(in_mp4, out_mp4, trim_head_frames=2, fps=24.0, normalize_audio=True, fx_mode="normal"):
     """
     对单个镜头执行：
     1) 切掉开头 trim_head_frames 帧（默认 2 帧 = 0.0833 秒）
-    2) 音频响度标准化 (-16 LUFS) + 首尾 0.10s 微淡化防爆音
+    2) 挂载电话带通滤波 (300-3400Hz) 或内心独白轻混响
+    3) 音频响度标准化 (-16 LUFS) + 首部 0.08s 微淡化防爆音
     """
     ss_sec = round(float(trim_head_frames) / float(fps), 4) if trim_head_frames > 0 else 0.0
-    af_chain = "afade=t=in:st=0:d=0.08"
-    if normalize_audio:
-        af_chain = f"loudnorm=I=-16:TP=-1.5:LRA=11,{af_chain}"
+    af_chain = build_audio_filter_chain(fx_mode=fx_mode, normalize_audio=normalize_audio)
 
     cmd = ["ffmpeg", "-y"]
     if ss_sec > 0:
@@ -41,7 +84,6 @@ def process_single_clip(in_mp4, out_mp4, trim_head_frames=2, fps=24.0, normalize
     ]
     r = subprocess.run(cmd, capture_output=True, text=True)
     if r.returncode != 0:
-        # 若原视频无音轨则回退纯视频编码
         cmd_vo = ["ffmpeg", "-y"]
         if ss_sec > 0:
             cmd_vo += ["-ss", str(ss_sec)]
@@ -57,21 +99,23 @@ def master_episode(project_dir, trim_head_frames=2, out_name="全集精修母带
         return False
 
     raw_clips = sorted(glob.glob(os.path.join(in_dir, "shot_*.mp4")))
-    # 过滤掉多候选重摇副本（如 shot_07_v2.mp4），只取正式选定版 shot_XX.mp4
     main_clips = [c for c in raw_clips if "_v" not in os.path.basename(c)]
     if not main_clips:
         print(f"[i] {in_dir} 下未找到任何 shot_XX.mp4 镜头文件。")
         return False
 
+    fx_map = load_shot_audio_fx_map(project_dir)
     work_dir = os.path.join(project_dir, "04_母带精修缓存")
     os.makedirs(work_dir, exist_ok=True)
 
     processed_list = []
-    print(f"[▶] 正在对 {len(main_clips)} 个镜头执行【首部 {trim_head_frames} 帧微修剪 + EBU R128 (-16 LUFS) 响度统一 + 切点消爆音】...")
+    print(f"[▶] 正在对 {len(main_clips)} 个镜头执行【首部 {trim_head_frames} 帧微修剪 + 电话/独白声学滤波 + EBU R128 (-16 LUFS) 响度统一】...")
     for c in main_clips:
         bn = os.path.basename(c)
+        stem = os.path.splitext(bn)[0]
+        fx_mode = fx_map.get(stem, "normal")
         out_c = os.path.join(work_dir, f"norm_{bn}")
-        if process_single_clip(c, out_c, trim_head_frames=trim_head_frames):
+        if process_single_clip(c, out_c, trim_head_frames=trim_head_frames, fx_mode=fx_mode):
             processed_list.append(out_c)
 
     concat_txt = os.path.join(work_dir, "concat_list.txt")
@@ -93,7 +137,7 @@ def master_episode(project_dir, trim_head_frames=2, out_name="全集精修母带
 
 
 def main():
-    ap = argparse.ArgumentParser(description="吞鲸 v4.0 母带音画精修与无损缝合引擎")
+    ap = argparse.ArgumentParser(description="吞鲸 v4.0 母带音画精修与声学特效缝合引擎")
     ap.add_argument("project_dir", help="项目目录路径")
     ap.add_argument("--trim-head-frames", type=int, default=2, help="每镜切除首部起势微顿帧数（默认2帧=0.08s，设0则不切）")
     ap.add_argument("--out-name", default="全集精修母带_Mastered.mp4", help="输出母带文件名")

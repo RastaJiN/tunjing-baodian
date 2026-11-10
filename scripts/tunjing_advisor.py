@@ -30,7 +30,7 @@ sys.path.insert(0, BASE_DIR)
 
 from tunjing_core import (
     load_poses, STAGING_IDS, TEASE_IDS, DRAMATIC_BODY_IDS,
-    EMOTION_MUSCLE_CUES, resolve_emotion_key
+    EMOTION_MUSCLE_CUES, resolve_emotion_key, check_dialogue_human_quality, parse_audio_fx_mode
 )
 
 
@@ -112,6 +112,23 @@ def diagnose_project(project_dir):
             "dimension": "【维度 4 · 空间参考图单一预警（防切特写穿帮/丢背景）】",
             "issue": f"当前 `00_资产/` 仅检测到 {len(scene_files)} 张场景底图 ({scene_files})。一图拍到底会导致站立镜前戏躺回床上、特写背景模糊穿帮。",
             "action": "建议采用吞鲸 4.0【空间图池单槽轮换法】，在 `00_资产/` 补齐 3 张同风格空间图（每镜 `<Picture 3>` 只挂 1 张不混喂）：① scene_main.png(主全景) ② scene_wall.png(立面墙镜) ③ scene_close.png(承托面近景俯拍，根治切特写丢背景)"
+        })
+
+    # ── 4b. 去AI味活人台词与声学特效诊断 ──
+    cliche_warnings = []
+    fx_notes = []
+    for idx_d, d_line in enumerate(dialogues, 1):
+        issues = check_dialogue_human_quality(d_line, shot_dur=4.5)
+        if issues:
+            cliche_warnings.extend(issues)
+        fx_m = parse_audio_fx_mode("", d_line)
+        if fx_m != "normal":
+            fx_notes.append(f"台词 {idx_d} 自动识别为 `{fx_m}` 声学模式")
+    if cliche_warnings:
+        suggestions.append({
+            "dimension": "【维度 4b · 台词去AI味与语速窗口预警】",
+            "issue": " | ".join(cliche_warnings[:3]),
+            "action": "建议精简为 12 字以内的口语化短句（常速 4.1字/秒，预留开口前 1.1s 延迟与句尾 0.7s 反应）。"
         })
 
     # ── 5. 运镜活性与防站桩诊断 ──

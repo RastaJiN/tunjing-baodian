@@ -3,15 +3,21 @@
 """
 吞鲸宝典 v4.0 · 全剧集导演调度与提示词装配共享核心 (Tunjing Assembly Core v4.0)
 
-核心融合特性（《不完全手册》×《吞鲸宝典》终极合体版）：
-1. 全面对齐 R1~R12 全肯定无否定式语法（Positive-Only Grammar）：
+核心特性：
+1. R1~R12 全肯定无否定式语法（Positive-Only Grammar）：
    - 正向送模文本彻底剥离 `=== NEGATIVE ===` 负向清单（防 Node 328 清零后正向反噬画油光/断肢）
    - 废除 `OUT OF FRAME / no / without` 否定词根，全面改用正面物理存在边界（Positive Cropping & Anatomy Lock）
-   - 注入 `MOTION FLOOR:` 底噪生命力锁（破除台词合成时身体 PSNR 42dB 僵尸定格）
+   - 注入 `MOTION FLOOR:` 底噪生命力锁（破除台词合成时身体僵尸定格）
    - 注入唯一 `Camera:` 量化运镜行与独立 `SPEECH:` 台词行
-2. 原生支持 9 图 + 3 音（`<Audio 1>` / `<Audio 2>` 人物固定声线克隆）动态锚定
-3. 原生支持 8 大非肉戏导演调度原语（环境空镜、双人封堵、男正打 srs_male、女反打 srs_female、信物微距 prop_insert、生理阻断 cut_insert、空间转移 spatial_shift、尾声独处 outro_solo）与 55 套肉戏真源无缝混排
-4. 13 类场地中英双轨承托面 (`with_scene_surface`) 动态改写
+2. 13 类场地承托面人体高度锚点（Body-Height Furniture Anchor）：
+   - 自动将桌面、床沿、吧台、窗台等承托物锚定在人体固定部位高度（如腰带高、膝盖高、胯部高），彻底消除跨镜家具高度乱跳
+3. 特写与微距头部自动瘦身裁剪（Macro/Face Header Slimming）：
+   - 切入 `macro` 或 `face` 镜头时，自动裁剪掉头部多余的房间全景与全身比例描述，防止模型强行把极特写拉宽为中景
+4. 正反打屏幕左右方向与俯仰视线互补锁（Complementary Eyeline & Angle Lock）：
+   - `srs_male`（男正打）锁定画面左侧向右下凝视，`srs_female`（女反打）锁定画面右侧向左上迎视，剪辑视线 100% 严丝合缝对撞
+5. 黄金情绪反应公式（1个明确情绪点名 + 2处可见解剖泄露 + 1.5秒内落定保持）
+6. 先静后动三段式运镜（0.0s–1.0s 起幅稳固定格 ➔ 中段平滑运镜 ➔ 尾段 0.8s 稳固落幅）
+7. H3 真实语速预算锁（4.1字/秒常速 + 扣除开口前延迟与尾段反应窗口）
 """
 
 import json, os, re
@@ -42,7 +48,7 @@ FOREPLAY = {"undress", "kiss_fondle", "breast_rub", "nipple_lick",
             "kiss_pin", "kiss_force", "kiss_her", "ass_rub", "masturbation",
             "finger_masturbate", "solo_masturbate", "thigh_grind", "mirror_ear_whisper", "strip_tease"}
 
-# R4 全肯定正向压油词（彻底剔除 without / non- / zero 等否定前缀，100% 物理肯定词）
+# R4 全肯定正向压油词（100% 物理肯定词）
 DE_OIL = (
     "authentic matte velvet skin finish, powdered dry complexion texture, natural human skin with "
     "visible fine pores and subtle dermal grain, soft subsurface scattering with gentle matte light absorption, "
@@ -64,27 +70,27 @@ OFFICIAL_CUT_PHRASES = (
     "the shot switches to",
 )
 
-# 吞鲸 4.0 · 12大核心表演情绪光谱 + 3大心理阈值反应阶段（四维面部解剖物理指令：眉弓+眼眸+鼻翼呼吸+下颌唇角）
+# 吞鲸 v4.0 · 黄金情绪反应配方（1个明确情绪点名 + 2处当前景别可见物理泄露 + 1.5s内落定保持）
 EMOTION_MUSCLE_CUES = {
-    # ── 12 大主动表演情绪底色 (Acting Emotion Spectrum) ──
-    "anger_rage":       "brows drawn sharply together with tense glabella, intense unblinking glare, nostrils flaring with heavy sharp inhales, jaw muscles bulging as words are forced through clenched teeth",
-    "cold_wrath":       "expressionless cold mask with narrowed eyes, chin slightly lowered casting shadow over the upper face, slow icy breathing, speaking with minimal lip movement and lethal calm",
-    "grief_sorrow":     "inner eyebrows subtly raised in grief, glistening tear film pooling along the lower eyelids, corners of the mouth pulled faintly downward, chest rising in a shaky broken sigh",
-    "humiliated_tears": "reddened eye rims with a single tear rolling down the cheek, teeth biting hard into the lower lip to suppress a sob, chin trembling slightly",
-    "triumph_smirk":    "eyes curving with sharp satisfaction, one corner of the lips lifting 3 mm into a victorious smirk, chin rising 10 degrees with relaxed confident posture",
-    "warm_joy":         "softened brow and warm bright gaze, cheeks lifting naturally with a gentle genuine smile, relaxed even breathing",
-    "fear_panic":       "pupils widened in sudden alarm, lips parted 5 mm in a frozen gasp, rapid shallow chest heaving as head pulls back 3 cm",
-    "jealousy_spite":   "sideways piercing gaze fixed on the target, lower jaw shifted tensely, fingers digging into the palm as nostrils tighten",
-    "mockery":          "eyelids half-lowered in disdain, sweeping a slow gaze from head to toe, one corner of the mouth lifting 2 mm with a scoffing exhale",
-    "provocation":      "chin tilted up 15 degrees, slow deliberate blink followed by steady seductive eye contact, collarbones rising with a slow breath",
-    "forbearance":      "jaw clenched tight, throat bobbing once in a hard swallow, gaze dropping 10 cm then rising while knuckles whiten",
-    "ecstasy":          "pupils dilated with upward gaze, flushed cheeks, head tilting back against the support as neck tendons tense",
-    # ── 3 大被动心理阈值反应阶段 (State Spectrum) ──
-    "inhibition":       "fingertips tightening subconsciously against the fabric, gaze shifting between the other person's eyes and lips with a 0.5-second hesitation lag before speaking, shallow guarded chest breathing",
-    "surge":            "all secondary hand fidgeting freezing abruptly, unblinking gaze locked dead-on with flared nostrils and deep ribcage expansion, jaw muscles visibly hardening",
-    "aftermath":        "both shoulders dropping 3 cm as torso support relaxes, gaze losing focus and drifting toward the ambient light source while lips part in a silent exhale",
-    "submission":       "eyelashes trembling with gaze lowered toward the floor, lower lip pressed between teeth as shoulders sink 2 cm",
-    "default":          "jaw muscles tensing with visible chest breathing and natural head micro-shifts of 2 cm",
+    # ── 12 大主动表演情绪底色 ──
+    "anger_rage":       "simmering with furious rage; brows drawn sharply together with tense glabella and jaw muscles bulging as nostrils flare, settling into a lethal unblinking glare within 1.5 seconds",
+    "cold_wrath":       "frozen in icy wrath; eyes narrowing beneath a lowered brow and chest breathing slowing to a cold steady rhythm, settling into a motionless intimidating stare within 1.5 seconds",
+    "grief_sorrow":     "overtaken by deep sorrow; inner eyebrows lifting subtly as glistening tear film pools along the lower eyelids and chest rises in a shaky sigh, settling within 1.5 seconds",
+    "humiliated_tears": "stung by humiliated grief; eye rims reddening with a tear rolling down the cheek while teeth bite hard into the lower lip, settling into a trembling silence within 1.5 seconds",
+    "triumph_smirk":    "radiating calculating triumph; eyes curving with sharp satisfaction and one corner of the lips lifting 3 mm into a victorious smirk, holding steady within 1.5 seconds",
+    "warm_joy":         "softened by genuine warmth; brow relaxing with bright warm eye contact and cheeks lifting into a natural gentle smile, settling smoothly within 1.5 seconds",
+    "fear_panic":       "struck by sudden alarm; pupils widening as lips part 5 mm in a frozen gasp and shoulders pull back 3 cm with rapid shallow breathing, locking still within 1.5 seconds",
+    "jealousy_spite":   "burning with bitter jealousy; sideways piercing gaze fixing on the target while the lower jaw shifts tensely and fingers dig into the palm, holding within 1.5 seconds",
+    "mockery":          "dripping with cold disdain; eyelids lowering halfway in a slow sweep and one corner of the mouth lifting 2 mm with a scoffing exhale, settling within 1.5 seconds",
+    "provocation":      "charged with deliberate provocation; chin tilting up 12 degrees with a slow deliberate blink and collarbones rising on a slow breath, holding steady eye contact within 1.5 seconds",
+    "forbearance":      "straining in silent forbearance; jaw clenching tight with throat bobbing once in a hard swallow while knuckles whiten, settling into tense restraint within 1.5 seconds",
+    "ecstasy":          "swept into breathless ecstasy; pupils dilating with upward gaze and head tilting back against the support as neck tendons tense, holding within 1.5 seconds",
+    # ── 3 大被动心理阈值反应阶段 ──
+    "inhibition":       "guarded in hesitant restraint; fingertips tightening against the fabric and gaze shifting between eyes and lips with a 0.5-second pause, settling within 1.5 seconds",
+    "surge":            "locked in sudden emotional surge; all secondary hand movement stopping dead as unblinking gaze locks forward with deep ribcage expansion, settling within 1.5 seconds",
+    "aftermath":        "drifting in exhausted aftermath; both shoulders dropping 3 cm as torso support relaxes and lips part in a silent exhale, settling within 1.5 seconds",
+    "submission":       "yielding in quiet submission; eyelashes trembling with gaze lowered toward the floor and lower lip pressed between teeth, settling within 1.5 seconds",
+    "default":          "focused in tense presence; jaw muscles tightening with visible chest breathing and natural head micro-shifts of 2 cm, settling within 1.5 seconds",
 }
 
 EMOTION_ZH_ALIAS = {
@@ -105,12 +111,64 @@ EMOTION_ZH_ALIAS = {
     "余波": "aftermath", "消散": "aftermath",
 }
 
+# 去AI味翻译腔黑名单（用于门禁与顾问自动拦截书面化/翻译腔废话台词）
+AI_CLICHE_PATTERNS = [
+    r"你怎么能如此",
+    r"我的心好痛",
+    r"充满了不可思议",
+    r"眼中闪过一丝",
+    r"嘴角勾起一抹弧度",
+    r"三分薄凉",
+    r"扇形统计图",
+    r"既然你如此无情",
+    r"休怪我无义",
+    r"这究竟是为什么",
+    r"你听我解释好不好",
+]
+
+
+def check_dialogue_human_quality(line_text, shot_dur=4.0):
+    """
+    吞鲸活人感台词与物理语速预算校验器：
+    1) 拦截 AI 翻译腔与书面套话
+    2) 核算真实语速窗口：说话常速 4.1 字/秒，扣除开口前 1.1s 动作起势延迟与句尾 0.7s 反应余韵
+    """
+    issues = []
+    clean = re.sub(r"\[.*?\]", "", (line_text or "")).strip()
+    if not clean:
+        return issues
+
+    for pat in AI_CLICHE_PATTERNS:
+        if re.search(pat, clean):
+            issues.append(f"检测到 AI 翻译腔/网文套话「{pat}」，请改为 12 字以内的活人短句、反问或拿捏把柄的狠话")
+
+    zh_chars = len(re.findall(r"[一-龥]", clean))
+    ellipses = clean.count("…") + clean.count("...")
+    # 开口延迟 1.0s + 句尾反应 0.6s + 4.1字/秒
+    needed_sec = 1.6 + (zh_chars / 4.1) + (ellipses * 0.5)
+    if needed_sec > shot_dur + 0.25:
+        issues.append(f"台词「{clean}」({zh_chars}字) 含开口前1.0s延迟与句尾0.6s反应共需 {needed_sec:.1f}s，超出镜头时长 {shot_dur:.2f}s（必被截断尾音）")
+    return issues
+
+
+def parse_audio_fx_mode(speaker_raw="", line_raw="", voiceover=False):
+    """
+    识别台词声学后期处理模式（供 tunjing_mastering.py 在后期合成时自动挂载 FFmpeg 音频滤镜）：
+    - `phone`：电话/听筒/对讲机音质（后期施加 300Hz–3400Hz 带通滤波 + 轻压缩）
+    - `inner_os`：内心独白/混响心声（后期施加轻空间混响 aecho）
+    - `normal`：标准同期干声
+    """
+    s = f"{speaker_raw} {line_raw}".lower()
+    if any(k in s for k in ("电话", "听筒", "免提", "语音通话", "对讲", "phone", "call", "telecom")):
+        return "phone"
+    if voiceover or any(k in s for k in ("心声", "独白", "os", "内心", "暗想", "monologue")):
+        return "inner_os"
+    return "normal"
+
 
 def resolve_emotion_key(emotion_input="", line_text="", fallback="default"):
     """
-    将中英文情绪标签或台词内容智能解析为 EMOTION_MUSCLE_CUES 标准键：
-    1) 若显式传入中文别名（如 '生气'/'忧伤'/'委屈'）或英文键，直接命中
-    2) 否则根据台词文本关键词与标点自动感知情绪底色
+    将中英文情绪标签或台词内容智能解析为 EMOTION_MUSCLE_CUES 标准键
     """
     e = (emotion_input or "").strip()
     if e in EMOTION_MUSCLE_CUES and e != "default":
@@ -140,6 +198,7 @@ def resolve_emotion_key(emotion_input="", line_text="", fallback="default"):
 
     return fallback if fallback in EMOTION_MUSCLE_CUES else "default"
 
+
 # 视听决策权触发器 (Visual Strategy Triggers：按戏剧意图动态匹配机位与景别)
 VISUAL_STRATEGY_TRIGGERS = {
     "suffocation": ("macro", "push_tension", "Intrusive suffocating perspective: extreme close framing with slow relentless push-in and high-contrast shadow falloff"),
@@ -152,21 +211,21 @@ NEG = """Subtitles, captions, watermarks, UI, logos, on-screen text
 Face swap, identity drift, deformed limbs, extra fingers, melting bodies
 Detached anatomy, orbiting camera, fast zoom, static frozen frames"""
 
-# ── 13 类场景承托面与声学映射 ──
+# ── 13 类场景承托面、声学映射与人体高度物理锚点（防家具跨镜忽高忽低）──
 SURFACE_PROFILES = {
-    "bed":     {"noun": "bed", "on": "on the bed", "brace": "bracing against the bed", "grab": "gripping the bedsheets", "edge": "edge of bed", "sitEdge": "sitting on the edge of the bed", "pad": "wrinkled bedsheets", "lie": "lying supine on the bed", "kneel": "kneeling on the bed", "sfx": "creaking bed frame resonance"},
-    "hotel":   {"noun": "hotel bed", "on": "on the hotel bed", "brace": "bracing on the hotel bed", "grab": "gripping crisp hotel sheets", "edge": "hotel bed edge", "sitEdge": "sitting on the hotel bed edge", "pad": "white hotel bedsheets", "lie": "lying on the hotel bed", "kneel": "kneeling on the hotel bed", "sfx": "muffled bedspring impact"},
-    "sofa":    {"noun": "leather sofa", "on": "on the sofa", "brace": "bracing against sofa armrest", "grab": "gripping sofa cushions", "edge": "sofa edge", "sitEdge": "perched on the sofa edge", "pad": "soft leather cushions", "lie": "reclined back against the sofa cushions", "kneel": "straddling and kneeling on the sofa", "sfx": "creaking leather upholstery"},
-    "chair":   {"noun": "heavy chair", "on": "on the chair", "brace": "gripping armrests", "grab": "holding the backrest", "edge": "seat edge", "sitEdge": "seated on the heavy chair", "pad": "chair seat", "lie": "leaning back into the chair", "kneel": "straddling the chair seat", "sfx": "strained wooden chair creaks"},
-    "kitchen": {"noun": "kitchen island counter", "on": "on the kitchen counter", "brace": "palms flat on cold granite counter", "grab": "gripping the counter edge", "edge": "counter edge", "sitEdge": "seated on the marble counter lip", "pad": "polished cold counter surface", "lie": "arched back over the counter", "kneel": "prone across the kitchen counter", "sfx": "dull hollow countertop thuds"},
-    "bath":    {"noun": "bathroom tiled floor", "on": "in the shower", "brace": "palms pressed against wet ceramic tiles", "grab": "holding tile wall ledge", "edge": "shower ledge", "sitEdge": "seated on the wet tile ledge", "pad": "slick wet bathroom tiles", "lie": "reclined against the tile wall", "kneel": "kneeling on the wet tile floor", "sfx": "splashing wet water echoes on cold tile"},
-    "desk":    {"noun": "industrial metal desk", "on": "on the desk", "brace": "palms pressed on cold scratched steel desktop", "grab": "white-knuckle grip on the metal desk lip", "edge": "table rim", "sitEdge": "seated back on the desk edge", "pad": "cold dark-grey steel tabletop", "lie": "upper torso flattened over the desk", "kneel": "prone belly-down over the desk rim", "sfx": "heavy metallic desk frame groan"},
-    "wall":    {"noun": "solid concrete wall", "on": "against the wall", "brace": "both palms flat against the solid wall", "grab": "fingers pressing wall texture", "edge": "wall corner", "sitEdge": "back pinned flat to the wall", "pad": "solid textured wall surface", "lie": "spine flush against the cold wall", "kneel": "upright against the wall", "sfx": "heavy dull wall impacts"},
-    "window":  {"noun": "floor-to-ceiling glass window", "on": "against the glass window", "brace": "palms pressed against the cold glass pane", "grab": "gripping window frame", "edge": "window sill", "sitEdge": "perched against the window sill", "pad": "steamed reflective glass window", "lie": "pressed back into the glass", "kneel": "kneeling before the window", "sfx": "glass pane vibration resonance"},
-    "rug":     {"noun": "thick wool rug", "on": "on the floor rug", "brace": "palms pressing into dense rug carpet", "grab": "clutching carpet fibers", "edge": "rug border", "sitEdge": "sitting on the rug", "pad": "textured thick rug", "lie": "supine across the soft rug", "kneel": "kneeling upright on the rug", "sfx": "muffled heavy floor impact"},
-    "floor":   {"noun": "hardwood floor", "on": "on the bare floor", "brace": "palms braced on bare floorboards", "grab": "gripping hardwood seams", "edge": "floor edge", "sitEdge": "sitting on the floor", "pad": "polished dark hardwood floor", "lie": "flat on the hardwood floor", "kneel": "kneeling on the floor", "sfx": "solid wood floorboard resonance"},
-    "car":     {"noun": "car leather seat", "on": "inside vehicle rear seat", "brace": "bracing on seat headrest", "grab": "gripping front seat back", "edge": "seat edge", "sitEdge": "cramped on the car leather seat", "pad": "contoured dark leather car seat", "lie": "tilted back in the car seat", "kneel": "straddling in the car cabin", "sfx": "leather seat compression squeaks"},
-    "balcony": {"noun": "balcony railing", "on": "at the balcony terrace", "brace": "holding the cold metal balcony railing", "grab": "both hands locked on the railing bar", "edge": "railing bar", "sitEdge": "leaned against the balcony ledge", "pad": "stone terrace floor", "lie": "bent forward over the terrace railing", "kneel": "kneeling on the stone balcony floor", "sfx": "wind draft and distant ambient air"},
+    "bed":     {"noun": "bed", "height_anchor": "mattress surface positioned at knee height (approx. 50 cm)", "on": "on the bed", "brace": "bracing palms against the knee-height mattress", "grab": "gripping the bedsheets", "edge": "edge of bed at knee height", "sitEdge": "sitting on the knee-height edge of the bed", "pad": "wrinkled bedsheets", "lie": "lying supine on the bed", "kneel": "kneeling on the bed", "sfx": "creaking bed frame resonance"},
+    "hotel":   {"noun": "hotel bed", "height_anchor": "hotel mattress edge positioned at knee height (approx. 55 cm)", "on": "on the hotel bed", "brace": "bracing on the hotel bed", "grab": "gripping crisp hotel sheets", "edge": "hotel bed edge at knee height", "sitEdge": "sitting on the knee-height hotel bed edge", "pad": "white hotel bedsheets", "lie": "lying on the hotel bed", "kneel": "kneeling on the hotel bed", "sfx": "muffled bedspring impact"},
+    "sofa":    {"noun": "leather sofa", "height_anchor": "sofa seat cushion at knee height (approx. 45 cm) with backrest at mid-torso height", "on": "on the sofa", "brace": "bracing against the hip-height sofa armrest", "grab": "gripping sofa cushions", "edge": "sofa edge at knee height", "sitEdge": "perched on the knee-height sofa edge", "pad": "soft leather cushions", "lie": "reclined back against the sofa cushions", "kneel": "straddling and kneeling on the sofa", "sfx": "creaking leather upholstery"},
+    "chair":   {"noun": "heavy chair", "height_anchor": "chair seat at knee height (approx. 48 cm) with armrests at hip height", "on": "on the chair", "brace": "gripping hip-height armrests", "grab": "holding the backrest", "edge": "seat edge", "sitEdge": "seated on the heavy chair", "pad": "chair seat", "lie": "leaning back into the chair", "kneel": "straddling the chair seat", "sfx": "strained wooden chair creaks"},
+    "kitchen": {"noun": "kitchen island counter", "height_anchor": "countertop surface fixed at hip height (approx. 90 cm)", "on": "on the hip-height kitchen counter", "brace": "palms flat on the hip-height cold granite counter", "grab": "gripping the hip-height counter edge", "edge": "counter edge at hip height", "sitEdge": "seated on the hip-height marble counter lip", "pad": "polished cold counter surface", "lie": "arched back over the counter", "kneel": "prone across the kitchen counter", "sfx": "dull hollow countertop thuds"},
+    "bath":    {"noun": "bathroom tiled ledge", "height_anchor": "tiled ledge fixed at mid-thigh height (approx. 60 cm)", "on": "in the shower", "brace": "palms pressed against chest-height wet ceramic tiles", "grab": "holding tile wall ledge", "edge": "shower ledge at mid-thigh height", "sitEdge": "seated on the wet tile ledge", "pad": "slick wet bathroom tiles", "lie": "reclined against the tile wall", "kneel": "kneeling on the wet tile floor", "sfx": "splashing wet water echoes on cold tile"},
+    "desk":    {"noun": "industrial metal desk", "height_anchor": "tabletop surface fixed at waist-belt height (approx. 75 cm)", "on": "on the waist-height desk", "brace": "palms pressed on the waist-height cold steel desktop", "grab": "white-knuckle grip on the waist-height metal desk lip", "edge": "table rim at waist-belt height", "sitEdge": "seated back on the waist-height desk edge", "pad": "cold dark-grey steel tabletop", "lie": "upper torso flattened over the waist-height desk", "kneel": "prone belly-down over the desk rim", "sfx": "heavy metallic desk frame groan"},
+    "wall":    {"noun": "solid concrete wall", "height_anchor": "vertical wall plane extending behind shoulders and head", "on": "against the wall", "brace": "both palms flat against the shoulder-height solid wall", "grab": "fingers pressing wall texture", "edge": "wall corner", "sitEdge": "back pinned flat to the wall", "pad": "solid textured wall surface", "lie": "spine flush against the cold wall", "kneel": "upright against the wall", "sfx": "heavy dull wall impacts"},
+    "window":  {"noun": "floor-to-ceiling glass window", "height_anchor": "window sill bar fixed at hip height (approx. 85 cm)", "on": "against the glass window", "brace": "palms pressed against chest-height cold glass pane", "grab": "gripping hip-height window frame", "edge": "window sill at hip height", "sitEdge": "perched against the hip-height window sill", "pad": "steamed reflective glass window", "lie": "pressed back into the glass", "kneel": "kneeling before the window", "sfx": "glass pane vibration resonance"},
+    "rug":     {"noun": "thick wool rug", "height_anchor": "floor-level dense wool rug beneath knees and ankles", "on": "on the floor rug", "brace": "palms pressing into dense rug carpet", "grab": "clutching carpet fibers", "edge": "rug border", "sitEdge": "sitting on the rug", "pad": "textured thick rug", "lie": "supine across the soft rug", "kneel": "kneeling upright on the rug", "sfx": "muffled heavy floor impact"},
+    "floor":   {"noun": "hardwood floor", "height_anchor": "ground-level hardwood floor plane", "on": "on the bare floor", "brace": "palms braced on bare floorboards", "grab": "gripping hardwood seams", "edge": "floor edge", "sitEdge": "sitting on the floor", "pad": "polished dark hardwood floor", "lie": "flat on the hardwood floor", "kneel": "kneeling on the floor", "sfx": "solid wood floorboard resonance"},
+    "car":     {"noun": "car leather seat", "height_anchor": "contoured car seat cushion at knee height inside the cabin", "on": "inside vehicle rear seat", "brace": "bracing on shoulder-height seat headrest", "grab": "gripping front seat back", "edge": "seat edge", "sitEdge": "cramped on the car leather seat", "pad": "contoured dark leather car seat", "lie": "tilted back in the car seat", "kneel": "straddling in the car cabin", "sfx": "leather seat compression squeaks"},
+    "balcony": {"noun": "balcony railing", "height_anchor": "metal railing top bar fixed at lower-chest height (approx. 100 cm)", "on": "at the balcony terrace", "brace": "holding the lower-chest-height cold metal balcony railing", "grab": "both hands locked on the railing bar", "edge": "railing bar at lower-chest height", "sitEdge": "leaned against the balcony ledge", "pad": "stone terrace floor", "lie": "bent forward over the terrace railing", "kneel": "kneeling on the stone balcony floor", "sfx": "wind draft and distant ambient air"},
 }
 
 
@@ -278,6 +337,7 @@ def build_fullref_header(
     is_undress=False,
     is_staging=False,
     tier="A_two_shot",
+    shot_size="mcu",
     female_desc="young woman anchored in <Picture 1>, preserving her exact facial structure, hairstyle, skin tone, and anatomical proportions",
     male_desc="mature man anchored in <Picture 2>, preserving his exact masculine facial identity, hairstyle, skin tone, and muscular build",
     scene_props="",
@@ -287,8 +347,8 @@ def build_fullref_header(
     吞鲸 v4.0 权威头部装配：
     - 100% 遵循 R1~R12 全肯定语法（零否定词）
     - 支持单人正反打/空镜槽位物理隔离描述
-    - 支持 <Audio 1> / <Audio 2> 角色声线参考声明
-    - 显式内嵌 MOTION FLOOR 与场景弱构图引用锁
+    - 支持特写/微距镜头头部自动瘦身裁剪（防特写被房间全景描述拉宽成中景）
+    - 内嵌家具人体高度锚点（height_anchor），防止跨镜台面/床沿高度跳变
     """
     sc_id = detect_scene_id(scene)
     surf = SURFACE_PROFILES.get(sc_id, SURFACE_PROFILES["bed"])
@@ -299,11 +359,18 @@ def build_fullref_header(
         "rug": "living room", "floor": "interior room", "car": "luxury sedan cabin",
         "balcony": "private terrace"
     }
-    scene_en = scene if not re.search(r"[\u4e00-\u9fff]", str(scene)) else scene_en_map.get(sc_id, "interior room")
-    props_clause = f", featuring {scene_props}" if scene_props and not re.search(r"[\u4e00-\u9fff]", scene_props) else f", featuring {surf['noun']}"
+    scene_en = scene if not re.search(r"[一-鿿]", str(scene)) else scene_en_map.get(sc_id, "interior room")
+    is_tight_crop = shot_size in ("macro", "face")
+    if is_tight_crop:
+        # 特写/微距镜头部自动瘦身：只保留局部接触材质与浅景深锚定，不写全景大房间与全身陈设，防止把特写拉宽成中景
+        props_clause = f" showing close-range {surf['pad']} texture in 20% shallow depth-of-field"
+    else:
+        props_clause = (f", featuring {scene_props} ({surf['height_anchor']})"
+                        if scene_props and not re.search(r"[一-鿿]", scene_props)
+                        else f", featuring {surf['noun']} ({surf['height_anchor']})")
 
     parts = []
-    # 1. Goal & Audio Contract (全肯定描述)
+    # 1. Goal & Audio Contract
     parts.append(f"Goal & Audio Contract: Generate a {dur:.2f}-second {aspect} live-action cinema video "
                  f"with readable physical biomechanics, locked identity consistency, and synchronized native audio.")
     parts.append("Audio rule: characters vocalize exclusively the exact words enclosed inside <d>...</d> tags; "
@@ -317,10 +384,10 @@ def build_fullref_header(
         parts.append(f"<Subject 3> is the pure architectural {scene_en} environment anchored in <Picture 3>{props_clause} and ambient lighting.")
     elif tier == "B_solo_female":
         parts.append(f"<Subject 1> is the {female_desc}.")
-        parts.append(f"<Subject 3> is the {scene_en} support surface and background environment anchored in <Picture 3>{props_clause}.")
+        parts.append(f"<Subject 3> is the {scene_en} support surface anchored in <Picture 3>{props_clause}.")
     elif tier == "B_solo_male":
         parts.append(f"<Subject 2> is the {male_desc}.")
-        parts.append(f"<Subject 3> is the {scene_en} support surface and background environment anchored in <Picture 3>{props_clause}.")
+        parts.append(f"<Subject 3> is the {scene_en} support surface anchored in <Picture 3>{props_clause}.")
     else:
         if is_undress:
             parts.append(f"<Subject 1> is the {female_desc}; her outer garment unfastens and slides down during this take.")
@@ -353,7 +420,7 @@ def build_fullref_header(
         else:
             parts.append("<Subject 1>: fully_preserved - facial identity, exact hairstyle, body anatomy, and skin texture are strictly locked to <Picture 1>.")
         parts.append("<Subject 2>: fully_preserved - masculine facial identity, physique, and skin tone are strictly locked to <Picture 2>.")
-    parts.append(f"<Subject 3>: fully_preserved for spatial geometry, {surf['noun']} texture, and lighting direction from <Picture 3>; weak_reference for exact camera framing.")
+    parts.append(f"<Subject 3>: fully_preserved for surface texture and lighting direction from <Picture 3>; weak_reference for exact camera framing.")
     parts.append("")
 
     # 5. Consistency, Skin & Lighting, MOTION FLOOR
@@ -361,7 +428,7 @@ def build_fullref_header(
         parts.append("Consistency: Empty architectural space containing exclusively furniture, structure, and lighting from <Picture 3>.")
     elif tier in ("B_solo_female", "B_solo_male"):
         subj = "<Subject 1>" if tier == "B_solo_female" else "<Subject 2>"
-        parts.append(f"Consistency: Single subject {subj} in frame with 20% shallow depth-of-field background showing <Subject 3> texture from <Picture 3>.")
+        parts.append(f"Consistency: Single subject {subj} in frame with 20% shallow depth-of-field background showing <Subject 3> surface texture from <Picture 3>.")
     else:
         parts.append("Consistency: Keep the same faces, body proportions, skin tone, hairstyle, and anatomical scale throughout. "
                      "Two adults in frame. The camera stays on the same side of them throughout; <Subject 1> is on the left, <Subject 2> is on the right.")
@@ -375,7 +442,7 @@ def build_fullref_header(
 
 def sanitize_positive_only(text):
     """
-    R4 正向全肯定净化器：将残留的否定短语转化为纯正面物理描述，确保 100% 通过 h3_lint R4
+    R4 正向全肯定净化器：将残留的否定短语转化为纯正面物理描述
     """
     if not text:
         return text
@@ -398,11 +465,24 @@ def sanitize_positive_only(text):
     return out
 
 
+def format_segmented_camera_en(cam_desc, dur):
+    """
+    先静后动三段式运镜封装器：
+    - 0.00s–1.00s 保持静态稳固定格起幅（防止开局前 15 帧人物脸部/手部因运镜产生形变）
+    - 1.00s 至 (dur - 0.80s) 平滑执行目标运镜
+    - 最后 0.80s 稳固定格落幅，方便下游剪辑切点咬合
+    """
+    if "tripod" in cam_desc.lower() or dur < 2.2:
+        return cam_desc
+    t_move_end = max(1.5, round(dur - 0.8, 2))
+    return f"0.00s to 1.00s holds steady locking the initial posture, then from 1.00s to {t_move_end:.2f}s {cam_desc}, holding steady for the final 0.80s"
+
+
 def build_shot_description(shot, index, total_shots, dur, size_desc, cam_desc,
                            lines="", speaker="女子A", scene="hotel suite",
                            emotion="default", voiceover=False, hold_last_second=False):
     """
-    编译单镜画面与独立 SPEECH 行（100% 对齐 R1~R12 全肯定语法 + 分号分割律 + 唯一 Camera 行）
+    编译单镜画面与独立 SPEECH 行（100% 对齐 R1~R12 全肯定语法 + 正反打视线互补锁 + 先静后动三段式运镜）
     """
     pid = shot.get("pose", "")
     first_p = pid.split("->")[0]
@@ -420,7 +500,7 @@ def build_shot_description(shot, index, total_shots, dur, size_desc, cam_desc,
     if lines and (shot.get("size") in ("hip", "macro") or first_p in ("env_establish", "prop_insert", "cut_insert")):
         effective_vo = True
 
-    # 防呆熔断 2：双轨物理分流构图死锁（R4 全肯定物理切边描述，零 OUT OF FRAME / NO 否定词）
+    # 防呆熔断 2：双轨物理分流构图死锁 + 正反打屏幕左右方向与俯仰视线互补锁
     comp_lock = ""
     if first_p == "env_establish":
         comp_lock = ("COMPOSITION LOCK: Pure architectural environment framing anchored in <Picture 3>, "
@@ -429,11 +509,11 @@ def build_shot_description(shot, index, total_shots, dur, size_desc, cam_desc,
         comp_lock = ("COMPOSITION LOCK: Extreme macro framing cropped tightly on the hand and surface contact area, "
                      "with 20% shallow depth-of-field background anchored in <Picture 3>. ")
     elif first_p == "srs_male":
-        comp_lock = ("COMPOSITION LOCK: Tight single-subject focus cropped from chest to head on <Subject 2>, "
-                     "capturing exclusively his facial expression, jawline tension, and shoulder drive against <Picture 3> background. ")
+        comp_lock = ("COMPOSITION LOCK: Tight single-subject focus cropped from chest to head on <Subject 2> positioned on the left side of the frame, "
+                     "gazing downward at a 12-degree angle toward the right foreground against <Picture 3> background. ")
     elif first_p == "srs_female":
-        comp_lock = ("COMPOSITION LOCK: Tight single-subject reaction cropped from collarbones to head on <Subject 1>, "
-                     "capturing exclusively her trembling eyelashes, lips, and rhythmic shoulder vibration against <Picture 3> support surface. ")
+        comp_lock = ("COMPOSITION LOCK: Tight single-subject reaction cropped from collarbones to head on <Subject 1> positioned on the right side of the frame, "
+                     "gazing upward at a 12-degree angle toward the left foreground against <Picture 3> support surface. ")
     elif shot.get("size") in ("hip", "macro") and is_penetration and (not lines or effective_vo):
         comp_lock = ("COMPOSITION LOCK: Low-angle pelvic framing cropped tightly from waist to mid-thigh, "
                      "containing exclusively the lower torso, joined hips, and rhythmic pelvic collision against <Picture 3> surface. ")
@@ -444,9 +524,11 @@ def build_shot_description(shot, index, total_shots, dur, size_desc, cam_desc,
         comp_lock = ("COMPOSITION LOCK: Medium-close framing cropped from chest to head on shoulders, collarbone, and unbuttoning fingers, "
                      "with <Subject 2> in full wardrobe. ")
 
+    segmented_cam = format_segmented_camera_en(cam_desc, dur)
+
     # 唯一 Camera: 指令行 + 分号 (;) 黄金分割律
     if index == 0:
-        shot_prefix = f"Camera: {size_desc}, {cam_desc}.\n[Shot 1] Live-action cinematic, {size_desc}, {cam_desc}; "
+        shot_prefix = f"Camera: {size_desc}, {segmented_cam}.\n[Shot 1] Live-action cinematic, {size_desc}, {segmented_cam}; "
         if first_p == "env_establish":
             at_str = "From 0.00s, within <Subject 3>: "
         elif first_p == "srs_female" or first_p == "outro_solo":
@@ -458,7 +540,7 @@ def build_shot_description(shot, index, total_shots, dur, size_desc, cam_desc,
     else:
         cut_phrase = OFFICIAL_CUT_PHRASES[index % len(OFFICIAL_CUT_PHRASES)]
         t0_val = shot.get("t0", round(index * dur, 2))
-        shot_prefix = f"Camera: {size_desc}, {cam_desc}.\n[Shot {index+1}] At {t0_val:.2f}s, {cut_phrase} {size_desc}, {cam_desc}; "
+        shot_prefix = f"Camera: {size_desc}, {segmented_cam}.\n[Shot {index+1}] At {t0_val:.2f}s, {cut_phrase} {size_desc}, {segmented_cam}; "
         at_str = "At 0.00s, actively in motion, inheriting kinetic momentum from the previous shot: "
 
     raw_action = shot.get("text_en") or shot.get("text") or ""
@@ -481,7 +563,7 @@ def build_shot_description(shot, index, total_shots, dur, size_desc, cam_desc,
     if index == total_shots - 1 and first_p != "outro_solo":
         tail += f" Final state: Continuous anatomical alignment and stable composition held steady to {dur:.2f}s."
 
-    # 独立成段的 SPEECH: 行（100% 符合《不完全手册》R2/R8 规范）
+    # 独立成段的 SPEECH: 行（扣除开口前 1.1s 延迟与尾段 0.7s 反应余韵）
     speech_line = ""
     if lines:
         is_female_spk = ("女" in speaker or "S1" in speaker or "Subject 1" in speaker)
@@ -499,9 +581,9 @@ def build_shot_description(shot, index, total_shots, dur, size_desc, cam_desc,
             speech_line = (f"\nSPEECH: {spk_tag} says in an off-screen voiceover: <d>[Chinese]{lines}</d> "
                            f"while {spk_pronoun} lips remain completely closed.")
         else:
-            t_mid_start = max(0.8, round(dur * 0.25, 2))
-            t_mid_end = min(dur - 0.5, round(dur * 0.75, 2))
-            speech_line = (f"\nSPEECH: From {t_mid_start:.2f}s to {t_mid_end:.2f}s, with {muscle_cue}, "
+            t_mid_start = min(1.10, round(dur * 0.25, 2))
+            t_mid_end = max(t_mid_start + 0.8, round(dur - 0.70, 2))
+            speech_line = (f"\nSPEECH: From {t_mid_start:.2f}s to {t_mid_end:.2f}s, {muscle_cue}, "
                            f"{spk_tag} says: <d>[Chinese]{lines}</d> while {listener_tag} keeps {listener_pronoun} lips completely closed and motionless.")
 
     full_shot_desc = f"{shot_prefix}{body_text}{tail}{speech_line}"
@@ -523,10 +605,11 @@ def single_shot_prompt(shot, index, total_shots, dur, size_desc, cam_desc,
     first_p = pid.split("->")[0]
     is_undress = "undress" in first_p
     is_staging = first_p in STAGING_IDS
+    shot_size = shot.get("size", "mcu")
 
     header = build_fullref_header(
         dur, "9:16", scene=scene, idea=idea, is_undress=is_undress,
-        is_staging=is_staging, tier=tier,
+        is_staging=is_staging, tier=tier, shot_size=shot_size,
         female_desc=female_desc, male_desc=male_desc, scene_props=scene_props,
         has_audio_refs=has_audio_refs
     )
