@@ -137,9 +137,9 @@ def parse_storyboard_md(sb_file):
 
         # ── 帧数提取与合法性检查 ──
         frames = None
-        fm = re.search(r"(\d+)\s*(?:帧|f\b|frames)", header + "\n" + b, flags=re.IGNORECASE)
+        fm = re.search(r"(?:H3帧数|帧数|frames)\s*[:：]?\s*(\d+)\s*(?:帧|f\b|frames)?|(?<!Re)(\d+)\s*帧", header + "\n" + b, flags=re.IGNORECASE)
         if fm:
-            frames = int(fm.group(1))
+            frames = int(fm.group(1) or fm.group(2))
         else:
             f_txt = _cell(b, "帧数", "H3帧数", "frames")
             if f_txt:
@@ -292,6 +292,8 @@ def export_to_jianying(project_dir=None, storyboard_file=None, draft_name=None,
     # 1. 扫描渲染视频文件
     search_dirs = [
         video_dir,
+        os.path.join(project_dir, "04_母带精修缓存"),
+        os.path.join(project_dir, "02_成片输出"),
         os.path.join(project_dir, "output"),
         os.path.join(project_dir, "renders"),
         os.path.join(project_dir, "batch"),
