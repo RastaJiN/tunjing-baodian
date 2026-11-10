@@ -212,6 +212,38 @@ def parse_storyboard_md(sb_file):
     return shots
 
 
+
+def _fmt_srt_time(sec):
+    ms = int(round((sec - int(sec)) * 1000))
+    s = int(sec) % 60
+    m = (int(sec) // 60) % 60
+    h = int(sec) // 3600
+    return f"{h:02d}:{m:02d}:{s:02d},{ms:03d}"
+
+
+def export_srt_file(shots, out_srt_path):
+    """生成与分镜时间轴毫秒级对齐的标准 SRT 字幕文件（防剪映 6.x 加密拦截的终极双保险）"""
+    lines = []
+    cur = 0.0
+    sub_idx = 1
+    for s in shots:
+        dur = float(s["duration"])
+        sp = (s.get("speech") or "").strip()
+        if sp:
+            # 对齐三段式念白窗口（取镜头中间段或全镜）
+            t0 = cur + min(0.5, dur * 0.15)
+            t1 = cur + max(dur - 0.2, dur * 0.90)
+            lines.append(str(sub_idx))
+            lines.append(f"{_fmt_srt_time(t0)} --> {_fmt_srt_time(t1)}")
+            lines.append(sp)
+            lines.append("")
+            sub_idx += 1
+        cur += dur
+    with open(out_srt_path, "w", encoding="utf-8") as f:
+        f.write("\n".join(lines))
+    return sub_idx - 1
+
+
 def print_dryrun_summary(sb_file, shots):
     """打印 --dry-run 解析统计"""
     total_dur = sum(s["duration"] for s in shots)
@@ -255,6 +287,9 @@ def export_to_jianying(project_dir=None, storyboard_file=None, draft_name=None,
     if not shots:
         raise ValueError("分镜中未解析出任何有效镜头！")
 
+    srt_path = os.path.join(project_dir, '全集卡点字幕.srt')
+    n_subs = export_srt_file(shots, srt_path)
+    print(f'[✓] 已同步生成剪映通用毫秒级卡点字幕 ({n_subs} 条): {srt_path}')
     if dry_run:
         print_dryrun_summary(sb_file, shots)
         return None
