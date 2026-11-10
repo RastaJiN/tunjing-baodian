@@ -19,11 +19,21 @@ import json, os, re
 BASE = os.path.dirname(os.path.abspath(__file__))
 REF = os.path.join(BASE, "..", "references")
 
+TEASE_IDS = {
+    "trace_collar", "ear_whisper_tease", "shoulder_strap_slide", "leg_brush_tease",
+    "neck_nuzzle_inhale", "waist_pull_collision", "lip_thumb_wipe", "tie_pull_seduce",
+    "back_arch_lean", "finger_interlock_pin"
+}
+DRAMATIC_BODY_IDS = {
+    "chin_lift", "wrist_pin", "loosen_tie", "wall_caging", "nape_grip",
+    "chest_push", "step_back_guard", "turn_evade", "clutch_fabric",
+    "grab_lapel", "collapse_sob", "present_item", "rub_temple", "fix_attire"
+}
 STAGING_IDS = {
     "env_establish", "blocking_2s", "srs_male", "srs_female",
     "prop_insert", "cut_insert", "spatial_shift", "outro_solo",
     "empty_cut", "corridor_cut"
-}
+} | TEASE_IDS | DRAMATIC_BODY_IDS
 FINISH_IDS = {"creampie", "cum_face", "cum_chest", "cum_belly", "cum_butt", "squirting_climax"}
 ORAL_ONLY = {"bj", "squat_bj", "prone_bj", "deepthroat", "head_thrust", "facefuck",
              "sixty_nine", "cunnilingus", "sofa_cunni", "fingering", "clit_tease",

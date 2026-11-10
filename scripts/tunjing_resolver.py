@@ -70,6 +70,32 @@ ALIAS = {
     "生理阻断": "cut_insert", "抓白微距": "cut_insert",
     "空间转移": "spatial_shift", "换场地": "spatial_shift",
     "尾声独处": "outro_solo", "结尾收束": "outro_solo", "余韵": "outro_solo",
+    # v4.0 10大暧昧挑逗与诱惑肢体别名
+    "划喉结": "trace_collar", "摸喉结": "trace_collar", "划领口": "trace_collar", "指尖挑逗": "trace_collar", "挑逗": "trace_collar",
+    "贴耳低语": "ear_whisper_tease", "耳语": "ear_whisper_tease", "咬耳朵": "ear_whisper_tease", "吹气": "ear_whisper_tease",
+    "滑肩带": "shoulder_strap_slide", "拨衣领": "shoulder_strap_slide", "半脱诱惑": "shoulder_strap_slide", "诱惑": "shoulder_strap_slide",
+    "腿蹭腿": "leg_brush_tease", "桌下蹭腿": "leg_brush_tease", "腿部挑逗": "leg_brush_tease", "蹭腿": "leg_brush_tease",
+    "埋颈": "neck_nuzzle_inhale", "闻脖子": "neck_nuzzle_inhale", "嗅颈": "neck_nuzzle_inhale",
+    "扣腰拉近": "waist_pull_collision", "搂腰撞怀": "waist_pull_collision", "拉入怀": "waist_pull_collision",
+    "摸嘴唇": "lip_thumb_wipe", "擦唇": "lip_thumb_wipe", "摩挲唇瓣": "lip_thumb_wipe",
+    "拽领带": "tie_pull_seduce", "拉领带": "tie_pull_seduce", "勾领带": "tie_pull_seduce",
+    "后仰倚桌": "back_arch_lean", "展露曲线": "back_arch_lean", "后仰诱惑": "back_arch_lean",
+    "十指紧扣": "finger_interlock_pin", "十指扣死": "finger_interlock_pin", "按压十指": "finger_interlock_pin",
+    # v4.0 14大权力对峙与情绪肢体别名
+    "捏下巴": "chin_lift", "抬下巴": "chin_lift", "掐下巴": "chin_lift",
+    "扣手腕": "wrist_pin", "抓手腕": "wrist_pin", "按手腕": "wrist_pin",
+    "松领带": "loosen_tie", "扯领带": "loosen_tie", "解袖扣": "loosen_tie",
+    "壁咚": "wall_caging", "单手撑墙": "wall_caging", "撑墙封堵": "wall_caging",
+    "扣后颈": "nape_grip", "按后颈": "nape_grip", "抓后颈": "nape_grip",
+    "抵胸推拒": "chest_push", "推开": "chest_push", "推胸口": "chest_push",
+    "护胸后退": "step_back_guard", "退到墙角": "step_back_guard", "后退抵桌": "step_back_guard",
+    "偏头躲避": "turn_evade", "躲开": "turn_evade", "侧头抗拒": "turn_evade",
+    "攥衣角": "clutch_fabric", "抓衣角": "clutch_fabric", "握拳隐忍": "clutch_fabric",
+    "揪衣领": "grab_lapel", "抓衣领质问": "grab_lapel",
+    "无力滑落": "collapse_sob", "掩面哭泣": "collapse_sob", "崩溃哭泣": "collapse_sob",
+    "拍信物": "present_item", "甩证据": "present_item", "递房卡": "present_item",
+    "揉眉心": "rub_temple", "扶额": "rub_temple", "叹气": "rub_temple",
+    "整理衣领": "fix_attire", "挽头发": "fix_attire", "整理衣服": "fix_attire",
 }
 
 

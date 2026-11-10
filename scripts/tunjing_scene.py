@@ -20,7 +20,7 @@
 
 import json, os, argparse, re
 from tunjing_core import (
-    load_poses, DE_OIL, NEG, FINISH_IDS, ORAL_ONLY, FOREPLAY, STAGING_IDS,
+    load_poses, DE_OIL, NEG, FINISH_IDS, ORAL_ONLY, FOREPLAY, STAGING_IDS, TEASE_IDS, DRAMATIC_BODY_IDS,
     single_shot_prompt
 )
 
@@ -92,14 +92,42 @@ CAMS_EN = {
 # ── Auto-DP 导演调度与体位拆镜配方（内嵌正反打 srs_male / srs_female 与动态运镜）──────────────────
 POSE_SHOT_PLAN = {
     # 8 大非肉戏导演调度原语
-    "env_establish":   [("wide", "pull_reveal")],
-    "blocking_2s":     [("wide", "arc_subtle"), ("mcu", "push_tension")],
-    "srs_male":        [("cu", "ots_depth")],
-    "srs_female":      [("face", "high_downward")],
-    "prop_insert":     [("macro", "push_tension")],
-    "cut_insert":      [("macro", "tilt_down_impact")],
-    "spatial_shift":   [("mcu", "arc_subtle")],
-    "outro_solo":      [("cu", "pull_reveal")],
+    "env_establish":        [("wide", "pull_reveal")],
+    "blocking_2s":          [("wide", "arc_subtle"), ("mcu", "push_tension")],
+    "srs_male":             [("cu", "ots_depth")],
+    "srs_female":           [("face", "high_downward")],
+    "prop_insert":          [("macro", "push_tension")],
+    "cut_insert":           [("macro", "tilt_down_impact")],
+    "spatial_shift":        [("mcu", "arc_subtle")],
+    "outro_solo":           [("cu", "pull_reveal")],
+
+    # 10 大暧昧挑逗与诱惑肢体动作 (Seductive & Tease Body Language)
+    "trace_collar":         [("cu", "tilt_down_impact"), ("face", "ots_depth")],
+    "ear_whisper_tease":    [("cu", "push_tension"), ("face", "handheld_breath")],
+    "shoulder_strap_slide": [("mcu", "tilt_up_desire"), ("cu", "push_tension")],
+    "leg_brush_tease":      [("mcu", "tilt_up_desire")],
+    "neck_nuzzle_inhale":   [("cu", "push_tension"), ("face", "high_downward")],
+    "waist_pull_collision": [("mcu", "arc_subtle"), ("cu", "ots_depth")],
+    "lip_thumb_wipe":       [("face", "push_tension")],
+    "tie_pull_seduce":      [("cu", "low_upward"), ("face", "ots_depth")],
+    "back_arch_lean":       [("mcu", "tilt_up_desire")],
+    "finger_interlock_pin": [("macro", "push_tension")],
+
+    # 14 大权力对峙、抗拒与情绪宣泄肢体动作 (Dramatic Conflict & Emotional Body Language)
+    "chin_lift":            [("cu", "low_upward"), ("face", "high_downward")],
+    "wrist_pin":            [("cu", "tilt_down_impact")],
+    "loosen_tie":           [("mcu", "push_tension")],
+    "wall_caging":          [("mcu", "arc_subtle"), ("cu", "ots_depth")],
+    "nape_grip":            [("cu", "ots_depth")],
+    "chest_push":           [("mcu", "push_tension")],
+    "step_back_guard":      [("mcu", "pull_reveal")],
+    "turn_evade":           [("face", "high_downward")],
+    "clutch_fabric":        [("macro", "push_tension")],
+    "grab_lapel":           [("cu", "handheld_breath")],
+    "collapse_sob":         [("cu", "high_downward")],
+    "present_item":         [("cu", "tilt_down_impact")],
+    "rub_temple":           [("cu", "pull_reveal")],
+    "fix_attire":           [("cu", "pull_reveal")],
 
     # 口爱系：建立 ➔ 男正打低头审视 ➔ 微距吞吐
     "bj":              [("mcu", "tilt_down_impact"), ("cu", "low_upward"), ("macro", "handheld_breath")],
@@ -357,9 +385,9 @@ def resolve_slot_refs(shot_size, pose_id, is_nude_state=True, asset_dir=""):
 
     if first_p in ("env_establish", "empty_cut", "corridor_cut"):
         return "C_empty_cut", ["s1", "s1", "s1"], [s_img, s_img, s_img], lora_weight, spatial_zone
-    if first_p == "srs_male":
+    if first_p in ("srs_male", "loosen_tie", "rub_temple"):
         return "B_solo_male", ["s1", "m1", "s1"], [s_img, m_img, s_img], lora_weight, spatial_zone
-    if first_p in ("srs_female", "outro_solo", "solo_masturbate", "finger_masturbate") or (
+    if first_p in ("srs_female", "outro_solo", "back_arch_lean", "turn_evade", "collapse_sob", "fix_attire", "shoulder_strap_slide", "solo_masturbate", "finger_masturbate") or (
         shot_size == "face" and first_p not in ("bj", "squat_bj", "prone_bj", "deepthroat", "head_thrust", "facefuck")
     ):
         return "B_solo_female", ["f1", "s1", "s1"], [f_img, s_img, s_img], lora_weight, spatial_zone
@@ -422,9 +450,9 @@ def save_project_artifacts(out_dir, shots, actual_total, want_total, lines="",
         else:
             line_map[1] = ("女子A", lines.strip())
 
-    # 单调服装状态机：若前序为环境建立/走位封堵/脱衣，初始处于穿衣状态；进入肉戏后单向切换为素身
+    # 单调服装状态机：若前序为文戏调度/对峙肢体/挑逗或脱衣，初始处于穿衣状态；一旦经过脱衣或进入实质前戏/肉戏后单向锁死为素身
     is_nude_state = True
-    if shots and shots[0].get("pose", "") in ("env_establish", "blocking_2s", "undress", "srs_male", "srs_female"):
+    if shots and (shots[0].get("pose", "") in STAGING_IDS or "undress" in shots[0].get("pose", "")):
         is_nude_state = False
 
     for i, s in enumerate(shots, 1):
@@ -434,8 +462,10 @@ def save_project_artifacts(out_dir, shots, actual_total, want_total, lines="",
         cam_desc_en = CAMS_EN.get(s["cam"], CAMS_EN["push_tension"])
 
         first_p = s.get("pose", "").split("->")[0]
-        if first_p not in ("env_establish", "blocking_2s", "undress") and first_p not in ("srs_male", "srs_female", "prop_insert"):
+        if first_p not in STAGING_IDS and "undress" not in first_p:
             is_nude_state = True
+        elif first_p == "fix_attire":
+            is_nude_state = False
 
         # 挂载对应镜头的台词、说话人与显式表演情绪（支持 "4:男子A(生气):台词" 语法）
         shot_line = ""

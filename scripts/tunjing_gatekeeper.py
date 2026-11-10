@@ -78,16 +78,7 @@ def audit_step_2(project_dir):
         return False, "剧本门禁未通过：台词必须严格使用 <d>[Chinese]...</d> 标签包裹！"
         
     # 检查是否提及体位（吞鲸 v3.0 标准 55 套原生 pose id）
-    KNOWN_IDS = {"env_establish","blocking_2s","srs_male","srs_female","prop_insert","cut_insert","spatial_shift","outro_solo",
-                 "bj","squat_bj","prone_bj","deepthroat","head_thrust","facefuck","sixty_nine",
-                 "tip_lick","ball_lick","penis_slap","titjob","handjob","fingering","clit_tease",
-                 "cunnilingus","sofa_cunni","kiss_fondle","kiss_pin","kiss_force","kiss_her",
-                 "breast_rub","nipple_lick","undress","pov_insert","missionary","missionary_legup",
-                 "doggy","table_doggy","stand_doggy_wall","stand_bend_doggy","bedside_stand","anal",
-                 "cowgirl","cowgirl_upright","reverse_cowgirl","squat_cowgirl","lap_sit_back","lap_sit",
-                 "facesit","stand_face_hug","carry_insert","face_insert","side_face","side_spoon",
-                 "ass_rub","footjob","creampie","cum_face","cum_chest","cum_belly","cum_butt",
-                 "solo_masturbate","thigh_grind","floor_missionary","mirror_ear_whisper","squirting_climax"}
+    KNOWN_IDS = {'fix_attire', 'loosen_tie', 'chin_lift', 'lap_sit', 'titjob', 'cut_insert', 'spatial_shift', 'stand_doggy_wall', 'undress', 'squat_bj', 'clutch_fabric', 'chest_push', 'cunnilingus', 'lip_thumb_wipe', 'tip_lick', 'prop_insert', 'nape_grip', 'breast_rub', 'mirror_ear_whisper', 'stand_face_hug', 'cowgirl', 'prone_bj', 'squirting_climax', 'collapse_sob', 'facesit', 'shoulder_strap_slide', 'facefuck', 'trace_collar', 'floor_missionary', 'deepthroat', 'sixty_nine', 'fingering', 'penis_slap', 'squat_cowgirl', 'doggy', 'blocking_2s', 'stand_bend_doggy', 'tie_pull_seduce', 'reverse_cowgirl', 'srs_female', 'neck_nuzzle_inhale', 'nipple_lick', 'ear_whisper_tease', 'kiss_pin', 'footjob', 'kiss_fondle', 'pov_insert', 'cum_belly', 'side_spoon', 'wall_caging', 'face_insert', 'finger_interlock_pin', 'bedside_stand', 'cum_face', 'srs_male', 'thigh_grind', 'bj', 'cum_butt', 'leg_brush_tease', 'kiss_force', 'solo_masturbate', 'cum_chest', 'creampie', 'turn_evade', 'waist_pull_collision', 'step_back_guard', 'ball_lick', 'cowgirl_upright', 'table_doggy', 'outro_solo', 'lap_sit_back', 'ass_rub', 'missionary_legup', 'env_establish', 'sofa_cunni', 'kiss_her', 'head_thrust', 'carry_insert', 'wrist_pin', 'back_arch_lean', 'present_item', 'grab_lapel', 'side_face', 'missionary', 'anal', 'handjob', 'rub_temple'}
     ids_in_script = set(re.findall(r'\b([a-z][a-z_]{1,24})\b', content)) & KNOWN_IDS
     if not ids_in_script:
         return False, "剧本门禁未通过：第三幕高能戏必须显式声明调用的吞鲸标准体位 ID（如 bj、missionary、cowgirl、doggy、cum_butt）！"
@@ -135,16 +126,7 @@ def audit_step_3(project_dir):
                 return False, f"分镜门禁未通过：台词与镜头时长严重脱节！检测到该镜头时长仅 {duration}s，但台词 '{speech_clean}' 包含 {char_count} 字，物理朗读需要至少 {required_time:.1f}s！请增加镜头时长或精简台词！"
 
     # 4. 吞鲸高能段三级戏份分档检测逻辑（含口交戏 / 独处自慰戏 / 纯插入交合戏）
-    KNOWN_IDS = {"env_establish","blocking_2s","srs_male","srs_female","prop_insert","cut_insert","spatial_shift","outro_solo",
-                 "bj","squat_bj","prone_bj","deepthroat","head_thrust","facefuck","sixty_nine",
-                 "tip_lick","ball_lick","penis_slap","titjob","handjob","fingering","clit_tease",
-                 "cunnilingus","sofa_cunni","kiss_fondle","kiss_pin","kiss_force","kiss_her",
-                 "breast_rub","nipple_lick","undress","pov_insert","missionary","missionary_legup",
-                 "doggy","table_doggy","stand_doggy_wall","stand_bend_doggy","bedside_stand","anal",
-                 "cowgirl","cowgirl_upright","reverse_cowgirl","squat_cowgirl","lap_sit_back","lap_sit",
-                 "facesit","stand_face_hug","carry_insert","face_insert","side_face","side_spoon",
-                 "ass_rub","footjob","creampie","cum_face","cum_chest","cum_belly","cum_butt",
-                 "solo_masturbate","thigh_grind","floor_missionary","mirror_ear_whisper","squirting_climax"}
+    KNOWN_IDS = {'fix_attire', 'loosen_tie', 'chin_lift', 'lap_sit', 'titjob', 'cut_insert', 'spatial_shift', 'stand_doggy_wall', 'undress', 'squat_bj', 'clutch_fabric', 'chest_push', 'cunnilingus', 'lip_thumb_wipe', 'tip_lick', 'prop_insert', 'nape_grip', 'breast_rub', 'mirror_ear_whisper', 'stand_face_hug', 'cowgirl', 'prone_bj', 'squirting_climax', 'collapse_sob', 'facesit', 'shoulder_strap_slide', 'facefuck', 'trace_collar', 'floor_missionary', 'deepthroat', 'sixty_nine', 'fingering', 'penis_slap', 'squat_cowgirl', 'doggy', 'blocking_2s', 'stand_bend_doggy', 'tie_pull_seduce', 'reverse_cowgirl', 'srs_female', 'neck_nuzzle_inhale', 'nipple_lick', 'ear_whisper_tease', 'kiss_pin', 'footjob', 'kiss_fondle', 'pov_insert', 'cum_belly', 'side_spoon', 'wall_caging', 'face_insert', 'finger_interlock_pin', 'bedside_stand', 'cum_face', 'srs_male', 'thigh_grind', 'bj', 'cum_butt', 'leg_brush_tease', 'kiss_force', 'solo_masturbate', 'cum_chest', 'creampie', 'turn_evade', 'waist_pull_collision', 'step_back_guard', 'ball_lick', 'cowgirl_upright', 'table_doggy', 'outro_solo', 'lap_sit_back', 'ass_rub', 'missionary_legup', 'env_establish', 'sofa_cunni', 'kiss_her', 'head_thrust', 'carry_insert', 'wrist_pin', 'back_arch_lean', 'present_item', 'grab_lapel', 'side_face', 'missionary', 'anal', 'handjob', 'rub_temple'}
     ORAL_SET = {"bj","squat_bj","prone_bj","deepthroat","head_thrust","facefuck","sixty_nine","tip_lick","ball_lick","penis_slap"}
     SOLO_SET = {"solo_masturbate","fingering","clit_tease"}
 
@@ -329,6 +311,19 @@ def check_gate(project_dir, target_step=None):
         ok, msg = auditors[target_step](project_dir)
         if ok:
             print(f"\n[✓] 门禁通过: {msg}")
+            if target_step in (2, 3):
+                try:
+                    import tunjing_advisor
+                    adv = tunjing_advisor.diagnose_project(project_dir)
+                    if adv.get("suggestions"):
+                        print("\n" + "─" * 65)
+                        print("💡 【鲸鲸导演主动升维顾问 (Proactive Director Advisor)】：")
+                        for idx_s, sg in enumerate(adv["suggestions"], 1):
+                            print(f"  {idx_s}. {sg['dimension']} -> {sg['action'].splitlines()[0]}")
+                        print(f"  👉 可随时运行 `python scripts/tunjing_advisor.py '{project_dir}'` 查看完整升维方案与推荐拆镜链！")
+                        print("─" * 65)
+                except Exception:
+                    pass
             if target_step == curr:
                 status["current_step"] = curr + 1
                 if curr not in status["passed_steps"]:
