@@ -254,6 +254,21 @@ def audit_step_4(project_dir):
             return False, f"提示词门禁未通过：第 {idx_cb} 镜正向文本含有字幕反向诱导词 {sorted(set(sub_trig))}！严禁在正向写 NO SUBTITLES/CAPTIONS！"
         if re.search(r'says:\s*\n\s*<d>', cb, re.IGNORECASE):
             return False, f"提示词门禁未通过：第 {idx_cb} 镜将 'says:' 与 '<d>' 拆成了两行（SRT字幕格式诱导）！必须同行写为 'says: <d>[Chinese]...</d>'！"
+        # 【字幕死锁 1 · 说话人真人名熔断】speaker 只认引擎原生命名女子A/男子A，含真人名必触发性别熔断
+        #   → 判画外音 + 强制闭唇 → 嘴不能动 → 模型把台词汉字画成画面字幕。这是字幕烫印的物理根因之一，代码层焊死。
+        real_name_hits = re.findall(r'(唐曼|陆骁|沈峥|许宁)', cb)
+        if real_name_hits:
+            return False, f"提示词门禁未通过：第 {idx_cb} 镜说话人声明夹带了真人名 {sorted(set(real_name_hits))}！speaker 只能写 '女子A'/'男子A'（或 <Subject 1>/<Subject 2>），严禁传唐曼/陆骁等真人名——真人名不含性别字，会触发引擎性别熔断，导致画外音+闭唇锁，嘴不能动就把台词画成字幕！"
+        # 【字幕死锁 2 · 台词必须有说话人口型锚点】每条真实台词 <d>[Chinese]…</d> 前必须紧跟 <Subject N> says / 女子A说 的口型声明
+        #   没有锚点，模型不清楚这句话是谁在开口，就会在画面里另起一行把它画出来当字幕。
+        #   正确格式：'...<Subject 1> (S1) says: <d>[Chinese]台词</d> while ...'（says: 与 <d> 同行紧接）
+        #   注意：只查 <d>[Chinese]…</d> 真实台词；跳过 header 里的文法示例 <d>...</d>（那是教 H3 语法，不含 [Chinese]）。
+        for dd in re.findall(r'<d>\[Chinese\].*?</d>', cb, re.DOTALL):
+            dd_ctx = cb[max(0, cb.find(dd) - 120):cb.find(dd)]
+            # 锚点判定：<d> 前 120 字符内存在「说话人标记 + 说话动词 + 冒号」且 says: 与 <d> 紧跟同行
+            has_anchor = re.search(r'(?:<subject\s*\d+>\s*\(?s\d+\)?|女子a|男子a|subject\s*\d+)\s*.*?(?:says|speaks|whispers|gasps|moans|murmurs)\s*:\s*$', dd_ctx, re.IGNORECASE)
+            if not has_anchor:
+                return False, f"提示词门禁未通过：第 {idx_cb} 镜存在一句真实台词 '<d>[Chinese]…</d>' 前方无说话人口型锚点（<Subject N> says / 女子A说，且 says: 与 <d> 同行）！无锚点的台词会被模型当作字幕画进画面，必须每条台词紧跟同行说话人声明。"
         if re.findall(r'(?:,\s*,+|,\s*\.|;\s*,)', cb):
             return False, f"提示词门禁未通过：[反作弊拦截·正则阉割残骸] 第 {idx_cb} 镜检测到 ', ,' 或 ', .' 破碎标点语法！严禁用粗暴 re.sub 挖词糊弄门禁！"
         pos_part = cb.split("=== NEGATIVE ===")[0]

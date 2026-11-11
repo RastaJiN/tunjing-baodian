@@ -504,6 +504,16 @@ def build_shot_description(shot, index, total_shots, dur, size_desc, cam_desc,
                       and not is_staging and not is_transition)
     is_undress = "undress" in first_p
 
+    # 防呆熔断 0（字幕物理根因·最高优先级）：speaker 只认引擎原生命名，含真人名/无性别字一律强制修正
+    #   H3 判定男女说话人只靠 is_female_spk = ("女" in speaker or "S1" in speaker or "Subject 1" in speaker)
+    #   speaker='唐曼' 不含「女」→ 判成男声 → 画外音+闭唇锁 → 嘴不能动 → 台词汉字被画成字幕。
+    #   这是 SHOT-003/005 反复出字的物理根。此处把 speaker 强制归一，任何真人名/异常值都敲回原生命名，杜绝再犯。
+    REAL_NAME_BLACKLIST = {"唐曼", "陆骁", "沈峥", "许宁"}
+    _spk_raw = (speaker or "").strip()
+    if _spk_raw in REAL_NAME_BLACKLIST or (not any(ch in _spk_raw for ch in ("女", "男", "S1", "S2", "Subject"))):
+        # 真人名或缺失性别字的任何 speaker，一律按当前镜头主体敲回原生命名，绝不带着真人名往下走
+        speaker = "女子A" if first_p != "srs_male" else "男子A"
+
     # 防呆熔断 1：若交合微距镜 (hip/macro) 或空镜/道具镜带了台词，自动转为 off-screen voiceover 画外音
     effective_vo = bool(voiceover)
     if lines and (shot.get("size") in ("hip", "macro") or first_p in ("env_establish", "prop_insert", "cut_insert")):

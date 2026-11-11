@@ -244,6 +244,26 @@ def main():
     os.makedirs(qc_sheet_dir, exist_ok=True)
 
     for s in shots:
+        # ── 字幕物理自检锁 (Subtitle Physical-Gate)：提交前用引擎同源正则硬核弹回任何可能画字的提示词 ──
+        #   这是全链路最后一道、也是唯一一道模型绕不过去的闸门：
+        #   之前 7 次字幕翻车，根因都是「门禁查关键词，模型改关键词」的古德哈特循环。
+        #   本锁不看关键词，只看三个物理事实：①有没有真人名 ②每条 <d> 前有没有 <Subject N> says 口型锚点 ③says: 是否与 <d> 断行。
+        prompt = s.get("prompt", "")
+        if prompt:
+            real_name = re.search(r'(唐曼|陆骁|沈峥|许宁)', prompt)
+            if real_name:
+                print(f"[X 字幕物理自检熔断] {s.get('shot_id')} 提示词含真人名 '{real_name.group(1)}'！speaker 只能写女子A/男子A，否则触发性别熔断→画外音→闭唇→台词被画成字幕。拒绝提交，请回引擎重装配！")
+                sys.exit(1)
+            for dd in re.findall(r'<d>\[Chinese\].*?</d>', prompt, re.DOTALL):
+                dd_ctx = prompt[max(0, prompt.find(dd) - 120):prompt.find(dd)]
+                has_anchor = re.search(r'(?:<subject\s*\d+>\s*\(?s\d+\)?|女子a|男子a|subject\s*\d+)\s*.*?(?:says|speaks|whispers|gasps|moans|murmurs)\s*:\s*$', dd_ctx, re.IGNORECASE)
+                if not has_anchor:
+                    print(f"[X 字幕物理自检熔断] {s.get('shot_id')} 存在无说话人口型锚点的真实台词 '<d>[Chinese]…</d>'！模型会把无锚点台词当字幕画进画面。拒绝提交，请回引擎重装配！")
+                    sys.exit(1)
+            if re.search(r'says:\s*\n\s*<d>', prompt, re.IGNORECASE):
+                print(f"[X 字幕物理自检熔断] {s.get('shot_id')} 检测到 'says:' 与 '<d>' 断行（SRT字幕格式诱导）！必须同行写 'says: <d>…</d>'。拒绝提交，请回引擎重装配！")
+                sys.exit(1)
+
         wf = build_shot_workflow(base_wf, s)
         out_p = os.path.join(payload_dir, f"{s.get('shot_id', 'shot')}_api.json")
         with open(out_p, "w", encoding="utf-8") as f:
