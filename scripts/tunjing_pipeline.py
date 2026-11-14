@@ -96,7 +96,7 @@ def main():
                       "以下为本集按场景自动识别的吞鲸标准调度序列（供门禁与分镜引擎识别）：", ""]
         for pid in pose_ids:
             p = poses.get(pid, {})
-            pose_lines.append(f"- `{pid}`：{p.get('nameZh', pid)}")
+            pose_lines.append(f"- `{pid}` {p.get('nameZh', pid)}")
         pose_lines.append("")
         with open(script_file, "a", encoding="utf-8") as f:
             f.write("\n" + "\n".join(pose_lines))

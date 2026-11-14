@@ -74,8 +74,18 @@ def audit_step_2(project_dir):
     if "第一幕" not in content or "第二幕" not in content:
         return False, "剧本门禁未通过：剧本必须包含清晰的幕次结构（至少具备【第一幕】与【第二幕】）！"
     
-    if "<d>" not in content or "</d>" not in content:
-        return False, "剧本门禁未通过：台词必须严格使用 <d>[Chinese]...</d> 标签包裹！"
+    # 台词标签检查：有对白必须用 <d> 包裹；纯动作戏（纯肉戏无对白）不强求台词标签
+    # 判定「真有对白」= 存在「角色名：台词」模式（全角冒号后跟中文、且以句末标点收尾），
+    # 排除「`体位ID` 中文名」这种反引号行（流水线写回剧本的调度链，不是对白）。
+    dialogue_lines = []
+    for ln in content.splitlines():
+        s = ln.strip()
+        if s.startswith("- `") or s.startswith("`"):
+            continue  # 体位调度链标注行，不是对白
+        if re.search(r'[:：]\s*[^：:]*[\。\！\？\，]', s):
+            dialogue_lines.append(s)
+    if dialogue_lines and ("<d>" not in content or "</d>" not in content):
+        return False, "剧本门禁未通过：检测到对白但未用 <d>[Chinese]...</d> 标签包裹！有对白必须加台词标签（防台词烫印成字幕）；纯动作戏无对白可豁免。"
 
     # 去AI味翻译腔与书面套话拦截
     cliche_hits = re.findall(r"(你怎么能如此|我的心好痛|充满了不可思议|眼中闪过一丝|嘴角勾起一抹弧度|三分薄凉|既然你如此无情|休怪我无义)", content)
@@ -193,14 +203,25 @@ def audit_step_3(project_dir):
                        f"但仅 {cam_hits} 处机位标注。逐镜必须标明机位"
                        f"（static_side/static_rear/low_hip/ots/high_angle 等）！")
 
-    # 镜头密度：从时长反推，平均单镜不得超过 8 秒（硬件上限）
-    durations = [float(x) for x in re.findall(r'(\d+(?:\.\d+)?)\s*(?:秒|s)\b', content)]
-    if durations and shot_count:
-        avg = sum(d for d in durations if d <= 30) / max(1, len([d for d in durations if d <= 30]))
+    # 镜头密度：从时长反推，平均单镜不得超过 8 秒（硬件上限，仅限画面动作镜）
+    # 含 <d> 台词的对白镜不受 8s 上限约束（其时长由台词驱动，前文已做台词时长咬合检查）；
+    # 只统计「无对白的纯画面/动作镜」的平均时长，防肉戏短镜被塞成 10s+ 长镜。
+    shot_blocks_d = re.split(r'###?\s*SHOT-|\n\[SHOT-', content)
+    action_durations = []
+    for blk in shot_blocks_d[1:]:
+        if '<d>' in blk:
+            continue  # 带台词的对白镜，时长由台词决定，不参与 8s 硬上限
+        dm = re.search(r'(\d+\.?\d*)\s*(?:秒|s)\b', blk, re.IGNORECASE)
+        if dm:
+            dv = float(dm.group(1))
+            if dv <= 30:
+                action_durations.append(dv)
+    if action_durations:
+        avg = sum(action_durations) / len(action_durations)
         if avg > 8.0:
             return False, (f"分镜门禁未通过：【镜头过长，违反硬件上限】！"
-                           f"平均单镜 {avg:.1f}s，超过 8s 上限。"
-                           f"2 分钟床戏应拆成 20~30 个 2~6s 短镜，严禁把多个体位压进一镜！")
+                           f"无对白动作镜平均 {avg:.1f}s，超过 8s 上限。"
+                           f"2 分钟肉戏应拆成 20~30 个 2~6s 短镜，严禁把多个体位压进一镜！")
         
     # ── 肉戏骨架契约 (Sex Scene Skeleton Contract)：骨头里的公式，硬死锁 ──
     # 只要本集含肉戏体位（非纯文戏调度），以下四条缺一即熔断，是「好肉戏」的结构完整性下限。
