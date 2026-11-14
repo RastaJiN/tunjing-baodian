@@ -21,7 +21,7 @@
 import json, os, argparse, re
 from tunjing_core import (
     load_poses, DE_OIL, NEG, FINISH_IDS, ORAL_ONLY, FOREPLAY, STAGING_IDS, TEASE_IDS, DRAMATIC_BODY_IDS,
-    single_shot_prompt, parse_audio_fx_mode
+    single_shot_prompt, parse_audio_fx_mode, dialogue_needed_seconds
 )
 
 BASE = os.path.dirname(os.path.abspath(__file__))
@@ -291,86 +291,91 @@ def plan_shot(pid, poses):
 
 def allocate_exact_h3_frames(shots, want_total_sec):
     """
-    全集总帧同余配平算法：
-    1. 每镜必须严格满足 f_i = 5 + 17 * k_i (k_i >= 2，即单镜至少 39 帧 ≈ 1.62s)
-    2. 全集总帧数 sum(f_i) = 5 * N + 17 * sum(k_i)
-       自动将目标总帧数对齐到最近的合法同余值，并按权重分配 k_i，实现分镜表、提示词与 JSON 帧数 100% 闭合！
+    全集总帧同余配平算法（对白 + 画面双驱动，不按姿势档位查表）：
+    1. 每镜必须有最小可见时长 `required_sec`（由「该镜对白时长」与「画面动作可见时长」取大者决定）
+    2. 每镜帧长 f_i = 5 + 17 * k_i (k_i >= 2)，向上对齐到能容纳 required_sec 的合法帧长
+    3. 对白太长超过单镜机器上限(12s)时，由上层拆镜（说话镜 + 听者反应镜），此处只保证单镜 ≤12.25s
+    4. 全集总帧自动对齐到最近合法同余值（5*N + 17*sum(k_i)），不强行均摊到每个镜头
     """
     n_shots = len(shots)
     if n_shots == 0:
         return shots, 0.0
 
-    target_raw_frames = max(n_shots * 39, round(float(want_total_sec) * 24))
-    # 计算总阶数 K_total，使 5 * n_shots + 17 * K_total 最接近 target_raw_frames
-    k_total = max(n_shots * 2, round((target_raw_frames - 5 * n_shots) / 17.0))
-
-    # 心电图呼吸节拍：按镜头「戏剧职责」直定目标 k 值，不用「权重×总k」的均摊法（会稀释呼吸幅度）
-    # k 档位对应帧长 f=5+17k: k=2→39f≈1.63s 短标点 / k=5→90f≈3.75s 过渡 / k=7→124f≈5.17s 反应
-    #                           k=10→175f≈7.29s 发力 / k=13→226f≈9.42s 长发力 / k=17→294f≈12.25s 满上限
-    ks_by_duty = []
-    for idx_s, s in enumerate(shots):
-        pid = s.get("pose", "")
-        sz = s.get("size", "")
-        if pid in ("cut_insert", "prop_insert"):
-            ks_by_duty.append(2)         # 1.63s 生理阻断短促标点（死锁最短，不让均摊拉长）
-        elif (sz == "macro" and pid in STAGING_IDS):
-            ks_by_duty.append(3)         # 2.33s 极短标志
-        elif s.get("type") == "transition":
-            ks_by_duty.append(5)         # 3.75s 换体位过渡
-        elif sz in ("face", "cu") or pid in ("srs_male", "srs_female"):
-            # 反应/正反打：短-中档，按心电图波浪交替 5~7
-            ks_by_duty.append(5 + (idx_s % 3))   # 5~7 → 3.75s~5.17s
-        else:
-            # 主力交合/发力/前戏：中长档，允许长发力，按波浪 8~13
-            ks_by_duty.append(8 + (idx_s % 6))   # 8~13 → 7.29s~9.42s，峰值可到 12s
-
-    # 把目标 k 收敛到总阶数（缩放整体，但保持短标点仍是相对最短、长发力仍是相对最长）
-    ks = ks_by_duty
-    # 先算比例再缩放，保证短标点不被稀释
-    total_k_need = sum(ks)
-    if total_k_need > 0:
-        scale = k_total / total_k_need
-        ks = []
-        for k in ks_by_duty:
-            if k <= 3:
-                ks.append(k)                     # 短标点死不缩放，保持 1.6~2.3s
+    # 1. 每个镜头的最小可见时长：由对白时长 + 画面动作可见时长决定
+    #    shot 已带 required_sec（由调用方按对白/画面算好），缺失时按画面类型给保守基准
+    for s in shots:
+        if "required_sec" not in s or s["required_sec"] is None:
+            pid = s.get("pose", "")
+            sz = s.get("size", "")
+            # 画面动作可见时长基准：短标点/插入镜短，主力交合/长台词长
+            if pid in ("cut_insert", "prop_insert"):
+                base = 1.6
+            elif s.get("type") == "transition":
+                base = 3.5
+            elif sz in ("macro",):
+                base = 2.3
+            elif sz in ("face", "cu") or pid in ("srs_male", "srs_female"):
+                base = 3.0
             else:
-                ks.append(max(4, min(17, round(k * scale))))
-    # 兜底：确保至少 k≥2
-    ks = [max(2, k) for k in ks]
+                base = 4.5
+            s["required_sec"] = base
 
-    # 打破连续 3 镜同帧长（严禁平铺一刀切，保持心电图呼吸）
+    # 2. 把每个 required_sec 向上对齐到合法帧长 f=5+17k → 得最小 k
+    def sec_to_k(sec):
+        # 找最小 k>=2 使 (5+17k)/24 >= sec
+        k = 2
+        while (5 + 17 * k) / 24.0 < sec and k < 17:
+            k += 1
+        return min(k, 17)  # k=17 → 294帧 ≈ 12.25s 机器上限
+
+    ks_min = [sec_to_k(s.get("required_sec", 2.0)) for s in shots]
+
+    # 3. 目标总帧对齐：sum(f_i) = 5*N + 17*sum(k_i)，尽量贴近 want_total_sec
+    target_raw_frames = max(sum(5 + 17 * k for k in ks_min), round(float(want_total_sec) * 24))
+    k_total_needed = round((target_raw_frames - 5 * n_shots) / 17.0)
+
+    # 当前已用的 k 总和（每个镜头的最小 k）
+    k_used = sum(ks_min)
+    # 剩余可分配的 k（用于把总时长补到目标），余量优先给"长发力主力镜"，不破坏短标点
+    ks = list(ks_min)
+    extra = k_total_needed - k_used
+
+    # 4. 余量分配：优先给非短标点的镜头（主力交合/长台词），短标点(cut_insert/macro)保持最短
+    if extra > 0:
+        # 可加长的镜头（非短标点）
+        eligible = [i for i, s in enumerate(shots)
+                    if s.get("pose", "").split("->")[0] not in ("cut_insert", "prop_insert")
+                    and s.get("size") not in ("macro",)]
+        idx = 0
+        guard = 0
+        while extra > 0 and eligible and guard < 5000:
+            guard += 1
+            i = eligible[idx % len(eligible)]
+            idx += 1
+            if ks[i] < 17:
+                ks[i] += 1
+                extra -= 1
+    elif extra < 0:
+        # 总帧超了，从最长的镜头（>6s）往下挤压，优先保护短标点
+        eligible = [i for i, s in enumerate(shots) if ks[i] > 6]
+        idx = 0
+        guard = 0
+        while extra < 0 and eligible and guard < 5000:
+            guard += 1
+            i = eligible[idx % len(eligible)]
+            idx += 1
+            if ks[i] > 2:
+                ks[i] -= 1
+                extra += 1
+
+    # 5. 打破连续 3 镜同帧长（保持心电图呼吸，严禁平铺一刀切）
     for i in range(2, n_shots):
         if ks[i] == ks[i - 1] == ks[i - 2]:
             if ks[i - 1] > 2 and ks[i] < 17:
                 ks[i - 1] -= 1
                 ks[i] += 1
-            elif ks[i] > 3:
-                ks[i] -= 1
-                ks[i - 2] = min(17, ks[i - 2] + 1)
 
-    # 精确配平差值到 K_total
-    diff = k_total - sum(ks)
-    idx = 0
-    guard = 0
-    while diff != 0 and guard < 2000:
-        guard += 1
-        i = idx % n_shots
-        idx += 1
-        if diff > 0 and ks[i] < 17:
-            # 避免制造三连同长
-            nxt_k = ks[i] + 1
-            if i >= 2 and ks[i - 1] == nxt_k and ks[i - 2] == nxt_k and guard < 1500:
-                continue
-            ks[i] = nxt_k
-            diff -= 1
-        elif diff < 0 and ks[i] > 2:
-            nxt_k = ks[i] - 1
-            if i >= 2 and ks[i - 1] == nxt_k and ks[i - 2] == nxt_k and guard < 1500:
-                continue
-            ks[i] = nxt_k
-            diff += 1
-
+    # 6. 落盘每镜帧数与时间戳
     t_frames = 0
     for s, k in zip(shots, ks):
         f_cnt = 5 + 17 * k
@@ -614,6 +619,35 @@ def save_project_artifacts(out_dir, shots, actual_total, want_total, lines="",
                     line_map[int(idx_m.group(0))] = ("女子A", parts[1].strip())
         else:
             line_map[1] = ("女子A", lines.strip())
+
+    # ── 对白驱动时长重排（台词物理时长决定镜头时长 + 长台词拆镜）──
+    # 正解：分镜时长由「剧本画面 + 对白时长」决定，不是姿势档位查表。
+    # 对白太长 → 该镜时长拉长；超单镜机器上限(12s) → 拆成说话镜 + 听者反应镜，声音连续画面切。
+    if line_map:
+        # 先把每句台词算好物理时长，写进对应镜头
+        MAX_SHOT_SEC = 12.25  # 单镜机器上限（k=17 → 294帧 ≈ 12.25s）
+        for shot_idx in sorted(line_map.keys()):
+            spk, txt = line_map[shot_idx]
+            need = dialogue_needed_seconds(txt)
+            if need <= 0:
+                continue
+            # 该台词挂在第 shot_idx 镜（1-based）；找到对应 shot
+            if shot_idx - 1 < len(shots):
+                target = shots[shot_idx - 1]
+                # 该镜最小可见时长 = max(画面动作可见时长, 对白时长)
+                cur_req = target.get("required_sec", 0) or 0
+                target["required_sec"] = max(cur_req, need)
+                if need > MAX_SHOT_SEC:
+                    # 长台词超单镜上限：拆镜——本镜只装前半句，剩余后半句拆给"听者反应镜"
+                    # 这里标记台词过长，由调用方/下游按"声不断画切"处理（本镜承载到 12s，其余续下一镜）
+                    target["dialogue_overflow"] = True
+                    target["dialogue_full_text"] = txt
+                    target["dialogue_speaker"] = spk
+
+        # 台词驱动后，重新按 required_sec 分配帧长与时间戳
+        shots2, actual_tmp = allocate_exact_h3_frames(shots, want_total)
+        # 注：shots 是同一列表引用，allocate 已原地改好 dur/frames/t0/t1
+
 
     # 单调服装状态机：若前序为文戏调度/对峙肢体/挑逗或脱衣，初始处于穿衣状态；一旦经过脱衣或进入实质前戏/肉戏后单向锁死为素身
     is_nude_state = True

@@ -127,6 +127,20 @@ AI_CLICHE_PATTERNS = [
 ]
 
 
+def dialogue_needed_seconds(line_text):
+    """
+    对白物理时长核算（拆镜决策的真源）：
+    说话常速 4.1 字/秒 + 开口前 1.1s 动作起势延迟 + 句尾 0.7s 反应余韵 + 省略号停顿。
+    返回这句台词「必须占用的秒数」，拆镜时用它判断：超单镜上限就拆镜，声音连续画面切。
+    """
+    clean = re.sub(r"\[.*?\]", "", (line_text or "")).strip()
+    if not clean:
+        return 0.0
+    zh_chars = len(re.findall(r"[一-龥]", clean))
+    ellipses = clean.count("…") + clean.count("...")
+    return 1.6 + (zh_chars / 4.1) + (ellipses * 0.5)
+
+
 def check_dialogue_human_quality(line_text, shot_dur=4.0):
     """
     吞鲸活人感台词与物理语速预算校验器：
