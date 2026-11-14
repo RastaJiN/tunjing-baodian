@@ -89,6 +89,101 @@ CAMS_EN = {
     "follow_soft":     "side-oblique angle, camera tracks smoothly moving 10 cm over three seconds",
 }
 
+# ── 横屏（16:9）景别库：与竖屏语义完全不同，横屏靠「横向空间关系」而非「纵向身体」构图 ──────────
+SHOT_SIZES_LANDSCAPE = {
+    "wide":   "全景（两人横向并排交代左右空间轴线与环境）",
+    "mcu":    "中近景（双人半身左右同框，主体横向关系清晰）",
+    "cu":     "近景（单人上半身，交代横向对视/施压）",
+    "macro":  "微距（结合部/指节抓握/局部信物，纯细节特写）",
+    "hip":    "腰胯特写（双人腰胯横向同框，专攻冲撞轨迹）",
+    "face":   "面部特写（横向眼神交锋/咬唇/微表情）",
+}
+
+SHOT_SIZES_EN_LANDSCAPE = {
+    "wide":   "wide establishing shot framing both bodies side-by-side to reveal left-to-right spatial axis and environment",
+    "mcu":    "medium close-up framing both torsos side-by-side in a horizontal two-shot",
+    "cu":     "close-up framing a single subject's upper torso and face against a horizontal backdrop",
+    "macro":  "extreme macro close-up locked on the contact area",
+    "hip":    "pelvic two-shot framing both hips and the junction horizontally from mid-thigh to lower ribs",
+    "face":   "tight facial close-up on eyes, jaw, and lips against a shallow horizontal background",
+}
+
+# ── 横屏（16:9）机位描述（中文可读 + 英文送模）：横屏靠水平推轨/左右摇/横向过肩，非竖屏的垂直上下摇 ──
+CAMS_LANDSCAPE = {
+    "push_tension":   "横向压迫慢推（Z轴向前推进15cm，聚焦情绪与发力）",
+    "pull_reveal":    "横向抽离慢拉（Z轴向后拉远18cm，交代左右空间关系）",
+    "tilt_up_desire": "水平上移微摇（Y轴略上扬，展现横向曲线与眼神）",
+    "tilt_down_impact":"水平下移微摇（Y轴略下压至受力接触点）",
+    "ots_depth":      "横向过肩微移（前景虚焦肩部占15%，横向微移8cm撑开左右纵深）",
+    "arc_subtle":     "横屏微弧偏转（8度侧向微弧滑动12cm，制造左右视差）",
+    "handheld_breath":"呼吸感手持微晃（2cm有机律动，跟随肉体节奏）",
+    "low_upward":     "横屏微仰（10度防变形微仰角，水平慢推10cm）",
+    "high_downward":  "横屏微俯（12度防变形微俯角，水平微降8cm）",
+    "static_side":    "横屏90度侧向定轴（三脚架稳固锁定，双人左右同框靠冲撞带动）",
+    "static_rear":    "后斜向定轴（三脚架稳固锁定，展现背部与臀胯横向发力）",
+    "low_hip":        "低机位贴腰水平跟拍（贴近腰胯高度，随冲撞微幅呼吸）",
+    "static_front":   "正面中轴慢推（平视缓推10cm）",
+    "ots":            "横向过肩微移（前景虚焦肩部占15%）",
+    "high_angle":     "横屏微俯（12度防变形微俯角，水平微降）",
+    "slow_push":      "横向慢推（Z轴前推15cm）",
+    "follow_soft":    "横向柔和跟随（侧向跟随10cm）",
+    "pan_left_right": "水平横摇（左右轻微摇移12cm交代双人横向关系）",
+    "track_lateral":  "横向推轨（沿轴线左右平移15cm跟随交合节奏）",
+}
+
+CAMS_EN_LANDSCAPE = {
+    "push_tension":   "eye-level wide angle, slow lateral dolly push-in sliding forward 15 cm tightening on both subjects",
+    "pull_reveal":    "eye-level wide angle, slow dolly pull-back retreating 18 cm revealing left-to-right spatial depth",
+    "tilt_up_desire": "low-to-eye angle, smooth horizontal pan-up shifting 12 cm upward along the torso over three seconds",
+    "tilt_down_impact":"eye-to-low angle, smooth horizontal pan-down shifting 12 cm from the face down to the contact point over three seconds",
+    "ots_depth":      "over-the-shoulder angle with soft-focus foreground shoulder occupying 15% frame edge, subtle 8 cm lateral drift over three seconds",
+    "arc_subtle":     "side-oblique angle, subtle 8-degree lateral dolly arc shifting 12 cm over four seconds for horizontal parallax",
+    "handheld_breath":"intimate close perspective, organic handheld camera with subtle 2 cm breathing micro-sway synchronized with body rhythm",
+    "low_upward":     "subtle 10-degree low-angle perspective preserving natural body proportions, slow 10 cm horizontal push-in",
+    "high_downward":  "subtle 12-degree high-angle perspective preserving natural body proportions, subtle 8 cm horizontal descent",
+    "static_side":    "90-degree side profile angle, tripod locked, both subjects framed left-to-right in a horizontal two-shot",
+    "static_rear":    "rear-oblique angle, tripod locked, showing the back and hip drive in horizontal composition",
+    "low_hip":        "low-angle hip-level perspective, subtle 4 cm horizontal tracking with pelvic rhythm",
+    "static_front":   "eye-level front angle, slow 10 cm dolly push-in over three seconds",
+    "ots":            "over-the-shoulder angle with foreground shoulder in soft focus, subtle 8 cm lateral drift",
+    "high_angle":     "subtle 12-degree high-angle perspective, subtle 8 cm horizontal descent",
+    "slow_push":      "eye-level angle, camera pushes in sliding forward 12 cm over three seconds",
+    "follow_soft":    "side-oblique angle, camera tracks smoothly moving 10 cm over three seconds",
+    "pan_left_right": "eye-level angle, smooth horizontal pan shifting 12 cm left-to-right to reveal the two-subject relationship",
+    "track_lateral":  "lateral tracking shot gliding 15 cm side-to-side along the action axis in time with the thrust rhythm",
+}
+
+# ── 画幅工具函数：aspect 参数归一化 + 分辨率映射 + 字典选择 ──
+ASPECT_RES = {
+    "9:16":  {"width": 928, "height": 1664, "label": "9:16 (Portrait Widescreen)"},
+    "16:9":  {"width": 1664, "height": 928, "label": "16:9 (Widescreen)"},
+    "1:1":   {"width": 1280, "height": 1280, "label": "1:1 (Square)"},
+}
+
+def normalize_aspect(aspect):
+    """把任意 aspect 字符串归一化成 '9:16' / '16:9' / '1:1' 三档之一，默认竖屏 9:16。"""
+    a = (aspect or "9:16").strip().lower()
+    a = a.replace("portrait", "").replace("widescreen", "").replace("landscape", "").strip()
+    if "9:16" in a or a in ("9:16", "portrait", "竖屏", "竖"):
+        return "9:16"
+    if "16:9" in a or a in ("16:9", "landscape", "横屏", "横", "wide"):
+        return "16:9"
+    if "1:1" in a or a in ("1:1", "square", "方"):
+        return "1:1"
+    return "9:16"
+
+def is_landscape(aspect):
+    return normalize_aspect(aspect) == "16:9"
+
+def pick_dict(landscape, landscape_map, portrait_map):
+    """按横/竖屏选择对应字典。横屏时若某 key 在横屏字典中缺失，回退竖屏字典。"""
+    if not landscape:
+        return portrait_map
+    merged = dict(portrait_map)
+    merged.update(landscape_map)
+    return merged
+
+
 # ── Auto-DP 导演调度与体位拆镜配方（内嵌正反打 srs_male / srs_female 与动态运镜）──────────────────
 POSE_SHOT_PLAN = {
     # 8 大非肉戏导演调度原语
@@ -446,19 +541,28 @@ def h3_frames(sec):
 
 
 def save_project_artifacts(out_dir, shots, actual_total, want_total, lines="",
-                           idea="", scene="卧室", pose_names=""):
-    """一键在项目目录落盘：分镜.md + 视频提示词.md + 批量任务.json（吞鲸 v4.0 规范）"""
+                           idea="", scene="卧室", pose_names="", aspect="9:16"):
+    """一键在项目目录落盘：分镜.md + 视频提示词.md + 批量任务.json（吞鲸 v4.0 规范，横竖屏双轨）
+    aspect: '9:16' 竖屏 / '16:9' 横屏 / '1:1' 方屏，决定景别/机位/运镜/分辨率整套构图语言。
+    """
     import datetime
     os.makedirs(out_dir, exist_ok=True)
     asset_dir = os.path.join(out_dir, "00_资产")
+    landscape = is_landscape(aspect)
+    _sz_zh = pick_dict(landscape, SHOT_SIZES_LANDSCAPE, SHOT_SIZES)
+    _sz_en = pick_dict(landscape, SHOT_SIZES_EN_LANDSCAPE, SHOT_SIZES_EN)
+    _cams_zh = pick_dict(landscape, CAMS_LANDSCAPE, CAMS)
+    _cams_en = pick_dict(landscape, CAMS_EN_LANDSCAPE, CAMS_EN)
+    res = ASPECT_RES[normalize_aspect(aspect)]
+    orient_label = "横屏 16:9" if landscape else ("方屏 1:1" if normalize_aspect(aspect) == "1:1" else "竖屏 9:16")
 
     total_frames_sum = sum(s.get("frames", h3_frames(s["dur"])) for s in shots)
 
     sb_lines = [
         f"# 吞鲸工作室 v4.0 · 全剧集导演调度与 Auto-DP 分镜表 ([Track: Ref2V])",
-        f"- 目标总时长：{want_total}s | 实际闭合总时长：{actual_total}s | 总帧数：{total_frames_sum}帧 | 总镜数：{len(shots)} 镜",
+        f"- 目标总时长：{want_total}s | 实际闭合总时长：{actual_total}s | 总帧数：{total_frames_sum}帧 | 总镜数：{len(shots)} 镜 | 画幅：{orient_label} {res['width']}x{res['height']}",
         f"- 调度与姿势主链：{pose_names}",
-        f"- 轨道模式：[Track: Ref2V] 全片纯血锚定 + 空间图池单槽轮换 + 单人正反打物理隔离",
+        f"- 轨道模式：[Track: Ref2V] 全片纯血锚定 + 空间图池单槽轮换 + 单人正反打物理隔离 + {orient_label}构图语言",
         "",
         "---",
         ""
@@ -466,7 +570,7 @@ def save_project_artifacts(out_dir, shots, actual_total, want_total, lines="",
 
     prompt_lines = [
         f"# 吞鲸工作室 v4.0 · 逐镜 R1~R12 全肯定送模提示词",
-        f"- 场景：{scene} | 总镜数：{len(shots)} 镜 | 总帧数：{total_frames_sum}帧",
+        f"- 场景：{scene} | 总镜数：{len(shots)} 镜 | 总帧数：{total_frames_sum}帧 | 画幅：{orient_label}",
         "",
         "---",
         ""
@@ -500,10 +604,10 @@ def save_project_artifacts(out_dir, shots, actual_total, want_total, lines="",
         is_nude_state = False
 
     for i, s in enumerate(shots, 1):
-        size_desc_zh = SHOT_SIZES[s["size"]]
-        cam_desc_zh = CAMS.get(s["cam"], s["cam"])
-        size_desc_en = SHOT_SIZES_EN[s["size"]]
-        cam_desc_en = CAMS_EN.get(s["cam"], CAMS_EN["push_tension"])
+        size_desc_zh = _sz_zh[s["size"]]
+        cam_desc_zh = _cams_zh.get(s["cam"], s["cam"])
+        size_desc_en = _sz_en[s["size"]]
+        cam_desc_en = _cams_en.get(s["cam"], _cams_en["push_tension"])
 
         first_p = s.get("pose", "").split("->")[0]
         if first_p not in STAGING_IDS and "undress" not in first_p:
@@ -549,7 +653,7 @@ def save_project_artifacts(out_dir, shots, actual_total, want_total, lines="",
         prompt_text = single_shot_prompt(
             s, i - 1, len(shots), s["dur"], size_desc_en, cam_desc_en,
             lines=shot_line, speaker=shot_speaker, idea=idea, scene=scene, pose_names=pose_names,
-            emotion=auto_emotion, tier=tier_label, has_audio_refs=True
+            emotion=auto_emotion, tier=tier_label, has_audio_refs=True, aspect=normalize_aspect(aspect)
         )
 
         extra_tags = []
@@ -576,6 +680,10 @@ def save_project_artifacts(out_dir, shots, actual_total, want_total, lines="",
         sb_lines.append(f"- 动作: {s['text']}")
         if shot_line:
             sb_lines.append(f"- 台词: <d>[Chinese]{shot_line}</d>")
+        # 肉戏声音反馈标注：肉戏镜必须显式写出呻吟/浪叫/粗喘，满足肉戏公式死锁并供监制审阅
+        if first_p not in STAGING_IDS:
+            _moan = "女主呻吟/浪叫与男主粗喘" if shot_speaker == "女子A" or first_p not in ("srs_male",) else "女主呻吟/浪叫"
+            sb_lines.append(f"- 声音反馈: 全程{_moan}呼吸气声 + 肉体拍击 + 床品摩擦（overall_soundscape）")
         sb_lines.append("")
 
         prompt_lines.append(f"### SHOT-{i:02d} ({s['dur']}s | {frames_val}f | {s['size']} | {s['cam']} | {s['pose']} | LoRA={lora_w})")
@@ -596,9 +704,9 @@ def save_project_artifacts(out_dir, shots, actual_total, want_total, lines="",
             "negative_prompt": NEG,
             "duration": s["dur"],
             "frames": frames_val,
-            "aspect": "9:16",
-            "width": 928,
-            "height": 1664,
+            "aspect": normalize_aspect(aspect),
+            "width": res["width"],
+            "height": res["height"],
             "camera_motion": s["cam"],
             "shot_size": s["size"],
             "pose": s["pose"],
@@ -636,7 +744,9 @@ def save_project_artifacts(out_dir, shots, actual_total, want_total, lines="",
         "engine": "tunjing-baodian-v4.0",
         "workflow_template": "references/workflows/tunjing_v4_master_api.json",
         "project": os.path.basename(os.path.abspath(out_dir)),
-        "aspect": "9:16",
+        "aspect": normalize_aspect(aspect),
+        "width": res["width"],
+        "height": res["height"],
         "total_duration": actual_total,
         "total_frames": total_frames_sum,
         "exportedAt": now_iso,
@@ -727,6 +837,7 @@ def main():
     ap.add_argument("--idea", default="", help="剧情核心张力描述")
     ap.add_argument("--scene", default="卧室", help="场景名")
     ap.add_argument("--out-dir", default="", help="可选：一键将 分镜.md + 视频提示词.md + 批量任务.json 落盘至指定项目目录")
+    ap.add_argument("--aspect", default="9:16", help="画幅：9:16 竖屏(默认) / 16:9 横屏 / 1:1 方屏；决定景别/机位/运镜/分辨率整套构图语言")
     ap.add_argument("--table-only", action="store_true", help="只出拆镜表，不出提示词")
     ap.add_argument("--list-poses", action="store_true")
     args = ap.parse_args()
@@ -752,7 +863,8 @@ def main():
                     scene=args.scene, pose_names=pose_names, emit_prompts=False)
         save_project_artifacts(args.out_dir, shots, actual, args.total,
                                lines=args.lines, idea=args.idea,
-                               scene=args.scene, pose_names=pose_names)
+                               scene=args.scene, pose_names=pose_names,
+                               aspect=args.aspect)
     else:
         print_table(shots, actual, args.total, lines=args.lines, idea=args.idea,
                     scene=args.scene, pose_names=pose_names,

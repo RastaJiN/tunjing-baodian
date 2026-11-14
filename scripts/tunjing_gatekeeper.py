@@ -202,7 +202,28 @@ def audit_step_3(project_dir):
                            f"平均单镜 {avg:.1f}s，超过 8s 上限。"
                            f"2 分钟床戏应拆成 20~30 个 2~6s 短镜，严禁把多个体位压进一镜！")
         
-    return True, "分镜【拆镜密度 + 逐镜景别机位 + 纯血Ref2V单轨 + 音画咬合 + 换体位与3次交合微距】全量验收 PASS！允许进入提示词编译。"
+    # ── 肉戏骨架契约 (Sex Scene Skeleton Contract)：骨头里的公式，硬死锁 ──
+    # 只要本集含肉戏体位（非纯文戏调度），以下四条缺一即熔断，是「好肉戏」的结构完整性下限。
+    # 1) 每场肉戏 ≥1 次体位交换；2) 分镜 ≥3 次交合特写；3) 穿插男女主表情反馈反打；4) 全程呻吟/声音反馈。
+    sex_staging = {"env_establish", "blocking_2s", "prop_insert", "cut_insert", "spatial_shift", "outro_solo",
+                   "srs_male", "srs_female", "present_item"}
+    sex_poses = all_poses - sex_staging
+    if sex_poses:
+        # 1) 体位交换：肉戏姿势 ≥2 个（前面已有 len(all_poses)<2 拦截，这里对纯肉戏姿势再锁一次）
+        if len(sex_poses) < 2:
+            return False, (f"分镜门禁未通过：【肉戏公式·体位交换缺失】本集肉戏仅 {len(sex_poses)} 个体位 "
+                           f"({sorted(sex_poses)})，一场肉戏必须至少交换 1 次体位（≥2 个不同交合/口交/前戏姿势）！")
+        # 2) 交合特写 ≥3 次：前面 macro_matches<3 已拦，这里语义明确为肉戏公式
+        # 3) 表情反馈穿插：肉戏必须穿插正反打表情反打 (srs_female/srs_male 或 face 景别表情镜)
+        reaction_hits = re.findall(r'srs_female|srs_male|表情|面部特写|face', content, re.IGNORECASE)
+        if len(reaction_hits) < 2:
+            return False, "分镜门禁未通过：【肉戏公式·表情反馈缺失】肉戏必须穿插女主/男主的表情反馈反打（srs_female/srs_male 正反打或面部特写），不能全程只看交合处！"
+        # 4) 全程呻吟/声音反馈：肉戏声场必须含呻吟/浪叫/粗喘等声音反馈（audio/声场/呻吟标注）
+        moan_hits = re.findall(r'呻吟|浪叫|粗喘|喘息|娇喘|气声|audio|呻吟|声场|音效|overall_soundscape|soundscape', content, re.IGNORECASE)
+        if not moan_hits:
+            return False, "分镜门禁未通过：【肉戏公式·声音反馈缺失】肉戏全程必须有女主呻吟/浪叫或男主粗喘等声音反馈标注（声场/音效/呻吟），不能全程无声！"
+
+    return True, "分镜【拆镜密度 + 逐镜景别机位 + 纯血Ref2V单轨 + 音画咬合 + 换体位与3次交合微距 + 肉戏公式死锁】全量验收 PASS！允许进入提示词编译。"
 
 def audit_step_4(project_dir):
     """门禁 4：吞鲸标准六段式提示词结构与正向压油核验"""

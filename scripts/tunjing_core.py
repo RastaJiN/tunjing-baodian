@@ -376,7 +376,12 @@ def build_fullref_header(
     parts.append(f"Goal & Audio Contract: Generate a {dur:.2f}-second {aspect} live-action cinema video "
                  f"with readable physical biomechanics, locked identity consistency, and synchronized native audio.")
     parts.append("Audio rule: characters vocalize exclusively the exact words enclosed inside <d>...</d> tags; "
-                 "all other moments contain pure physical foley and natural breathing.")
+                 "all other moments contain pure physical foley and natural breathing. "
+                 "Never speak stage directions, pose names, camera moves, or any instruction aloud; "
+                 "only the dialogue inside <d> tags is spoken, everything else stays as unvoiced visual action.")
+    # H3 反念稿死锁：显式声明「提示词指令永不出声、只出声 <d> 内台词」，杜绝模型把 Goal/Camera/负向等工程文本念出来
+    parts.append("Voice discipline: <d> content is the sole spoken text; "
+                 "pose labels, intensity tags, and framing terms are never narrated, only enacted silently on screen.")
     parts.append("")
 
     # 2. Anchoring & subject_definitions
@@ -616,7 +621,7 @@ def single_shot_prompt(shot, index, total_shots, dur, size_desc, cam_desc,
                        male_desc="mature man anchored in <Picture 2>, preserving his exact masculine facial identity, hairstyle, skin tone, and muscular build",
                        scene_props="", prop_ref="", prop_desc="key physical item anchored in <Picture 4>, preserving its exact printed markings, shape, and surface texture",
                        emotion="default", voiceover=False, hold_last_second=False,
-                       tier="A_two_shot", has_audio_refs=True):
+                       tier="A_two_shot", has_audio_refs=True, aspect="9:16"):
     """
     吞鲸 v4.0 对外唯一装配接口：
     - 输出纯净正向送模提示词（不含 === NEGATIVE ===，杜绝正向反噬）
@@ -630,7 +635,7 @@ def single_shot_prompt(shot, index, total_shots, dur, size_desc, cam_desc,
 
     eff_prop = prop_ref or shot.get("prop_ref", "")
     header = build_fullref_header(
-        dur, "9:16", scene=scene, idea=idea, is_undress=is_undress,
+        dur, aspect, scene=scene, idea=idea, is_undress=is_undress,
         is_staging=is_staging, tier=tier, shot_size=shot_size,
         female_desc=female_desc, male_desc=male_desc, scene_props=scene_props,
         prop_ref=eff_prop, prop_desc=prop_desc,
@@ -651,6 +656,16 @@ def single_shot_prompt(shot, index, total_shots, dur, size_desc, cam_desc,
     parts.append("Overall Soundscape:")
     parts.append("overall_soundscape: " + build_soundscape_en(scene, is_staging=is_staging))
     parts.append("non_diegetic_music: N/A")
+    # H3 负向声明锚 [Negatives Avoid | Do Not Speak]：补充视觉约束语义，同时前置声明「这些是视觉约束、绝不出声不分词」
+    #   借鉴 h3keys v209——它把负向单独成段并加 never narrate 前缀，有效压掉「模型把负向/提示词原文念出来」的隐患。
+    #   注意：这里只放「反向注意力不敏感的约束语义」，不放字幕词根（NO SUBTITLES 等），也不混入正向正文。
+    parts.append("")
+    parts.append("[Visual Constraints | Do Not Speak]")
+    parts.append("(visual/audio guidance only; never voiced, never narrated)")
+    parts.append("- only one mouth speaks in any given second; non-speaking characters keep lips softly closed and natural")
+    parts.append("- clean full-bleed raw 35mm cinema frame with no on-screen overlays or UI elements")
+    parts.append("- same faces, body proportions, and identity across every beat; no identity drift, no extra limbs, no ghosting")
+    parts.append("- stable composition; cuts change framing and beat only, never identity or scene")
     return "\n".join(parts)
 
 
