@@ -39,6 +39,7 @@ REQUIRED_FILES = [
     "scripts/tunjing_storyboard.py",
     "scripts/tunjing_dialogue.py",
     "scripts/tunjing_pipeline.py",
+    "scripts/tunjing_pose_select.py",
     "scripts/tunjing_resolver.py",
     "scripts/tunjing_gatekeeper.py",
     "scripts/tunjing_compiler.py",

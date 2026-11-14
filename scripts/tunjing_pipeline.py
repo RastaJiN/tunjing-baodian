@@ -75,57 +75,35 @@ def main():
 
     from tunjing_core import load_poses, STAGING_IDS
     from tunjing_dialogue import DIALOGUE_SHOT_RECIPES, resolve_intent
+    from tunjing_pose_select import select_poses_with_staging, select_poses_from_script
     poses = load_poses()
 
-    # 提取剧本里提到的吞鲸体位 ID
-    found_ids = []
-    import re
-    for m in re.findall(r"\b([a-z][a-z_0-9]{1,28})\b", script_txt):
-        if m in poses:
-            found_ids.append(m)
+    # 场景自动识别体位（场景 → 姿势 → 体位提示词），绝不写死默认链
+    pose_ids, pose_source, intent = select_poses_with_staging(script_txt, args.scene)
 
-    # 自动识别文戏意图（按剧本里的情绪词）
-    intent_hits = []
-    for alias in ("对峙", "吵架", "争执", "质问", "施压", "争吵"):
-        if alias in script_txt:
-            intent_hits.append("confront"); break
-    for alias in ("摊牌", "揭露", "真相", "坦白", "揭穿"):
-        if alias in script_txt:
-            intent_hits.append("reveal"); break
-    for alias in ("崩溃", "大哭", "破防", "宣泄"):
-        if alias in script_txt:
-            intent_hits.append("breakdown"); break
-    for alias in ("挑逗", "暧昧", "勾引", "撩"):
-        if alias in script_txt:
-            intent_hits.append("tease"); break
-    if not intent_hits:
-        intent_hits.append("confront")
+    print(f"  识别到体位序列: {pose_ids}")
+    print(f"  识别来源: {pose_source} | 文戏意图: {intent} -> {DIALOGUE_SHOT_RECIPES[intent]['zh']}")
+    sex_pose_ids = [p for p in pose_ids if p not in STAGING_IDS]
+    if not sex_pose_ids:
+        print("[X] 剧本里没有识别到任何肉戏体位，且场景无法匹配。请监制明确告知本段肉戏意图。")
+        sys.exit(1)
 
-    print(f"  识别到剧本体位 ID: {found_ids if found_ids else '(剧本未显式写体位，用默认肉戏链)'}")
-    print(f"  识别到文戏意图: {intent_hits[0]} -> {DIALOGUE_SHOT_RECIPES[intent_hits[0]]['zh']}")
+    # 把识别出的体位写回剧本（场景 → 姿势 → 写进剧本 → 门禁可识别吞鲸 ID）
+    # 只追加一段「体位推进」，保留剧本原文不动；若剧本已有该段则跳过
+    if "吞鲸体位推进" not in script_txt:
+        pose_lines = ["## 吞鲸体位推进", "",
+                      "以下为本集按场景自动识别的吞鲸标准体位序列（供门禁与分镜引擎识别）：", ""]
+        for pid in sex_pose_ids:
+            p = poses.get(pid, {})
+            pose_lines.append(f"- `{pid}`：{p.get('nameZh', pid)}")
+        pose_lines.append("")
+        with open(script_file, "a", encoding="utf-8") as f:
+            f.write("\n" + "\n".join(pose_lines))
+        print(f"  已将 {len(sex_pose_ids)} 个体位写回剧本（吞鲸体位推进段落）：{','.join(sex_pose_ids)}")
 
-    # ── 2. 组装调度链：文戏原语 + 肉戏体位 ──
-    step_banner(2, "自动组装调度链（文戏镜头 + 肉戏体位）")
-    # 文戏开场原语（按意图映射）
-    intent_to_staging = {
-        "confront": ["env_establish", "srs_male", "srs_female"],
-        "reveal": ["env_establish", "blocking_2s", "srs_female"],
-        "breakdown": ["env_establish", "srs_female"],
-        "tease": ["env_establish", "blocking_2s"],
-    }
-    staging = intent_to_staging.get(intent_hits[0], ["env_establish", "srs_male", "srs_female"])
-
-    # 肉戏链：优先用剧本识别到的体位，否则默认完整肉戏
-    default_sex = ["undress", "kiss_fondle", "missionary", "srs_female", "doggy", "srs_male", "creampie"]
-    sex_chain = [p for p in found_ids if p not in STAGING_IDS] or default_sex
-
-    full_chain = staging + sex_chain
-    # 去相邻重复
-    dedup = []
-    for p in full_chain:
-        if not dedup or dedup[-1] != p:
-            dedup.append(p)
-    chain_str = ",".join(dedup)
+    # ── 2. 组装调度链：场景自动识别的体位序列 ──
+    step_banner(2, "自动组装调度链（场景识别体位）")
+    chain_str = ",".join(pose_ids)
     print(f"  完整调度链: {chain_str}")
 
     # ── 3. 拆镜 + 装提示词（调用 tunjing_scene.py） ──
