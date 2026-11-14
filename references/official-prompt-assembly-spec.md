@@ -29,9 +29,12 @@
 ### [1] Goal & Audio Contract（全肯定描述，零否定词）
 
 ```text
-Goal & Audio Contract: Generate a {dur:.2f}-second 9:16 live-action cinema video with readable physical biomechanics, locked identity consistency, and synchronized native audio.
-Audio rule: characters vocalize exclusively the exact words enclosed inside <d>...</d> tags; all other moments contain pure physical foley and natural breathing.
+Goal & Audio Contract: Generate a {dur:.2f}-second {aspect} live-action cinema video with readable physical biomechanics, locked identity consistency, and synchronized native audio.
+Audio rule: characters vocalize exclusively the exact words enclosed inside <d>...</d> tags; all other moments contain pure physical foley and natural breathing. Never speak stage directions, pose names, camera moves, or any instruction aloud; only the dialogue inside <d> tags is spoken, everything else stays as unvoiced visual action.
+Voice discipline: <d> content is the sole spoken text; pose labels, intensity tags, and framing terms are never narrated, only enacted silently on screen.
 ```
+
+> 注：`{aspect}` 为画幅参数（`9:16` 竖屏默认 / `16:9` 横屏 / `1:1` 方屏），由 `--aspect` 贯穿全链路，横屏时整套景别/机位/运镜语言同步切换（见铁律 10b）。反念稿两行（`Never speak stage directions` + `Voice discipline`）是对齐外部 H3 生态后的硬性新增，用于压掉「模型把 Goal/姿势名/机位/负向等工程文本当台词念出来」的隐患。
 
 ### [2] Anchoring & Consistency (`subject_definitions`)
 
@@ -86,7 +89,16 @@ SPEECH: From {t_mid_start:.2f}s to {t_mid_end:.2f}s, {golden_emotion_cue}, <Subj
 Overall Soundscape:
 overall_soundscape: Quiet room tone continues throughout. Rhythmic skin-on-skin collision slaps, viscous lubrication friction, heavy ragged breathing, and subtle {surf_sfx}.
 non_diegetic_music: N/A
+
+[Visual Constraints | Do Not Speak]
+(visual/audio guidance only; never voiced, never narrated)
+- only one mouth speaks in any given second; non-speaking characters keep lips softly closed and natural
+- clean full-bleed raw 35mm cinema frame with no on-screen overlays or UI elements
+- same faces, body proportions, and identity across every beat; no identity drift, no extra limbs, no ghosting
+- stable composition; cuts change framing and beat only, never identity or scene
 ```
+
+> 注：`[Visual Constraints | Do Not Speak]` 负向声明锚为对齐外部 H3 生态后的新增段，置于 footer 末尾。前置声明「这些是视觉约束、绝不出声不朗读」，既补视觉约束语义又压掉模型把它们念出来。**注意：此段只放反向注意力不敏感的约束语义，严禁放入 `NO SUBTITLES` / `no captions` 等字幕词根（会诱发字幕烫印）**。
 
 ---
 
