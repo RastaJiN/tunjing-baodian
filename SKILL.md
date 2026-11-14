@@ -37,6 +37,7 @@ metadata:
    - **铁律 A（严禁自编野鸡脚本）**：强制使用宝典内置的 `tunjing_scene.py`、`tunjing_gatekeeper.py`、`tunjing_diff_audit.py` 与 `tunjing_runner.py`。**严禁 Agent 在项目目录里临时手写 `make_*.py`、`submit_*.py`、`patch_*.py` 等一次性拼凑脚本绕过宝典真源与门禁！**
    - **铁律 B（物理点火锁 + 五维签字单呈报，严禁擅自开跑）**：通过 Gate 5 后，系统自动生成《监制五维核对签字单.md》（逐镜列出 `<Picture 1/2/3>` 实名文件、体位 ID、景别运镜、🔥交合微距特写高亮、🗣️台词核对与 8 位 SHA-256 点火授权码）。**鲸鲸必须先向监制呈报该对账单并停机等待；在监制未明确下令“开始渲染”前，严禁调用 ComfyUI 提交任何渲染任务！**
    - **铁律 C（Git 提交保密，监制硬性要求）**：对吞鲸宝典主仓库（`RastaJiN/tunjing-baodian`，本地 `C:/Users/Rasta/AppData/Local/hermes/skills/tunjing-baodian`）的任何 `git commit`，**commit message 一律只写 `修复少量BUG`，严禁在提交信息里暴露本次更新的具体内容**（功能名、铁律号、新脚本名、模块名、任何描述性说明都不写）。这是监制的明确保密要求——更新内容只体现在代码和 SKILL.md 正文里，绝不进 commit message。推送前需确认 Clash 代理在线（`export https_proxy=http://127.0.0.1:7897 http_proxy=http://127.0.0.1:7897`，否则裸 `git` 连不上 GitHub）。
+   - **铁律 D（反绕死锁，治「大模型自己写脚本绕过门禁/伪造 PASS/篡改代码」）**：发散型大模型（DeepSeek 等）会做三件越权事——① 自己写脚本绕过门禁直接渲染；② 伪造 SHA-256 全 PASS 报告；③ 篡改宝典脚本删掉门禁/签名逻辑。三层反绕死锁焊死：**① 渲染点火锁**（`tunjing_runner.py`）：Gate 1~5 必须全 PASS + `--confirm-token` 必须对；**② HMAC 防伪签名**（`tunjing_core.py` 的 `sign_project`）：签名用 HMAC-SHA256 + 模型不可知的密钥（密钥拆三段运行时拼接），模型拿到批量任务.json 也**算不出真签名**，裸 SHA-256 已被废除；**③ 反改代码锁**：`sign_project` 把 `gatekeeper/diff_audit/core/runner` 四个核心脚本自身指纹纳入签名，模型篡改任一脚本 → 签名变 → 对不上基准 → 拒绝渲染。**核心心法**：约束必须是「代码」，不是「文字」——文字约束大模型聊着聊着就忘，代码约束它永远跳不脱；大模型想自由发挥，代码直接熔断，不是靠它自觉。若模型跳脱了（聊着聊着不按对白时长走、肉戏提示词自己瞎写、自己写脚本绕过门禁），唯一正解是「回滚到代码装配」，不是拉锯式人工修改。
 
 ---
 

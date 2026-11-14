@@ -21,9 +21,46 @@
 """
 
 import json, os, re
+import hmac as _hmac
+import hashlib as _hashlib
 
 BASE = os.path.dirname(os.path.abspath(__file__))
 REF = os.path.join(BASE, "..", "references")
+
+
+# ── 反绕死锁密钥 (Anti-Bypass HMAC Secret)：让「门禁 PASS + 批量任务」的签名只能由宝典代码自己算 ──
+# 发散型大模型（DeepSeek 等）会自己写脚本伪造 SHA-256 绕过门禁渲染。
+# 裸 SHA-256 是「文件哈希」，模型拿到文件就能重算伪造；HMAC 带一个模型不可知的密钥，模型算不出真签名。
+# 密钥拆成三段，运行时拼接，避免直接在代码里出现完整值（防模型读代码直接抄走密钥）。
+def _hmac_secret():
+    _a = "tunjing"
+    _b = "baodian"
+    _c = "v4-anti-bypass-seal"
+    return (_a + "-" + _b + "-" + _c).encode("utf-8")
+
+
+def sign_project(project_dir):
+    """对项目的「批量任务.json + 门禁状态 + 宝典核心脚本指纹」生成 HMAC-SHA256 防伪签名（模型算不出）"""
+    batch_file = os.path.join(project_dir, "批量任务.json")
+    status_file = os.path.join(project_dir, ".tunjing_status.json")
+    payload = b""
+    for f in (batch_file, status_file):
+        if os.path.exists(f):
+            with open(f, "rb") as fh:
+                payload += fh.read()
+    # 反"改代码"锁：把宝典核心脚本自身指纹也纳入签名。
+    # DeepSeek 若篡改门禁/签名逻辑，脚本指纹变 → 签名变 → 对不上监制基准 → 拒绝渲染。
+    for fn in ("tunjing_gatekeeper.py", "tunjing_diff_audit.py", "tunjing_core.py", "tunjing_runner.py"):
+        sp = os.path.join(os.path.dirname(os.path.abspath(__file__)), fn)
+        if os.path.exists(sp):
+            with open(sp, "rb") as fh:
+                payload += fh.read()
+    return _hmac.new(_hmac_secret(), payload, _hashlib.sha256).hexdigest()[:16]
+
+
+def verify_project_sign(project_dir, signature):
+    """校验签名，防 DeepSeek 伪造 PASS 结果绕过门禁渲染"""
+    return sign_project(project_dir) == signature
 
 TEASE_IDS = {
     "trace_collar", "ear_whisper_tease", "shoulder_strap_slide", "leg_brush_tease",

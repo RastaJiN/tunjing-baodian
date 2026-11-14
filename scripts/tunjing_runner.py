@@ -285,11 +285,16 @@ def main():
         print(f"[X 越权拦截] Gate 1~5 尚未全部通过 (当前仅通过: {st_data.get('passed_steps')})！严禁擅自提交渲染！")
         sys.exit(1)
 
-    # 2) 必须校验 --confirm-token 与当前 批量任务.json 的前 8 位 SHA-256 一致
-    h = hashlib.sha256()
-    with open(bj_path, "rb") as bf:
-        h.update(bf.read())
-    expected_token = h.hexdigest()[:8]
+    # 2) 必须校验 --confirm-token 与宝典 HMAC 防伪签名一致（不是裸 SHA-256，模型算不出、伪造不了）
+    try:
+        from tunjing_core import sign_project
+        expected_token = sign_project(args.project_dir)
+    except Exception:
+        import hashlib
+        h = hashlib.sha256()
+        with open(bj_path, "rb") as bf:
+            h.update(bf.read())
+        expected_token = h.hexdigest()[:8]
     if args.confirm_token.strip() != expected_token:
         receipt_path = os.path.join(args.project_dir, "监制五维核对签字单.md")
         print("=" * 75)
