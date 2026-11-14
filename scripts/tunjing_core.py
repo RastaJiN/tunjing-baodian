@@ -492,6 +492,16 @@ def format_segmented_camera_en(cam_desc, dur):
     return f"0.00s to 1.00s holds steady locking the initial posture, then from 1.00s to {t_move_end:.2f}s {cam_desc}, holding steady for the final 0.80s"
 
 
+def _dialogue_blocking(shot):
+    """为文戏原语生成站位描述（隔桌/隔门/贴墙/并排），返回 (类型, 英文站位描述)"""
+    try:
+        from tunjing_dialogue import build_blocking_lock
+    except ImportError:
+        return "隔桌", "both characters face each other across a table positioned between them"
+    scene_hint = " ".join(str(shot.get(k, "")) for k in ("text", "text_en", "pose_zh", "handoff"))
+    return build_blocking_lock(scene_hint, "")
+
+
 def build_shot_description(shot, index, total_shots, dur, size_desc, cam_desc,
                            lines="", speaker="女子A", scene="hotel suite",
                            emotion="default", voiceover=False, hold_last_second=False):
@@ -534,11 +544,20 @@ def build_shot_description(shot, index, total_shots, dur, size_desc, cam_desc,
         comp_lock = (f"COMPOSITION LOCK: Extreme macro framing cropped tightly on the hand and surface contact area,{prop_anchor_clause} "
                      "with 20% shallow depth-of-field background anchored in <Picture 3>. ")
     elif first_p == "srs_male":
+        # 文戏男方正打：带站位 + 视线互补，不写肉戏交合
+        blocking_type, blocking_en = _dialogue_blocking(shot)
         comp_lock = ("COMPOSITION LOCK: Tight single-subject focus cropped from chest to head on <Subject 2> positioned on the left side of the frame, "
-                     "gazing downward at a 12-degree angle toward the right foreground against <Picture 3> background. ")
+                     "gazing downward at a 12-degree angle toward the right foreground against <Picture 3> background. "
+                     f"Staging: {blocking_en}. ")
     elif first_p == "srs_female":
+        blocking_type, blocking_en = _dialogue_blocking(shot)
         comp_lock = ("COMPOSITION LOCK: Tight single-subject reaction cropped from collarbones to head on <Subject 1> positioned on the right side of the frame, "
-                     "gazing upward at a 12-degree angle toward the left foreground against <Picture 3> support surface. ")
+                     "gazing upward at a 12-degree angle toward the left foreground against <Picture 3> support surface. "
+                     f"Staging: {blocking_en}. ")
+    elif first_p == "blocking_2s":
+        blocking_type, blocking_en = _dialogue_blocking(shot)
+        comp_lock = ("COMPOSITION LOCK: Two-shot framing both characters establishing their relative positions and power dynamic. "
+                     f"Staging: {blocking_en}. ")
     elif shot.get("size") in ("hip", "macro") and is_penetration and (not lines or effective_vo):
         comp_lock = ("COMPOSITION LOCK: Low-angle pelvic framing cropped tightly from waist to mid-thigh, "
                      "containing exclusively the lower torso, joined hips, and rhythmic pelvic collision against <Picture 3> surface. ")

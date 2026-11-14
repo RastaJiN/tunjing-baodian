@@ -107,6 +107,65 @@ def recipe_for(intent):
     return key, r
 
 
+# ── 文戏站位库 (Blocking Library)：解决「模型不知道人物站位」的根本症结 ──
+# 每场文戏必须有「场景站位」：固定锚点 + 人物相对位置 + 轴线 + 摄影机工作侧 + 屏幕方向。
+# 这是 drama-skills blocking-playbooks 的核心，宝典此前缺失，导致文戏人物乱站、对视错位、过肩拍反。
+
+# 场景站位模板：按「对峙双方的相对关系」生成站位描述
+BLOCKING_ANCHORS = {
+    # 隔桌/隔物对峙：两人之间有承托面
+    "隔桌": {
+        "anchor": "两人隔着一张{surface}相对，{surface}在两人之间",
+        "screen": "机位在{surface}一侧时，施压方在画面右，承受方在画面左",
+    },
+    "隔门": {
+        "anchor": "一人站在门口，另一人站在房内，隔着门框相对",
+        "screen": "机位在门内时，门口的人在画面中景，房内的人在画面前景",
+    },
+    "贴墙": {
+        "anchor": "一人背贴墙壁，另一人逼近到身前，把对方困在墙与门之间",
+        "screen": "贴墙的人在画面深处靠墙，逼近的人在画面前景",
+    },
+    "并排": {
+        "anchor": "两人并排站立，面向同一方向，中间保持一臂距离",
+        "screen": "机位侧拍时，两人左右并排在画面中横排",
+    },
+}
+
+# 文戏站位 → 英文送模描述（COMPOSITION LOCK 用）
+BLOCKING_EN = {
+    "隔桌": "both characters face each other across a {surface} positioned between them, the {surface} anchoring the distance and the power dynamic",
+    "隔门": "one character stands in the doorway while the other stands inside the room, the door frame separating foreground from mid-ground",
+    "贴墙": "one character's back is pinned against the wall while the other advances into their personal space against <Picture 3>",
+    "并排": "both characters stand side by side facing the same direction, an arm's length apart, framing them as a horizontal two-shot",
+}
+
+
+# 站位 surface 中文 → 英文（送入提示词必须纯英文，防字幕烫印）
+SURFACE_EN = {"桌": "table", "门框": "door frame", "墙": "wall", "": "surface"}
+
+
+def resolve_blocking(scene_text, lines_text):
+    """自动识别文戏站位类型：隔桌/隔门/贴墙/并排"""
+    t = (scene_text or "") + " " + (lines_text or "")
+    if any(k in t for k in ("桌", "办公桌", "柜台", "吧台", "茶几", "table", "desk")):
+        return "隔桌", "table"
+    if any(k in t for k in ("门口", "门", "走廊", "玄关", "door")):
+        return "隔门", "door frame"
+    if any(k in t for k in ("壁咚", "墙", "贴墙", "靠墙", "wall")):
+        return "贴墙", "wall"
+    if any(k in t for k in ("并排", "并肩", "一起看", "一起走")):
+        return "并排", ""
+    return "隔桌", "table"
+
+
+def build_blocking_lock(scene_text, lines_text):
+    """生成文戏站位的 COMPOSITION LOCK 英文描述"""
+    btype, surface = resolve_blocking(scene_text, lines_text)
+    en = BLOCKING_EN.get(btype, BLOCKING_EN["隔桌"]).format(surface=surface or "table")
+    return btype, en
+
+
 def list_intents():
     """列出全部文戏意图配方，供模型/用户查阅"""
     return DIALOGUE_SHOT_RECIPES
