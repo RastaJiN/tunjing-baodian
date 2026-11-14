@@ -203,25 +203,19 @@ def audit_step_3(project_dir):
                        f"但仅 {cam_hits} 处机位标注。逐镜必须标明机位"
                        f"（static_side/static_rear/low_hip/ots/high_angle 等）！")
 
-    # 镜头密度：从时长反推，平均单镜不得超过 8 秒（硬件上限，仅限画面动作镜）
-    # 含 <d> 台词的对白镜不受 8s 上限约束（其时长由台词驱动，前文已做台词时长咬合检查）；
-    # 只统计「无对白的纯画面/动作镜」的平均时长，防肉戏短镜被塞成 10s+ 长镜。
+    # 镜头时长硬边界：单镜不得超过机器 12s 上限（H3 物理上限），节奏呼吸由引擎 allocate_exact_h3_frames 负责
+    # 门禁不卡「平均时长」，只卡「单镜超 12s 机器上限」这一条硬边界，防止某镜被塞爆
     shot_blocks_d = re.split(r'###?\s*SHOT-|\n\[SHOT-', content)
-    action_durations = []
+    over_limit = []
     for blk in shot_blocks_d[1:]:
-        if '<d>' in blk:
-            continue  # 带台词的对白镜，时长由台词决定，不参与 8s 硬上限
         dm = re.search(r'(\d+\.?\d*)\s*(?:秒|s)\b', blk, re.IGNORECASE)
         if dm:
             dv = float(dm.group(1))
-            if dv <= 30:
-                action_durations.append(dv)
-    if action_durations:
-        avg = sum(action_durations) / len(action_durations)
-        if avg > 8.0:
-            return False, (f"分镜门禁未通过：【镜头过长，违反硬件上限】！"
-                           f"无对白动作镜平均 {avg:.1f}s，超过 8s 上限。"
-                           f"2 分钟肉戏应拆成 20~30 个 2~6s 短镜，严禁把多个体位压进一镜！")
+            if dv > 12.5:
+                over_limit.append(dv)
+    if over_limit:
+        return False, (f"分镜门禁未通过：【单镜超机器上限】检测到 {len(over_limit)} 镜超过 12s 机器物理上限 "
+                       f"（{sorted(over_limit)[:3]}...），H3 单镜最长约 12 秒，超长的镜头必须拆开！")
         
     # ── 肉戏骨架契约 (Sex Scene Skeleton Contract)：骨头里的公式，硬死锁 ──
     # 只要本集含肉戏体位（非纯文戏调度），以下四条缺一即熔断，是「好肉戏」的结构完整性下限。

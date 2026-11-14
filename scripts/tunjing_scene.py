@@ -304,33 +304,50 @@ def allocate_exact_h3_frames(shots, want_total_sec):
     # 计算总阶数 K_total，使 5 * n_shots + 17 * K_total 最接近 target_raw_frames
     k_total = max(n_shots * 2, round((target_raw_frames - 5 * n_shots) / 17.0))
 
-    # 心电图呼吸节拍权重（短 1.63s/k=2 标点微距 ⇄ 中 3.75s~4.46s 反应/过渡 ⇄ 长 5.17s~6.58s 主力发力/长台词）
-    ecg_wave = [0.82, 1.15, 0.95, 1.32, 0.72, 1.22, 1.05]
-    weights = []
+    # 心电图呼吸节拍：按镜头「戏剧职责」直定目标 k 值，不用「权重×总k」的均摊法（会稀释呼吸幅度）
+    # k 档位对应帧长 f=5+17k: k=2→39f≈1.63s 短标点 / k=5→90f≈3.75s 过渡 / k=7→124f≈5.17s 反应
+    #                           k=10→175f≈7.29s 发力 / k=13→226f≈9.42s 长发力 / k=17→294f≈12.25s 满上限
+    ks_by_duty = []
     for idx_s, s in enumerate(shots):
         pid = s.get("pose", "")
         sz = s.get("size", "")
-        if pid in ("cut_insert", "prop_insert") or (sz == "macro" and pid in STAGING_IDS):
-            weights.append(0.38)  # 1.625s (39f) 生理阻断短促标点
+        if pid in ("cut_insert", "prop_insert"):
+            ks_by_duty.append(2)         # 1.63s 生理阻断短促标点（死锁最短，不让均摊拉长）
+        elif (sz == "macro" and pid in STAGING_IDS):
+            ks_by_duty.append(3)         # 2.33s 极短标志
         elif s.get("type") == "transition":
-            weights.append(0.68)  # ~3.75s (90f) 换体位过渡
+            ks_by_duty.append(5)         # 3.75s 换体位过渡
         elif sz in ("face", "cu") or pid in ("srs_male", "srs_female"):
-            weights.append(ecg_wave[idx_s % len(ecg_wave)])
+            # 反应/正反打：短-中档，按心电图波浪交替 5~7
+            ks_by_duty.append(5 + (idx_s % 3))   # 5~7 → 3.75s~5.17s
         else:
-            weights.append(ecg_wave[(idx_s + 1) % len(ecg_wave)] * 1.12)
+            # 主力交合/发力/前戏：中长档，允许长发力，按波浪 8~13
+            ks_by_duty.append(8 + (idx_s % 6))   # 8~13 → 7.29s~9.42s，峰值可到 12s
 
-    w_sum = sum(weights)
-    ks = [max(2, min(10, round(k_total * (w / w_sum)))) for w in weights]
+    # 把目标 k 收敛到总阶数（缩放整体，但保持短标点仍是相对最短、长发力仍是相对最长）
+    ks = ks_by_duty
+    # 先算比例再缩放，保证短标点不被稀释
+    total_k_need = sum(ks)
+    if total_k_need > 0:
+        scale = k_total / total_k_need
+        ks = []
+        for k in ks_by_duty:
+            if k <= 3:
+                ks.append(k)                     # 短标点死不缩放，保持 1.6~2.3s
+            else:
+                ks.append(max(4, min(17, round(k * scale))))
+    # 兜底：确保至少 k≥2
+    ks = [max(2, k) for k in ks]
 
-    # 打破连续 3 镜同帧长（严禁平铺一刀切 175f/7.29s）
+    # 打破连续 3 镜同帧长（严禁平铺一刀切，保持心电图呼吸）
     for i in range(2, n_shots):
         if ks[i] == ks[i - 1] == ks[i - 2]:
-            if ks[i - 1] > 2 and ks[i] < 10:
+            if ks[i - 1] > 2 and ks[i] < 17:
                 ks[i - 1] -= 1
                 ks[i] += 1
             elif ks[i] > 3:
                 ks[i] -= 1
-                ks[i - 2] = min(10, ks[i - 2] + 1)
+                ks[i - 2] = min(17, ks[i - 2] + 1)
 
     # 精确配平差值到 K_total
     diff = k_total - sum(ks)
@@ -340,7 +357,7 @@ def allocate_exact_h3_frames(shots, want_total_sec):
         guard += 1
         i = idx % n_shots
         idx += 1
-        if diff > 0 and ks[i] < 10:
+        if diff > 0 and ks[i] < 17:
             # 避免制造三连同长
             nxt_k = ks[i] + 1
             if i >= 2 and ks[i - 1] == nxt_k and ks[i - 2] == nxt_k and guard < 1500:
