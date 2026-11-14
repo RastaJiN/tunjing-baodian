@@ -116,7 +116,17 @@ def select_poses_from_script(script_text, scene_text=""):
                 dedup.append(p)
         return dedup, "剧本显式体位词"
 
-    # 2) 剧本没写体位词 → 按场景承托面匹配
+    # 2) 剧本没写体位词 → 先判断「有没有肉戏信号」，再决定是否按场景匹配
+    #    肉戏信号：脱衣/上床/交合/做爱/沦陷/缠绵/亲密/肌肤/呻吟等暗示
+    #    纯文戏（只有对峙/谈判/对话）没有肉戏信号时，绝不强行塞肉戏体位。
+    SEX_SIGNAL_WORDS = ("脱衣", "上床", "交合", "做爱", "沦陷", "缠绵", "亲密", "肌肤",
+                        "呻吟", "浪叫", "插入", "云雨", "翻云覆雨", "共度", "肉体", "欲",
+                        "吻", "揉", "舔", "骑", "插", "射", "高潮", "结合", "温存")
+    has_sex_signal = any(w in (txt + scene_text) for w in SEX_SIGNAL_WORDS)
+    if not has_sex_signal:
+        # 纯文戏：不塞肉戏体位，只保留文戏原语
+        return [], "纯文戏（无肉戏信号，不匹配肉戏体位）"
+
     scene_key = detect_scene_key(scene_text or txt)
     scene_poses = SCENE_POSE_MAP.get(scene_key, SCENE_POSE_MAP["床"])
     # 只保留真实存在的体位

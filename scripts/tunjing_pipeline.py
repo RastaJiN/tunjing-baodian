@@ -85,21 +85,25 @@ def main():
     print(f"  识别来源: {pose_source} | 文戏意图: {intent} -> {DIALOGUE_SHOT_RECIPES[intent]['zh']}")
     sex_pose_ids = [p for p in pose_ids if p not in STAGING_IDS]
     if not sex_pose_ids:
-        print("[X] 剧本里没有识别到任何肉戏体位，且场景无法匹配。请监制明确告知本段肉戏意图。")
-        sys.exit(1)
+        # 纯文戏剧集（无肉戏信号），合法，继续跑文戏链，不塞肉戏、不退出
+        print("  [纯文戏] 剧本无肉戏信号，仅编排文戏镜头，不强行塞肉戏体位。")
 
-    # 把识别出的体位写回剧本（场景 → 姿势 → 写进剧本 → 门禁可识别吞鲸 ID）
-    # 只追加一段「体位推进」，保留剧本原文不动；若剧本已有该段则跳过
+    # 把识别出的调度链写回剧本（场景 → 文戏原语/体位 → 写进剧本 → 门禁可识别吞鲸 ID）
+    # 纯文戏写文戏原语，含肉戏写体位 + 文戏原语；保留剧本原文不动
     if "吞鲸体位推进" not in script_txt:
+        # 写回时按顺序写全部调度链（文戏原语 + 肉戏体位），确保 Gate 2 能认到
         pose_lines = ["## 吞鲸体位推进", "",
-                      "以下为本集按场景自动识别的吞鲸标准体位序列（供门禁与分镜引擎识别）：", ""]
-        for pid in sex_pose_ids:
+                      "以下为本集按场景自动识别的吞鲸标准调度序列（供门禁与分镜引擎识别）：", ""]
+        for pid in pose_ids:
             p = poses.get(pid, {})
             pose_lines.append(f"- `{pid}`：{p.get('nameZh', pid)}")
         pose_lines.append("")
         with open(script_file, "a", encoding="utf-8") as f:
             f.write("\n" + "\n".join(pose_lines))
-        print(f"  已将 {len(sex_pose_ids)} 个体位写回剧本（吞鲸体位推进段落）：{','.join(sex_pose_ids)}")
+        # 重新读剧本（已含写入的调度链），供后续使用
+        with open(script_file, "r", encoding="utf-8") as f:
+            script_txt = f.read()
+        print(f"  已将 {len(pose_ids)} 个调度项写回剧本（吞鲸调度链段落）：{','.join(pose_ids)}")
 
     # ── 2. 组装调度链：场景自动识别的体位序列 ──
     step_banner(2, "自动组装调度链（场景识别体位）")
