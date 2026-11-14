@@ -111,6 +111,29 @@ EMOTION_ZH_ALIAS = {
     "余波": "aftermath", "消散": "aftermath",
 }
 
+# ── 身体决断动作库 (Body Beat Actions)：治站桩木讷的核心，让身体跟着情绪演，不只脸动 ──
+# 每个情绪配一套「身体外显动作」，角色不只面部有戏，重心/肩线/手指/步伐/物件都要动。
+# 这是从 drama-skills「构造可见的表演变化」内化：目光/呼吸/身体决断三通道，禁止只写情绪词。
+EMOTION_BODY_ACTIONS = {
+    "anger_rage":   "weight shifting forward onto the balls of the feet, shoulders squared and chest thrusting slightly out, one hand balling into a fist at the side with knuckles whitening",
+    "cold_wrath":   "body going rigidly still, chin lowering a fraction as the gaze hardens, hands dropping to the sides with fingers curling slowly inward",
+    "grief_sorrow": "shoulders collapsing inward as the chest sinks, one hand rising to press over the mouth, the other arm hugging across the torso",
+    "humiliated_tears": "head bowing slightly as the spine curls, shoulders shaking in tiny pulses, hands twisting together at waist height",
+    "triumph_smirk": "chin tilting up as the posture straightens, weight settling back onto the rear foot, one hand resting loosely on the hip",
+    "warm_joy":     "posture opening up as the shoulders relax downward, head tilting a few degrees, hands unclenching and rising in a natural open gesture",
+    "fear_panic":   "upper body recoiling back a step, palms rising defensively in front of the chest, shoulders hunching to protect the neck",
+    "jealousy_spite": "body turning obliquely away while the head stays fixed, arms crossing tightly over the chest, one foot pivoting outward as if about to leave",
+    "mockery":      "body leaning back with one eyebrow area relaxing, weight slouching onto one leg, a hand flipping dismissively at the wrist",
+    "provocation":  "body leaning forward into the other's space, one finger rising to point or tap, hips cocking to one side, chin jutting up",
+    "forbearance":  "jaw locking as the throat bobs once, hands pressing flat against a surface or clasping behind the back, feet planted in a wide brace",
+    "ecstasy":      "spine arching back, head thrown, fingers clawing at the support surface or the partner's back, hips bucking in bucking rhythm",
+    "inhibition":   "body drawing back a fraction, one hand rising to touch the collarbone or hold the other arm, feet retreating half a step",
+    "surge":        "body snapping forward into sudden motion, hands leaving their rest position, weight driving onto the front foot",
+    "aftermath":    "body going slack as the tension drains, shoulders dropping, arms falling heavy to the sides, gaze going soft and unfocused",
+    "submission":   "body lowering slightly, chin tucking, hands folding in the lap or hanging limply, shoulders angled submissively away",
+    "default":      "subtle weight shift between the feet, shoulders settling, hands finding a natural rest, chest rising with a measured breath",
+}
+
 # 去AI味翻译腔黑名单（用于门禁与顾问自动拦截书面化/翻译腔废话台词）
 AI_CLICHE_PATTERNS = [
     r"你怎么能如此",
@@ -320,6 +343,25 @@ def with_scene_surface(act_text, scene_name):
     for pat, repl in reps_en:
         out = re.sub(pat, repl, out, flags=re.IGNORECASE)
     return out
+
+
+def wrap_action_arc(action_text):
+    """
+    起点-变化-终点动作链包装器（治站桩的最后一块）：
+    把体位 beats 的"动作"包成「起点姿态 → 因果动作 → 终点落定」，
+    让模型知道角色从哪起、怎么动、停在哪，而不是没头没尾地站桩。
+    用相对时序（不按秒卡点），交给模型自然呼吸。
+    """
+    if not action_text:
+        return action_text
+    t = str(action_text).strip()
+    if not t:
+        return t
+    # 已有起点语义则不再重复包装
+    if "From 0.00s" in t or "starting" in t.lower():
+        return t
+    return (f"Starting from a held starting posture, {t}; "
+            f"the movement settles into a clear held end-state with weight fully transferred and hands finding their finish position")
 
 
 def build_soundscape_en(scene_name, is_staging=False):
@@ -603,11 +645,21 @@ def build_shot_description(shot, index, total_shots, dur, size_desc, cam_desc,
 
     raw_action = shot.get("text_en") or shot.get("text") or ""
     adapted_action = sanitize_positive_only(with_scene_surface(raw_action, scene))
+    # 起点-变化-终点动作链（治站桩：动作必须有头有尾，不是没头没尾的体位拍）
+    adapted_action = wrap_action_arc(adapted_action)
 
     emo_key_body = resolve_emotion_key(emotion, lines, fallback="default")
     emo_cue_extra = ""
-    if not lines and (shot.get("size") in ("face", "cu") or first_p in ("srs_male", "srs_female", "blocking_2s", "outro_solo")):
-        emo_cue_extra = f" Facial performance: {EMOTION_MUSCLE_CUES.get(emo_key_body, EMOTION_MUSCLE_CUES['default'])}."
+    body_action = EMOTION_BODY_ACTIONS.get(emo_key_body, EMOTION_BODY_ACTIONS["default"])
+    # 面部表情 + 身体决断动作双通道（治站桩木讷：脸和身一起演，不只脸动）
+    # 有台词无台词都要加——有台词时角色边说话边演，更需要身体动作
+    if shot.get("size") in ("face", "cu") or first_p in ("srs_male", "srs_female", "blocking_2s", "outro_solo"):
+        emo_cue_extra = (f" Facial performance: {EMOTION_MUSCLE_CUES.get(emo_key_body, EMOTION_MUSCLE_CUES['default'])} "
+                         f"Body action: {body_action}.")
+    # 肉戏高潮/泄洪镜也强制加身体表演（不是你之前要的"肉戏要表演、要反馈，不是单纯抽插"）
+    elif first_p in FINISH_IDS or is_penetration:
+        emo_cue_extra = (f" Facial performance: {EMOTION_MUSCLE_CUES.get(emo_key_body, EMOTION_MUSCLE_CUES['default'])} "
+                         f"Body action: {body_action}.")
     body_text = f"{comp_lock}{at_str}{adapted_action}.{emo_cue_extra}"
     if any(k in pid for k in ("kiss", "kiss_fondle", "kiss_pin", "kiss_force", "kiss_her")):
         body_text += " (Anatomical lock: lips gently parted 5 mm with subtle contact and natural lip geometry; his left hand is the single hand in frame)."
