@@ -37,9 +37,36 @@ def step_banner(n, title):
     print("=" * 70)
 
 
+def entry_selfcheck():
+    """
+    入口自检：判断当前处在「创作/擦屁股/继续」哪个入口，给出选择题回应。
+    返回 (入口类型, 判断结果说明)
+    """
+    # 自检：当前工作目录 / 常见位置有没有剧本
+    checks = []
+    cwd = os.getcwd()
+    for d in (cwd,):
+        for fn in ("剧本.md", "EP001/剧本.md", "剧集/EP001/剧本.md"):
+            p = os.path.join(d, fn)
+            if os.path.exists(p):
+                checks.append(p)
+    if checks:
+        script = checks[0]
+        # 快速判断剧本是否"合格"（有没有幕次结构 + 是否是散装/废稿）
+        with open(script, encoding="utf-8") as f:
+            txt = f.read()
+        has_act = ("第一幕" in txt or "第二幕" in txt or "## " in txt)
+        has_d = "<d>" in txt or "：" in txt
+        if has_act and has_d:
+            return "continue", f"已有合格剧本 {script}，可继续走 分镜→提示词→门禁→渲染"
+        else:
+            return "fix", f"有剧本但残缺（{script} 缺幕次结构或台词标签），是擦屁股材料，先诊断再改编"
+    return "create", "没有找到剧本，是从零创作，先定题材+冲突原型+画幅再写剧本"
+
+
 def main():
     ap = argparse.ArgumentParser(description="吞鲸宝典端到端自动流水线（One-Shot Auto-Pipeline）")
-    ap.add_argument("script", help="剧本.md 文件路径（或项目目录）")
+    ap.add_argument("script", nargs="?", default="", help="剧本.md 文件路径（或项目目录）；不填则自检入口并提示")
     ap.add_argument("--aspect", default="9:16", help="画幅 9:16/16:9/1:1，默认竖屏")
     ap.add_argument("--total", type=float, default=240.0, help="全集目标时长秒")
     ap.add_argument("--scene", default="酒店客房", help="主场景名")
@@ -48,7 +75,32 @@ def main():
     ap.add_argument("--dry", action="store_true", help="只跑到分镜+提示词落地，不渲染")
     args = ap.parse_args()
 
-    # ── 0. 确定项目目录 ──
+    # ── 0. 入口自检（不填 script 时，自动判断入口并给选择题，不直接报错）──
+    if not args.script:
+        kind, msg = entry_selfcheck()
+        print("🐳 吞鲸宝典 · 入口自检")
+        print(f"   [判断] {msg}")
+        print()
+        if kind == "continue":
+            print("   [选择题] 剧本已就绪，下一步怎么走？")
+            print("     A. 继续跑完整流水线（分镜→提示词→门禁→渲染）")
+            print("     B. 先只出分镜和提示词给我审，先不渲染")
+            print("     C. 先诊断升维，看能不能更精彩再跑")
+        elif kind == "fix":
+            print("   [选择题] 这是要擦屁股的材料，怎么处理？")
+            print("     A. 先诊断哪里烂（tunjing_advisor.py），列出问题再决定改法")
+            print("     B. 直接按冲突发动机改编（tunjing_drama.py 先定冲突原型）")
+            print("     C. 我先说明要什么样的剧，你帮我重写剧本")
+        else:
+            print("   [选择题] 从零创作，请先回答三个方向：")
+            print("     A. 题材是什么？（人妻/交换/绿帽/偷窥/不伦/正经情感/悬疑...）")
+            print("     B. 冲突原型选哪个？（夺物/揭密/逼选/摊牌/破防）")
+            print("     C. 画幅横屏还是竖屏？")
+        print()
+        print("   （监制拍板后，鲸鲸按所选方向继续。带剧本重跑：python tunjing_pipeline.py '<剧本路径>'）")
+        return
+
+    # ── 确定项目目录 ──
     if os.path.isdir(args.script):
         project_dir = os.path.abspath(args.script)
         script_file = os.path.join(project_dir, "剧本.md")
